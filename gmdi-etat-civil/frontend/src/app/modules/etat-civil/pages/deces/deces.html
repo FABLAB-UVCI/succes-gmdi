@@ -1,0 +1,72 @@
+<div>
+  @if (showToast()) {
+    <div class="success-toast"><i class="ti ti-check"></i><span>{{ toastMsg() }}</span></div>
+  }
+
+  <div class="tabs">
+    <div class="tab" [class.act]="currentTab() === 'decl'" (click)="switchTab('decl')">
+      <i class="ti ti-plus"></i>Déclaration décès
+    </div>
+    <div class="tab" [class.act]="currentTab() === 'registre'" (click)="switchTab('registre')">
+      <i class="ti ti-list"></i>Registre Décès
+    </div>
+  </div>
+
+  <div class="panel notop">
+    @if (currentTab() === 'decl') {
+      <div>
+        <div class="ph"><div class="pt"><i class="ti ti-file-plus"></i>Enregistrement de Décès</div></div>
+        <div class="pb">
+          <div class="fsec">Informations du Défunt</div>
+          <div class="form-grid">
+            <div class="fg"><div class="fl">Nom</div><input class="fi" [(ngModel)]="decesForm.nom" type="text" placeholder="Ex: KOUADIO"></div>
+            <div class="fg"><div class="fl">Prénom(s)</div><input class="fi" [(ngModel)]="decesForm.prenom" type="text" placeholder="Ex: Jean Marc"></div>
+          </div>
+          <div class="form-grid">
+            <div class="fg"><div class="fl">Date de Naissance (si connue)</div><input class="fi" [(ngModel)]="decesForm.dob" type="date"></div>
+            <div class="fg"><div class="fl">Commune</div><input class="fi" [(ngModel)]="decesForm.commune" type="text" placeholder="Ex: Cocody"></div>
+          </div>
+          <div class="form-grid-3">
+            <div class="fg"><div class="fl">Date du Décès</div><input class="fi" [(ngModel)]="decesForm.date" type="date"></div>
+            <div class="fg"><div class="fl">Heure</div><input class="fi" [(ngModel)]="decesForm.heure" type="time"></div>
+            <div class="fg"><div class="fl">Lieu du Décès</div><input class="fi" [(ngModel)]="decesForm.lieu" type="text" placeholder="Ex: CHU Treichville"></div>
+          </div>
+          <div class="form-grid">
+            <div class="fg"><div class="fl">Cause du décès</div><input class="fi" [(ngModel)]="decesForm.cause" type="text" placeholder="Ex: Insuffisance cardiaque"></div>
+            <div class="fg"><div class="fl">Déclarant (nom)</div><input class="fi" [(ngModel)]="decesForm.declarant" type="text"></div>
+          </div>
+          <div class="fa">
+            <button class="btn-p" (click)="enregistrerDeces()"><i class="ti ti-check"></i>Dresser l'acte de Décès</button>
+          </div>
+        </div>
+      </div>
+    }
+
+    @if (currentTab() === 'registre') {
+      <div>
+        <div class="ph"><div class="pt"><i class="ti ti-list"></i>Registre des Décès</div></div>
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr><th>N° Acte</th><th>Nom complet</th><th>Date Décès</th><th>Lieu</th><th>Statut</th></tr>
+            </thead>
+            <tbody>
+              @for (d of deces(); track d.id) {
+                <tr>
+                  <td style="font-family:monospace;font-size:11px">{{ d.numero }}</td>
+                  <td><strong>{{ d.nomComplet }}</strong></td>
+                  <td>{{ d.dateDeces }}</td>
+                  <td>{{ d.lieu }}</td>
+                  <td><span class="chip cv">{{ d.statut }}</span></td>
+                </tr>
+              }
+              @if (deces().length === 0) {
+                <tr><td colspan="5" style="text-align:center;color:#aaa;padding:2rem">Aucun acte enregistré</td></tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+  </div>
+</div>

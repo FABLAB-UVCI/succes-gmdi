@@ -1,0 +1,46 @@
+.sidebar { 
+  width: 240px; 
+  background: linear-gradient(180deg, #003366 0%, #001f3f 100%);
+  min-height: calc(100vh - 65px); 
+  padding: 24px 0; 
+}
+
+.sb-sec { 
+  font-size: 11px; 
+  color: #8daac7; 
+  padding: 12px 20px 8px; 
+  text-transform: uppercase; 
+  font-weight: 700; 
+}
+
+.sb-item { 
+  display: flex; 
+  align-items: center; 
+  gap: 12px; 
+  padding: 11px 20px; 
+  margin: 4px 12px;
+  border-radius: 8px;
+  color: #cbdcf0; 
+  font-size: 13.5px; 
+  font-weight: 500;
+  cursor: pointer; 
+  transition: all 0.25s; 
+}
+
+.sb-item i { 
+  font-size: 18px; 
+  width: 24px; 
+  text-align: center; 
+}
+
+.sb-item:hover { 
+  background: rgba(255,255,255,0.07); 
+  color: white; 
+  transform: translateX(4px);
+}
+
+.sb-item.act { 
+  background: linear-gradient(90deg, #F77F00 0%, #e06d00 100%);
+  color: white; 
+  font-weight: 600; 
+}

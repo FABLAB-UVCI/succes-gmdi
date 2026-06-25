@@ -1,0 +1,14 @@
+<header class="topbar">
+  <div>
+    <div class="topbar-title">GMDI — Module État Civil</div>
+    <div class="topbar-sub">République de Côte d'Ivoire</div>
+  </div>
+  <div class="topbar-user">
+    <div class="av">{{ userInitials() }}</div>
+    <span><strong>{{ userName() }}</strong> — {{ userRole() }}</span>
+    <button class="logout-btn" (click)="logout()">
+      <i class="ti ti-logout"></i>
+      <span class="logout-label">Déconnexion</span>
+    </button>
+  </div>
+</header>

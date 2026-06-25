@@ -1,0 +1,73 @@
+.topbar { 
+  background: white;
+  padding: 0 1.5rem; 
+  height: 65px; 
+  display: flex; 
+  align-items: center; 
+  justify-content: space-between; 
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  border-bottom: 4px solid transparent;
+  border-image: linear-gradient(90deg, #F77F00 33%, white 33%, white 66%, #009A44 66%) 1;
+}
+
+.topbar-title { 
+  color: #003366; 
+  font-size: 19px; 
+  font-weight: 800; 
+}
+
+.topbar-sub { 
+  color: #6c757d; 
+  font-size: 11px; 
+  font-weight: 600; 
+  text-transform: uppercase; 
+}
+
+.topbar-user { 
+  color: #003366; 
+  font-size: 13px; 
+  display: flex; 
+  align-items: center; 
+  gap: 10px; 
+  background: #f4f6f9;
+  padding: 6px 16px;
+  border-radius: 30px; 
+}
+
+.av {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #F77F00, #009A44);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: bold;
+  color: white;
+}
+
+.logout-btn {
+  background: #fff0f0;
+  border: 1.5px solid #f5c6c6;
+  cursor: pointer;
+  color: #dc3545;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.2s, border-color 0.2s;
+  margin-left: 8px;
+  font-family: inherit;
+}
+.logout-btn:hover {
+  background: #dc3545;
+  color: white;
+  border-color: #dc3545;
+}
+.logout-label {
+  font-size: 13px;
+}

@@ -1,0 +1,87 @@
+<div>
+  @if (showToast()) {
+    <div class="success-toast"><i class="ti ti-check"></i><span>{{ toastMsg() }}</span></div>
+  }
+  <div class="tabs">
+    <div class="tab" [class.act]="currentTab() === 'bans'" (click)="switchTab('bans')"><i class="ti ti-news"></i>Publication des bans</div>
+    <div class="tab" [class.act]="currentTab() === 'celebration'" (click)="switchTab('celebration')"><i class="ti ti-heart"></i>Célébration</div>
+    <div class="tab" [class.act]="currentTab() === 'registre'" (click)="switchTab('registre')"><i class="ti ti-list"></i>Registre</div>
+  </div>
+  <div class="panel notop">
+    @if (currentTab() === 'bans') {
+      <div>
+        <div class="ph"><div class="pt"><i class="ti ti-news"></i>Publication de bans</div></div>
+        <div class="pb">
+          <div class="form-grid">
+            <div class="fg"><div class="fl">Futur Époux</div><input class="fi" [(ngModel)]="bansForm.epoux" type="text"></div>
+            <div class="fg"><div class="fl">Future Épouse</div><input class="fi" [(ngModel)]="bansForm.epouse" type="text"></div>
+          </div>
+          <div class="form-grid">
+            <div class="fg"><div class="fl">Date de publication</div><input class="fi" [(ngModel)]="bansForm.pub" type="date"></div>
+            <div class="fg"><div class="fl">Date prévue du mariage</div><input class="fi" [(ngModel)]="bansForm.mar" type="date"></div>
+          </div>
+          <div class="fa"><button class="btn-p" (click)="publierBans()"><i class="ti ti-check"></i>Valider la publication</button></div>
+        </div>
+      </div>
+    }
+    @if (currentTab() === 'celebration') {
+      <div>
+        <div class="ph"><div class="pt"><i class="ti ti-heart-handshake"></i>Acte de Célébration de Mariage</div></div>
+        <div class="pb">
+          <div class="fsec">Conjoint 1 — Époux</div>
+          <div class="form-grid-3">
+            <div class="fg"><div class="fl">Nom complet</div><input class="fi" [(ngModel)]="mariageForm.epNom" type="text"></div>
+            <div class="fg"><div class="fl">Profession</div><input class="fi" [(ngModel)]="mariageForm.epProf" type="text"></div>
+            <div class="fg"><div class="fl">Nationalité</div><input class="fi" [(ngModel)]="mariageForm.epNat" type="text"></div>
+          </div>
+          <div class="fsec">Conjoint 2 — Épouse</div>
+          <div class="form-grid-3">
+            <div class="fg"><div class="fl">Nom complet</div><input class="fi" [(ngModel)]="mariageForm.esNom" type="text"></div>
+            <div class="fg"><div class="fl">Profession</div><input class="fi" [(ngModel)]="mariageForm.esProf" type="text"></div>
+            <div class="fg"><div class="fl">Nationalité</div><input class="fi" [(ngModel)]="mariageForm.esNat" type="text"></div>
+          </div>
+          <div class="fsec">Détails juridiques</div>
+          <div class="form-grid-3">
+            <div class="fg"><div class="fl">Date du mariage</div><input class="fi" [(ngModel)]="mariageForm.date" type="date"></div>
+            <div class="fg"><div class="fl">Lieu</div><input class="fi" [(ngModel)]="mariageForm.lieu" type="text" placeholder="Ex: Mairie de Cocody"></div>
+            <div class="fg"><div class="fl">Régime matrimonial</div>
+              <select class="fs" [(ngModel)]="mariageForm.regime">
+                <option>Communauté de biens</option><option>Séparation de biens</option><option>Polygamie</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="fg"><div class="fl">Témoin 1</div><input class="fi" [(ngModel)]="mariageForm.temoin1" type="text"></div>
+            <div class="fg"><div class="fl">Témoin 2</div><input class="fi" [(ngModel)]="mariageForm.temoin2" type="text"></div>
+          </div>
+          <div class="fa"><button class="btn-p" (click)="enregistrerMariage()"><i class="ti ti-check"></i>Enregistrer le mariage civil</button></div>
+        </div>
+      </div>
+    }
+    @if (currentTab() === 'registre') {
+      <div>
+        <div class="ph"><div class="pt"><i class="ti ti-list"></i>Registre des mariages</div></div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>N° Acte</th><th>Époux</th><th>Épouse</th><th>Date Union</th><th>Régime</th><th>Statut</th></tr></thead>
+            <tbody>
+              @for (m of mariages(); track m.id) {
+                <tr>
+                  <td style="font-family:monospace;font-size:11px">{{ m.numero }}</td>
+                  <td><strong>{{ m.epoux }}</strong></td>
+                  <td><strong>{{ m.epouse }}</strong></td>
+                  <td>{{ m.dateMariage }}</td>
+                  <td>{{ m.regime }}</td>
+                  <td><span class="chip cv">{{ m.statut }}</span></td>
+                </tr>
+              }
+              @if (mariages().length === 0) {
+                <tr><td colspan="6" style="text-align:center;color:#aaa;padding:2rem">Aucun mariage enregistré</td></tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+  </div>
+</div>
