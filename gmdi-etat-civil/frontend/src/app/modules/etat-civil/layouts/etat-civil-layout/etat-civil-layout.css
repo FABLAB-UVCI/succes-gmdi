@@ -1,19 +1,31 @@
+/* ══════════════════════════════════════════
+   LAYOUT — Style Ivoirien
+   Fond crème sable, kente subtil
+══════════════════════════════════════════ */
+
 :host {
   --ci-orange: #F77F00;
-  --ci-green: #009A44;
-  --ci-dark-blue: #003366;
+  --ci-green:  #009A44;
+  --ci-gold:   #F5A623;
+  --ci-cream:  #FDF5E8;
+  display: block;
+  min-height: 100%;
 }
 
 .layout-container {
   display: flex;
   min-height: 100vh;
   position: relative;
+  background: var(--ci-cream);
 }
 
 /* ── Sidebar ── */
 .sidebar-wrapper {
   width: 240px;
   flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
   transition: transform 0.3s ease;
   z-index: 200;
 }
@@ -31,36 +43,50 @@
   align-items: stretch;
 }
 
-.topbar-row app-topbar {
-  flex: 1;
-}
+.topbar-row app-topbar { flex: 1; }
 
-/* Hamburger — caché sur desktop */
+/* Hamburger */
 .hamburger {
   display: none;
   flex-direction: column;
   justify-content: center;
   gap: 5px;
   padding: 0 16px;
-  background: white;
+  background: #FFFBF4;
   border: none;
   cursor: pointer;
   border-bottom: 4px solid transparent;
-  border-image: linear-gradient(90deg, var(--ci-orange) 33%, white 33%, white 66%, var(--ci-green) 66%) 1;
+  border-image: linear-gradient(
+    90deg,
+    var(--ci-orange) 33%, white 33%, white 66%, var(--ci-green) 66%
+  ) 1;
 }
 .hamburger span {
   display: block;
   width: 22px;
   height: 2px;
-  background: var(--ci-dark-blue);
+  background: #006B30;
   border-radius: 2px;
   transition: all 0.25s;
 }
 
+/* Contenu principal — fond crème sable + kente */
 .main-content {
   padding: 24px;
-  background: #f5f6fa;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(247,127,0,0.025) 0px, rgba(247,127,0,0.025) 1px,
+      transparent 1px, transparent 24px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      rgba(0,154,68,0.02) 0px, rgba(0,154,68,0.02) 1px,
+      transparent 1px, transparent 24px
+    ),
+    #FDF5E8;
   flex: 1;
+  min-height: 0;
 }
 
 /* ── Overlay mobile ── */
@@ -68,7 +94,7 @@
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.45);
+  background: rgba(0,40,10,0.5);
   z-index: 199;
 }
 
@@ -77,10 +103,10 @@
   position: fixed;
   bottom: 28px;
   right: 28px;
-  width: 52px;
-  height: 52px;
+  width: 54px;
+  height: 54px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--ci-dark-blue), #004080);
+  background: linear-gradient(135deg, var(--ci-orange), #D96B00);
   color: white;
   border: none;
   font-size: 22px;
@@ -88,20 +114,22 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 16px rgba(0,51,102,0.35);
+  box-shadow:
+    0 4px 20px rgba(247,127,0,0.40),
+    0 0 0 3px rgba(247,127,0,0.15);
   z-index: 300;
   transition: transform 0.2s, box-shadow 0.2s;
 }
 .qr-fab:hover {
-  transform: scale(1.1);
-  box-shadow: 0 6px 20px rgba(0,51,102,0.45);
+  transform: scale(1.12);
+  box-shadow: 0 6px 28px rgba(247,127,0,0.55), 0 0 0 4px rgba(247,127,0,0.2);
 }
 
 /* ── Modal QR ── */
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0,30,10,0.55);
   z-index: 400;
   display: flex;
   align-items: center;
@@ -110,18 +138,19 @@
 }
 .modal-box {
   background: white;
-  border-radius: 16px;
+  border-radius: 18px;
   width: 100%;
   max-width: 420px;
-  box-shadow: 0 24px 48px rgba(0,0,0,0.2);
+  box-shadow: 0 32px 64px rgba(0,0,0,0.25);
   overflow: hidden;
+  border-top: 4px solid var(--ci-orange);
 }
 .modal-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 1rem 1.25rem;
-  background: var(--ci-dark-blue);
+  background: linear-gradient(135deg, #004D20, #003A18);
   color: white;
   font-weight: 700;
   font-size: 15px;
@@ -135,25 +164,26 @@
   padding: 4px;
   display: flex;
   align-items: center;
-  opacity: 0.8;
+  opacity: 0.7;
 }
 .modal-close:hover { opacity: 1; }
-.modal-body { padding: 1.25rem; }
+.modal-body { padding: 1.25rem; background: #FEFCF8; }
 .qr-input {
   width: 100%;
   padding: 10px 14px;
-  border: 1.5px solid #dee2e6;
+  border: 1.5px solid #E0D4C0;
   border-radius: 8px;
   font-size: 14px;
   outline: none;
   box-sizing: border-box;
   font-family: monospace;
+  background: white;
 }
-.qr-input:focus { border-color: var(--ci-dark-blue); }
+.qr-input:focus { border-color: var(--ci-orange); box-shadow: 0 0 0 3px rgba(247,127,0,0.1); }
 .qr-result {
   margin-top: 1rem;
-  background: #f0fff4;
-  border: 1px solid #b7ebc7;
+  background: #F0FFF6;
+  border: 1px solid #B7EBC7;
   border-left: 3px solid var(--ci-green);
   border-radius: 8px;
   padding: 10px 14px;
@@ -161,47 +191,48 @@
   color: #155724;
 }
 
-/* ══════════════════════════════════
-   RESPONSIVE — tablette / mobile
-══════════════════════════════════ */
+/* btn-p utilisé dans modal */
+.btn-p {
+  background: linear-gradient(135deg, var(--ci-orange), #D96B00);
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 9px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  font-family: 'Ubuntu', sans-serif;
+  font-size: 14px;
+}
+.btn-p:hover {
+  background: linear-gradient(135deg, #D96B00, #B85800);
+  box-shadow: 0 4px 14px rgba(247,127,0,0.35);
+  transform: translateY(-1px);
+}
+
+/* ══════════════════
+   RESPONSIVE
+══════════════════ */
 @media (max-width: 900px) {
-
-  .hamburger {
-    display: flex;
-  }
-
-  .sidebar-overlay {
-    display: block;
-  }
-
+  .hamburger { display: flex; }
+  .sidebar-overlay { display: block; }
   .sidebar-wrapper {
     position: fixed;
-    top: 0;
-    left: 0;
+    top: 0; left: 0;
     height: 100vh;
     transform: translateX(-100%);
   }
-
   .sidebar-wrapper.open {
     transform: translateX(0);
-    box-shadow: 4px 0 24px rgba(0,0,0,0.2);
+    box-shadow: 4px 0 28px rgba(0,0,0,0.22);
   }
-
-  .main-content {
-    padding: 16px;
-  }
+  .main-content { padding: 16px; }
 }
 
 @media (max-width: 600px) {
-  .main-content {
-    padding: 12px;
-  }
-
-  .qr-fab {
-    bottom: 18px;
-    right: 18px;
-    width: 46px;
-    height: 46px;
-    font-size: 20px;
-  }
+  .main-content { padding: 12px; }
+  .qr-fab { bottom: 18px; right: 18px; width: 48px; height: 48px; font-size: 20px; }
 }

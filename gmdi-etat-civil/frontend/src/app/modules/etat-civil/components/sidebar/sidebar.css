@@ -1,46 +1,148 @@
-.sidebar { 
-  width: 240px; 
-  background: linear-gradient(180deg, #003366 0%, #001f3f 100%);
-  min-height: calc(100vh - 65px); 
-  padding: 24px 0; 
+/* ══════════════════════════════════════════
+   SIDEBAR — Style Ivoirien / Kente
+   Vert forêt CI, motifs or et orange
+══════════════════════════════════════════ */
+
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 100vh;
 }
 
-.sb-sec { 
-  font-size: 11px; 
-  color: #8daac7; 
-  padding: 12px 20px 8px; 
-  text-transform: uppercase; 
-  font-weight: 700; 
+.sidebar {
+  width: 240px;
+  flex: 1;
+  min-height: 100vh;
+  padding: 20px 0 28px;
+
+  /* Vert forêt ivoirien profond */
+  background: linear-gradient(170deg, #004D20 0%, #003A18 55%, #002510 100%);
+
+  /* Bande kente verticale droite */
+  border-right: 5px solid transparent;
+  border-image: linear-gradient(
+    180deg,
+    #F77F00  0%,  #F77F00  20%,
+    #F5A623  20%, #F5A623  40%,
+    #ffffff  40%, #ffffff  60%,
+    #F5A623  60%, #F5A623  80%,
+    #F77F00  80%, #F77F00  100%
+  ) 1;
+
+  position: relative;
 }
 
-.sb-item { 
-  display: flex; 
-  align-items: center; 
-  gap: 12px; 
-  padding: 11px 20px; 
-  margin: 4px 12px;
-  border-radius: 8px;
-  color: #cbdcf0; 
-  font-size: 13.5px; 
+/* Motif kente tissé en fond */
+.sidebar::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      rgba(245,166,35,0.06) 0px, rgba(245,166,35,0.06) 2px,
+      transparent 2px, transparent 22px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      rgba(247,127,0,0.04) 0px, rgba(247,127,0,0.04) 2px,
+      transparent 2px, transparent 22px
+    );
+  pointer-events: none;
+}
+
+/* Accent or en bas */
+.sidebar::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #F77F00, #F5A623, #009A44);
+}
+
+/* ── Section label ── */
+.sb-sec {
+  font-size: 10px;
+  color: rgba(255,255,255,0.38);
+  padding: 18px 22px 6px;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  font-family: 'Ubuntu', sans-serif;
+}
+
+.sb-sec::after {
+  content: '';
+  display: block;
+  margin-top: 7px;
+  height: 2px;
+  background: linear-gradient(90deg, #F77F00 0%, #F5A623 50%, transparent 100%);
+  border-radius: 1px;
+}
+
+/* ── Item ── */
+.sb-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 18px;
+  margin: 3px 10px;
+  border-radius: 10px;
+  color: rgba(255,240,200,0.75);
+  font-size: 13.5px;
   font-weight: 500;
-  cursor: pointer; 
-  transition: all 0.25s; 
+  cursor: pointer;
+  transition: all 0.22s ease;
+  position: relative;
+  font-family: 'Ubuntu', sans-serif;
 }
 
-.sb-item i { 
-  font-size: 18px; 
-  width: 24px; 
-  text-align: center; 
+.sb-item i {
+  font-size: 19px;
+  width: 26px;
+  text-align: center;
+  flex-shrink: 0;
+  color: rgba(245,166,35,0.75);
+  transition: color 0.22s, transform 0.22s;
 }
 
-.sb-item:hover { 
-  background: rgba(255,255,255,0.07); 
-  color: white; 
-  transform: translateX(4px);
+.sb-item:hover {
+  background: rgba(247,127,0,0.12);
+  color: #FFE8B0;
 }
 
-.sb-item.act { 
-  background: linear-gradient(90deg, #F77F00 0%, #e06d00 100%);
-  color: white; 
-  font-weight: 600; 
+.sb-item:hover i {
+  color: #F5A623;
+  transform: scale(1.15);
+}
+
+/* ── Actif : fond orange ivoirien ── */
+.sb-item.act {
+  background: linear-gradient(90deg, #F77F00 0%, #D96B00 100%);
+  color: #ffffff;
+  font-weight: 700;
+  box-shadow:
+    0 4px 18px rgba(247,127,0,0.45),
+    inset 0 1px 0 rgba(255,255,255,0.15);
+}
+
+.sb-item.act i {
+  color: #ffffff;
+  transform: scale(1.1);
+}
+
+/* Pastille blanche gauche sur l'actif */
+.sb-item.act::before {
+  content: '';
+  position: absolute;
+  left: -10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 55%;
+  background: #fff;
+  border-radius: 0 3px 3px 0;
 }

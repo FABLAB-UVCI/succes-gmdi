@@ -17,11 +17,11 @@ export class MariagesComponent implements OnInit {
   mariages = signal<any[]>([]);
 
   bansForm = { epoux: '', epouse: '', pub: '', mar: '' };
-  mariageForm = {
+  mariageForm: { epNom: string; epProf: string; epNat: string; esNom: string; esProf: string; esNat: string; date: string; lieu: string; regime: string; temoin1: string; temoin2: string; cniEpoux: File | null; cniEpouse: File | null } = {
     epNom: '', epProf: '', epNat: 'Ivoirienne',
     esNom: '', esProf: '', esNat: 'Ivoirienne',
     date: '', lieu: '', regime: 'Communauté de biens',
-    temoin1: '', temoin2: ''
+    temoin1: '', temoin2: '', cniEpoux: null, cniEpouse: null
   };
 
   constructor(private api: ApiService) {}
@@ -36,6 +36,9 @@ export class MariagesComponent implements OnInit {
     this.toastMsg.set(msg); this.showToast.set(true);
     setTimeout(() => this.showToast.set(false), 3500);
   }
+
+  onCniEpouxSelected(e: Event) { this.mariageForm.cniEpoux = (e.target as HTMLInputElement).files?.[0] ?? null; }
+  onCniEpouseSelected(e: Event) { this.mariageForm.cniEpouse = (e.target as HTMLInputElement).files?.[0] ?? null; }
 
   publierBans() {
     if (!this.bansForm.epoux || !this.bansForm.epouse) { this.notify('Noms requis'); return; }
@@ -55,7 +58,7 @@ export class MariagesComponent implements OnInit {
       next: res => {
         this.mariages.update(l => [res, ...l]);
         this.notify(`Mariage enregistré — N° ${res.numero}`);
-        this.mariageForm = { epNom: '', epProf: '', epNat: 'Ivoirienne', esNom: '', esProf: '', esNat: 'Ivoirienne', date: '', lieu: '', regime: 'Communauté de biens', temoin1: '', temoin2: '' };
+        this.mariageForm = { epNom: '', epProf: '', epNat: 'Ivoirienne', esNom: '', esProf: '', esNat: 'Ivoirienne', date: '', lieu: '', regime: 'Communauté de biens', temoin1: '', temoin2: '', cniEpoux: null, cniEpouse: null };
       },
       error: () => this.notify("Erreur lors de l'enregistrement")
     });

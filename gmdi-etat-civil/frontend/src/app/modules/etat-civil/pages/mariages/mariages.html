@@ -54,6 +54,19 @@
             <div class="fg"><div class="fl">Témoin 1</div><input class="fi" [(ngModel)]="mariageForm.temoin1" type="text"></div>
             <div class="fg"><div class="fl">Témoin 2</div><input class="fi" [(ngModel)]="mariageForm.temoin2" type="text"></div>
           </div>
+          <div class="fsec">Documents d'identité</div>
+          <div class="form-grid">
+            <div class="fg" style="max-width:340px">
+              <div class="fl">CNI / Passeport — Époux</div>
+              <input style="font-size:11px;padding:4px 6px" class="fi" type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="onCniEpouxSelected($event)">
+              @if (mariageForm.cniEpoux) { <small style="color:green">✓ {{ mariageForm.cniEpoux.name }}</small> }
+            </div>
+            <div class="fg" style="max-width:340px">
+              <div class="fl">CNI / Passeport — Épouse</div>
+              <input style="font-size:11px;padding:4px 6px" class="fi" type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="onCniEpouseSelected($event)">
+              @if (mariageForm.cniEpouse) { <small style="color:green">✓ {{ mariageForm.cniEpouse.name }}</small> }
+            </div>
+          </div>
           <div class="fa"><button class="btn-p" (click)="enregistrerMariage()"><i class="ti ti-check"></i>Enregistrer le mariage civil</button></div>
         </div>
       </div>

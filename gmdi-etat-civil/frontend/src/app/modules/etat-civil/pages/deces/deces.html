@@ -35,6 +35,24 @@
             <div class="fg"><div class="fl">Cause du décès</div><input class="fi" [(ngModel)]="decesForm.cause" type="text" placeholder="Ex: Insuffisance cardiaque"></div>
             <div class="fg"><div class="fl">Déclarant (nom)</div><input class="fi" [(ngModel)]="decesForm.declarant" type="text"></div>
           </div>
+          <div class="fsec">Documents justificatifs</div>
+          <div class="form-grid-3">
+            <div class="fg">
+              <div class="fl">CNI du médecin</div>
+              <input style="font-size:11px;padding:4px 6px" class="fi" type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="onCniMedecinSelected($event)">
+              @if (decesForm.cniMedecin) { <small style="color:green">✓ {{ decesForm.cniMedecin.name }}</small> }
+            </div>
+            <div class="fg">
+              <div class="fl">Certificat de décès (PDF)</div>
+              <input style="font-size:11px;padding:4px 6px" class="fi" type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="onCertificatDecesSelected($event)">
+              @if (decesForm.certificatDeces) { <small style="color:green">✓ {{ decesForm.certificatDeces.name }}</small> }
+            </div>
+            <div class="fg">
+              <div class="fl">CNI du déclarant</div>
+              <input style="font-size:11px;padding:4px 6px" class="fi" type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="onCniDeclarantSelected($event)">
+              @if (decesForm.cniDeclarant) { <small style="color:green">✓ {{ decesForm.cniDeclarant.name }}</small> }
+            </div>
+          </div>
           <div class="fa">
             <button class="btn-p" (click)="enregistrerDeces()"><i class="ti ti-check"></i>Dresser l'acte de Décès</button>
           </div>

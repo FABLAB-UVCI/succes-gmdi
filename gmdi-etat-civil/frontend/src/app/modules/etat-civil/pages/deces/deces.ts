@@ -16,7 +16,7 @@ export class DecesComponent implements OnInit {
   showToast = signal(false);
   deces = signal<any[]>([]);
 
-  decesForm = { nom: '', prenom: '', dob: '', date: '', heure: '', lieu: '', commune: '', cause: '', declarant: '', lien: '' };
+  decesForm: { nom: string; prenom: string; dob: string; date: string; heure: string; lieu: string; commune: string; cause: string; declarant: string; lien: string; cniMedecin: File | null; certificatDeces: File | null; cniDeclarant: File | null } = { nom: '', prenom: '', dob: '', date: '', heure: '', lieu: '', commune: '', cause: '', declarant: '', lien: '', cniMedecin: null, certificatDeces: null, cniDeclarant: null };
 
   constructor(private api: ApiService) {}
 
@@ -30,6 +30,10 @@ export class DecesComponent implements OnInit {
     this.toastMsg.set(msg); this.showToast.set(true);
     setTimeout(() => this.showToast.set(false), 3500);
   }
+
+  onCniMedecinSelected(e: Event) { this.decesForm.cniMedecin = (e.target as HTMLInputElement).files?.[0] ?? null; }
+  onCertificatDecesSelected(e: Event) { this.decesForm.certificatDeces = (e.target as HTMLInputElement).files?.[0] ?? null; }
+  onCniDeclarantSelected(e: Event) { this.decesForm.cniDeclarant = (e.target as HTMLInputElement).files?.[0] ?? null; }
 
   enregistrerDeces() {
     const f = this.decesForm;
@@ -45,7 +49,7 @@ export class DecesComponent implements OnInit {
       next: res => {
         this.deces.update(l => [res, ...l]);
         this.notify(`Acte de décès enregistré — N° ${res.numero}`);
-        this.decesForm = { nom: '', prenom: '', dob: '', date: '', heure: '', lieu: '', commune: '', cause: '', declarant: '', lien: '' };
+        this.decesForm = { nom: '', prenom: '', dob: '', date: '', heure: '', lieu: '', commune: '', cause: '', declarant: '', lien: '', cniMedecin: null, certificatDeces: null, cniDeclarant: null };
       },
       error: () => this.notify("Erreur lors de l'enregistrement")
     });

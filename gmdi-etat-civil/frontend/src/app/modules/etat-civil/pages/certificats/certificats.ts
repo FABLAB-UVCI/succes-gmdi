@@ -2,6 +2,7 @@ import { Component, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../../../services/api.service';
+import { TOUTES_COMMUNES } from '../../../../communes.ci';
 
 @Component({
   selector: 'app-certificats',
@@ -16,9 +17,10 @@ export class CertificatsComponent implements OnInit {
   showToast = signal(false);
   certificats = signal<any[]>([]);
 
-  celibatForm = { nom: '', prenom: '', dob: '', acteRef: '' };
-  residenceForm = { nom: '', prenom: '', adresse: '', commune: '' };
-  vieForm = { nom: '', prenom: '', dob: '' };
+  communesList = TOUTES_COMMUNES;
+  celibatForm: { nom: string; prenom: string; dob: string; acteRef: string; cni: File | null } = { nom: '', prenom: '', dob: '', acteRef: '', cni: null };
+  residenceForm: { nom: string; prenom: string; adresse: string; commune: string; cni: File | null } = { nom: '', prenom: '', adresse: '', commune: '', cni: null };
+  vieForm: { nom: string; prenom: string; dob: string; cni: File | null } = { nom: '', prenom: '', dob: '', cni: null };
 
   constructor(private api: ApiService) {}
 
@@ -33,6 +35,10 @@ export class CertificatsComponent implements OnInit {
     setTimeout(() => this.showToast.set(false), 3500);
   }
 
+  onCniCelibatSelected(e: Event) { this.celibatForm.cni = (e.target as HTMLInputElement).files?.[0] ?? null; }
+  onCniResidenceSelected(e: Event) { this.residenceForm.cni = (e.target as HTMLInputElement).files?.[0] ?? null; }
+  onCniVieSelected(e: Event) { this.vieForm.cni = (e.target as HTMLInputElement).files?.[0] ?? null; }
+
   delivrer(type: string) {
     let nom = '', prenom = '', acteRef = '', typeLabel = '';
     if (type === 'Célibat') { nom = this.celibatForm.nom; prenom = this.celibatForm.prenom; acteRef = this.celibatForm.acteRef; typeLabel = 'Célibat'; }
@@ -46,9 +52,9 @@ export class CertificatsComponent implements OnInit {
         next: res => {
           this.certificats.update(l => [res, ...l]);
           this.notify(`Certificat de ${typeLabel} délivré — N° ${res.numero}`);
-          this.celibatForm = { nom: '', prenom: '', dob: '', acteRef: '' };
-          this.residenceForm = { nom: '', prenom: '', adresse: '', commune: '' };
-          this.vieForm = { nom: '', prenom: '', dob: '' };
+          this.celibatForm = { nom: '', prenom: '', dob: '', acteRef: '', cni: null };
+          this.residenceForm = { nom: '', prenom: '', adresse: '', commune: '', cni: null };
+          this.vieForm = { nom: '', prenom: '', dob: '', cni: null };
         },
         error: () => this.notify("Erreur lors de la délivrance")
       });

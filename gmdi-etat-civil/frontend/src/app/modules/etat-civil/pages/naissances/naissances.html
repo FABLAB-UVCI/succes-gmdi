@@ -212,11 +212,11 @@
             </div>
             
             <div class="form-grid">
-                <div class="fg">
-                <div class="fl">Pièce d'identité du Père adoptant (CNI/Passeport)</div>
-                <input class="fi" type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="onAdoptionPereFileSelected($event)">
+                <div class="fg" style="max-width:340px">
+                <div class="fl">CNI / Passeport — Père adoptant</div>
+                <input style="font-size:11px;padding:4px 6px" class="fi" type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="onAdoptionPereFileSelected($event)">
                 @if (adoptionForm.piecePereAdoptant) {
-                    <small style="color: green;">✓ Fichier chargé: {{ adoptionForm.piecePereAdoptant.name }}</small>
+                    <small style="color: green;">✓ {{ adoptionForm.piecePereAdoptant.name }}</small>
                 }
                 </div>
             </div>
@@ -238,11 +238,11 @@
             </div>
             
             <div class="form-grid">
-                <div class="fg">
-                <div class="fl">Pièce d'identité de la Mère adoptante (CNI/Passeport)</div>
-                <input class="fi" type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="onAdoptionMereFileSelected($event)">
+                <div class="fg" style="max-width:340px">
+                <div class="fl">CNI / Passeport — Mère adoptante</div>
+                <input style="font-size:11px;padding:4px 6px" class="fi" type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="onAdoptionMereFileSelected($event)">
                 @if (adoptionForm.pieceMereAdoptante) {
-                    <small style="color: green;">✓ Fichier chargé: {{ adoptionForm.pieceMereAdoptante.name }}</small>
+                    <small style="color: green;">✓ {{ adoptionForm.pieceMereAdoptante.name }}</small>
                 }
                 </div>
             </div>
@@ -276,11 +276,11 @@
             
             <!-- Upload du jugement -->
             <div class="form-grid">
-                <div class="fg">
+                <div class="fg" style="max-width:340px">
                 <div class="fl">Document du jugement (PDF)</div>
-                <input class="fi" type="file" accept=".pdf" (change)="onAdoptionJugementFileSelected($event)">
+                <input style="font-size:11px;padding:4px 6px" class="fi" type="file" accept=".pdf" (change)="onAdoptionJugementFileSelected($event)">
                 @if (adoptionForm.pieceJugement) {
-                    <small style="color: green;">✓ Jugement chargé: {{ adoptionForm.pieceJugement.name }}</small>
+                    <small style="color: green;">✓ {{ adoptionForm.pieceJugement.name }}</small>
                 }
                 </div>
             </div>
@@ -297,7 +297,7 @@
         <div>
         <div class="ph"><div class="pt"><i class="ti ti-copy"></i>Demande de Duplicata / Extrait d'Acte</div></div>
         <div class="pb">
-            <div class="form-grid"><div class="fg"><div class="fl">Type d'acte requis</div><select class="fs" [(ngModel)]="duplicataForm.type"><option value="naissance">Extrait de Naissance</option><option value="mariage">Extrait de Mariage</option><option value="deces">Extrait de Décès</option></select></div><div class="fg"><div class="fl">Numéro de l'acte original</div><input class="fi" [(ngModel)]="duplicataForm.num" type="text"></div></div>
+            <div class="form-grid"><div class="fg"><div class="fl">Type d'acte requis</div><select class="fs" [(ngModel)]="duplicataForm.type"><option value="naissance">Extrait de Naissance</option><option value="mariage">Extrait de Mariage</option><option value="deces">Extrait de Décès</option><option value="jugement">Jugement supplétif</option><option value="adoption">Adoption</option></select></div><div class="fg"><div class="fl">Numéro de l'acte original</div><input class="fi" [(ngModel)]="duplicataForm.num" type="text"></div></div>
             <div class="form-grid"><div class="fg"><div class="fl">Nom du demandeur</div><input class="fi" [(ngModel)]="duplicataForm.dem" type="text"></div><div class="fg"><div class="fl">Motif de la demande</div><input class="fi" [(ngModel)]="duplicataForm.motif" type="text"></div></div>
             <div class="fa"><button class="btn-p" (click)="delivrerDuplicata()"><i class="ti ti-printer"></i>Délivrer et imprimer l'extrait</button></div>
         </div>

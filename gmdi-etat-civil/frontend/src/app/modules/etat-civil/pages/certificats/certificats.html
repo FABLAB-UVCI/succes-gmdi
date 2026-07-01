@@ -21,6 +21,13 @@
             <div class="fg"><div class="fl">Date de naissance</div><input class="fi" [(ngModel)]="celibatForm.dob" type="date"></div>
             <div class="fg"><div class="fl">Référence acte de naissance</div><input class="fi" [(ngModel)]="celibatForm.acteRef" type="text" placeholder="Ex: CI-CC-2000-N-001234"></div>
           </div>
+          <div class="form-grid">
+            <div class="fg" style="max-width:340px">
+              <div class="fl">CNI / Passeport du demandeur</div>
+              <input style="font-size:11px;padding:4px 6px" class="fi" type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="onCniCelibatSelected($event)">
+              @if (celibatForm.cni) { <small style="color:green">✓ {{ celibatForm.cni.name }}</small> }
+            </div>
+          </div>
           <div class="fa"><button class="btn-p" (click)="delivrer('Célibat')"><i class="ti ti-printer"></i>Établir & Imprimer</button></div>
         </div>
       </div>
@@ -35,7 +42,19 @@
           </div>
           <div class="form-grid">
             <div class="fg"><div class="fl">Adresse complète</div><input class="fi" [(ngModel)]="residenceForm.adresse" type="text" placeholder="Ex: 12 Rue des Jardins, Cocody"></div>
-            <div class="fg"><div class="fl">Commune</div><input class="fi" [(ngModel)]="residenceForm.commune" type="text" placeholder="Ex: Cocody"></div>
+            <div class="fg"><div class="fl">Commune</div>
+              <select class="fs" [(ngModel)]="residenceForm.commune">
+                <option value="">-- Sélectionner une commune --</option>
+                @for (c of communesList; track c) { <option [value]="c">{{ c }}</option> }
+              </select>
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="fg" style="max-width:340px">
+              <div class="fl">CNI / Passeport du demandeur</div>
+              <input style="font-size:11px;padding:4px 6px" class="fi" type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="onCniResidenceSelected($event)">
+              @if (residenceForm.cni) { <small style="color:green">✓ {{ residenceForm.cni.name }}</small> }
+            </div>
           </div>
           <div class="fa"><button class="btn-p" (click)="delivrer('Résidence')"><i class="ti ti-printer"></i>Établir & Imprimer</button></div>
         </div>
@@ -51,6 +70,13 @@
           </div>
           <div class="form-grid">
             <div class="fg"><div class="fl">Date de naissance</div><input class="fi" [(ngModel)]="vieForm.dob" type="date"></div>
+          </div>
+          <div class="form-grid">
+            <div class="fg" style="max-width:340px">
+              <div class="fl">CNI / Passeport du demandeur</div>
+              <input style="font-size:11px;padding:4px 6px" class="fi" type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="onCniVieSelected($event)">
+              @if (vieForm.cni) { <small style="color:green">✓ {{ vieForm.cni.name }}</small> }
+            </div>
           </div>
           <div class="fa"><button class="btn-p" (click)="delivrer('Vie')"><i class="ti ti-printer"></i>Établir & Imprimer</button></div>
         </div>
