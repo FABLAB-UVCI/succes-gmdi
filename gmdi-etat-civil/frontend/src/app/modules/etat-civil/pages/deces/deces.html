@@ -54,7 +54,7 @@
             </div>
           </div>
           <div class="fa">
-            <button class="btn-p" (click)="enregistrerDeces()"><i class="ti ti-check"></i>Dresser l'acte de Décès</button>
+            <button class="btn-p" (click)="enregistrerDeces()"><i class="ti ti-printer"></i>Dresser l'acte & Imprimer</button>
           </div>
         </div>
       </div>
@@ -66,7 +66,7 @@
         <div class="tbl-wrap">
           <table>
             <thead>
-              <tr><th>N° Acte</th><th>Nom complet</th><th>Date Décès</th><th>Lieu</th><th>Statut</th></tr>
+              <tr><th>N° Acte</th><th>Nom complet</th><th>Date Décès</th><th>Lieu</th><th>Statut</th><th>Actions</th></tr>
             </thead>
             <tbody>
               @for (d of deces(); track d.id) {
@@ -76,10 +76,11 @@
                   <td>{{ d.dateDeces }}</td>
                   <td>{{ d.lieu }}</td>
                   <td><span class="chip cv">{{ d.statut }}</span></td>
+                  <td><button class="btn-s" style="padding:3px 8px;font-size:11px" (click)="imprimer(d)"><i class="ti ti-printer"></i>Imprimer</button></td>
                 </tr>
               }
               @if (deces().length === 0) {
-                <tr><td colspan="5" style="text-align:center;color:#aaa;padding:2rem">Aucun acte enregistré</td></tr>
+                <tr><td colspan="6" style="text-align:center;color:#aaa;padding:2rem">Aucun acte enregistré</td></tr>
               }
             </tbody>
           </table>

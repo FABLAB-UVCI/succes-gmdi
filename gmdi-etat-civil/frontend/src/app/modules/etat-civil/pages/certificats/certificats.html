@@ -87,7 +87,7 @@
         <div class="ph"><div class="pt"><i class="ti ti-list"></i>Historique des certificats délivrés</div></div>
         <div class="tbl-wrap">
           <table>
-            <thead><tr><th>N° Certificat</th><th>Type</th><th>Bénéficiaire</th><th>Date Délivrance</th><th>Statut</th></tr></thead>
+            <thead><tr><th>N° Certificat</th><th>Type</th><th>Bénéficiaire</th><th>Date Délivrance</th><th>Statut</th><th>Actions</th></tr></thead>
             <tbody>
               @for (c of certificats(); track c.id) {
                 <tr>
@@ -96,10 +96,11 @@
                   <td>{{ c.beneficiaire }}</td>
                   <td>{{ c.dateDelivrance }}</td>
                   <td><span class="chip cv">{{ c.statut }}</span></td>
+                  <td><button class="btn-s" style="padding:3px 8px;font-size:11px" (click)="imprimer(c)"><i class="ti ti-printer"></i>Imprimer</button></td>
                 </tr>
               }
               @if (certificats().length === 0) {
-                <tr><td colspan="5" style="text-align:center;color:#aaa;padding:2rem">Aucun certificat délivré</td></tr>
+                <tr><td colspan="6" style="text-align:center;color:#aaa;padding:2rem">Aucun certificat délivré</td></tr>
               }
             </tbody>
           </table>

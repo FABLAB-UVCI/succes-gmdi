@@ -67,7 +67,7 @@
               @if (mariageForm.cniEpouse) { <small style="color:green">✓ {{ mariageForm.cniEpouse.name }}</small> }
             </div>
           </div>
-          <div class="fa"><button class="btn-p" (click)="enregistrerMariage()"><i class="ti ti-check"></i>Enregistrer le mariage civil</button></div>
+          <div class="fa"><button class="btn-p" (click)="enregistrerMariage()"><i class="ti ti-printer"></i>Enregistrer & Imprimer</button></div>
         </div>
       </div>
     }
@@ -76,7 +76,7 @@
         <div class="ph"><div class="pt"><i class="ti ti-list"></i>Registre des mariages</div></div>
         <div class="tbl-wrap">
           <table>
-            <thead><tr><th>N° Acte</th><th>Époux</th><th>Épouse</th><th>Date Union</th><th>Régime</th><th>Statut</th></tr></thead>
+            <thead><tr><th>N° Acte</th><th>Époux</th><th>Épouse</th><th>Date Union</th><th>Régime</th><th>Statut</th><th>Actions</th></tr></thead>
             <tbody>
               @for (m of mariages(); track m.id) {
                 <tr>
@@ -86,10 +86,11 @@
                   <td>{{ m.dateMariage }}</td>
                   <td>{{ m.regime }}</td>
                   <td><span class="chip cv">{{ m.statut }}</span></td>
+                  <td><button class="btn-s" style="padding:3px 8px;font-size:11px" (click)="imprimer(m)"><i class="ti ti-printer"></i>Imprimer</button></td>
                 </tr>
               }
               @if (mariages().length === 0) {
-                <tr><td colspan="6" style="text-align:center;color:#aaa;padding:2rem">Aucun mariage enregistré</td></tr>
+                <tr><td colspan="7" style="text-align:center;color:#aaa;padding:2rem">Aucun mariage enregistré</td></tr>
               }
             </tbody>
           </table>
