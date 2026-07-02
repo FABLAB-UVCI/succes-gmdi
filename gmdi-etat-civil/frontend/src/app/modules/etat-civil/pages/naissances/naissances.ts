@@ -652,7 +652,7 @@ export class NaissancesComponent implements OnInit {
         /* Éléments de la colonne de droite */
         .commune-illustration {
             width: 100%;
-            border: 1px dashed #ccc;
+            /*border: 1px dashed #ccc;*/
             height: 110px;
             margin-bottom: 25px;
             display: flex;
@@ -709,18 +709,17 @@ export class NaissancesComponent implements OnInit {
         /* Pied de page : Sceau et Signatures */
         .signature-section {
             display: flex;
-            justify-content: space-between;
+            justify-content: end;
             align-items: center;
             margin-top: 20px;
-            padding: 0 20px;
+            padding: 0 20px 62px;
             position: relative;
             z-index: 2;
         }
 
         .seal-placeholder {
-            width: 120px;
-            height: 120px;
-            border: 2px dashed #2b5797;
+            width: 140px;
+            height: 140px;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -738,7 +737,6 @@ export class NaissancesComponent implements OnInit {
 
         .signature-title {
             font-style: italic;
-            margin-bottom: 40px;
         }
 
         .signature-line {
@@ -749,7 +747,7 @@ export class NaissancesComponent implements OnInit {
         /* Note légale en bas */
         .footer-legal-notice {
             position: absolute;
-            bottom: 25px;
+            bottom: -9px;
             left: 40px;
             right: 40px;
             border: 1px solid #1e5c33;
@@ -781,7 +779,9 @@ export class NaissancesComponent implements OnInit {
             <tr>
                 <!-- Logo et République -->
                 <td class="header-left">
-                    <div class="logo-placeholder">Logo Armoiries<br>Côte d'Ivoire</div>
+                    <div class="logo-placeholder">
+                     <img src="/armoirie_0.jpg" alt="Description de l'image" width="82" height="82">
+                    </div>
                     RÉPUBLIQUE<br>DE CÔTE D'IVOIRE
                 </td>
                 
@@ -807,12 +807,18 @@ export class NaissancesComponent implements OnInit {
                 <!-- Timbre Numérique et N° d'acte -->
                 <td class="header-right">
                     <div class="numero-acte">N° EA-COC-2024-0012345</div>
-                    <div class="timbre-numerique">
-                        <div>TIMBRE NUMÉRIQUE OFFICIEL</div>
+                    <div class="timbre-numerique">   
+                        
+                       <!--<div>TIMBRE NUMÉRIQUE OFFICIEL</div>
                         <div style="margin: 5px 0;">TN-24-5F7K-9M2P</div>
-                        <div>27/05/2024</div>
+                        <div>27/05/2024</div>-->
+
+                        <img src="/timbre_numerique1.png" height="130" weight="130">
+
+
+
                     </div>
-                    <div class="certif-box">Document Électronique<br>Certifié 🔒</div>
+                    <div class="certif-box">Document Électronique<br>Certifié</div>
                 </td>
             </tr>
         </table>
@@ -942,14 +948,15 @@ export class NaissancesComponent implements OnInit {
                 
                 <!-- Illustration Mairie -->
                 <div class="commune-illustration">
-                    <strong style="color: #1e5c33;">COMMUNE DE COCODY</strong>
-                    <span style="font-size: 9px; margin-top:5px; color:#999;">[Illustration Mairie / Carte]</span>
+                  <img src="/Batiment_Mairie_Cocody.png" width="210" height="210">
                 </div>
 
                 <!-- Box de Vérification QR Code -->
                 <div class="qr-verification-box">
                     <div class="qr-title">VÉRIFICATION EN LIGNE</div>
-                    <div class="qr-placeholder">Code QR</div>
+                      <div class="qr-placeholder">
+                        <img src="/Qr_Code.png" alt="Qr_Code.png" height="112" width="112">
+                      </div>
                     <div class="qr-text">
                         Scannez ce QR code ou rendez-vous sur <strong>https://etatcivil.gouv.ci/verification</strong> pour vérifier l'authenticité de ce document.
                     </div>
@@ -965,16 +972,14 @@ export class NaissancesComponent implements OnInit {
         <!-- Zone Signature et Sceau de fin -->
         <div class="signature-section">
             <!-- Sceau rond Officier d'État civil -->
-            <div class="seal-placeholder">
-                Sceau Officiel<br>Commune de Cocody<br>République de Côte d'Ivoire
-            </div>
-
+            <img src="/seau.png" alt="sceau" width="" height="" class="seal-placeholder">
             <!-- Bloc Signature Date -->
             <div class="signature-box">
                 <div>Fait à Cocody, le 27 Mai 2024</div>
                 <div class="signature-title">L'Officier de l'État Civil</div>
-                <div class="signature-line"></div>
-                <div style="font-size: 10px; color:#777; margin-top:5px;">[Signature Numérique / Griffe]</div>
+                <div class="">
+                <img src="/Signature.png" alt="signature" width="150" height="60">
+                <div>
             </div>
         </div>
 
