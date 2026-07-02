@@ -19,12 +19,12 @@ export class NaissancesComponent implements OnInit {
 
   naissancesDB: any[] = [];
 
-  constructor(private api: ApiService) {}
+  constructor(private api: ApiService) { }
 
   ngOnInit() {
     this.api.getNaissances().subscribe({
       next: (data) => this.naissancesDB = data,
-      error: () => {}
+      error: () => { }
     });
   }
 
@@ -96,7 +96,7 @@ export class NaissancesComponent implements OnInit {
   };
 
   adoptionForm = {
-    enfantNom: '', 
+    enfantNom: '',
     enfantDateNaissance: '',
     enfantLieuNaissance: '',
     // Père adoptant
@@ -159,8 +159,8 @@ export class NaissancesComponent implements OnInit {
   }
 
   resetAdoptionForm() {
-    this.adoptionForm = { 
-      enfantNom: '', 
+    this.adoptionForm = {
+      enfantNom: '',
       enfantDateNaissance: '',
       enfantLieuNaissance: '',
       adoptantPereNom: '',
@@ -299,7 +299,7 @@ export class NaissancesComponent implements OnInit {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
       this.jugementForm.pieceIdentite = input.files[0];
-      
+
       // Vérification du type de fichier
       const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf'];
       if (!allowedTypes.includes(input.files[0].type)) {
@@ -307,7 +307,7 @@ export class NaissancesComponent implements OnInit {
         this.jugementForm.pieceIdentite = null;
         return;
       }
-      
+
       this.showToast.emit(`✓ Pièce d'identité chargée: ${input.files[0].name}`);
     }
   }
@@ -394,198 +394,601 @@ export class NaissancesComponent implements OnInit {
     pereProf?: string; mereProf?: string; pereNat?: string; mereNat?: string;
   }): void {
     const today = new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
-    const html = `<!DOCTYPE html>
+    const html =
+      `
+<!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<title>Acte de Naissance — ${data.numero}</title>
-<style>
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family: 'Times New Roman', serif; font-size: 11pt; color: #000; background: #fff; }
-  .page { width: 210mm; min-height: 297mm; margin: 0 auto; padding: 18mm 20mm 14mm; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extrait d'Acte de Naissance</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Times+New+Roman&family=Roboto:wght@400;700&display=swap');
 
-  /* ── EN-TÊTE ── */
-  .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6mm; }
-  .header-left, .header-right { text-align: center; font-size: 9pt; line-height: 1.5; width: 45mm; }
-  .header-center { text-align: center; flex: 1; }
-  .republic { font-size: 10pt; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
-  .motto { font-size: 9pt; font-style: italic; color: #333; }
-  .ministry { font-size: 8.5pt; margin-top: 2mm; font-weight: bold; text-transform: uppercase; }
-  .sub-ministry { font-size: 8pt; color: #444; }
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
 
-  /* ── BANDE TRICOLORE ── */
-  .flag-bar { height: 5px; background: linear-gradient(90deg, #F77F00 33.3%, #fff 33.3% 66.6%, #009A44 66.6%); margin: 3mm 0; border: 0.5px solid #ccc; }
+        /* Conteneur principal simulant le format A4 papier */
+        .document-container {
+            width: 800px;
+            min-height: 1130px;
+            background-color: #ffffff;
+            padding: 40px;
+            box-sizing: border-box;
+            position: relative;
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
 
-  /* ── COMMUNE & INFOS ── */
-  .commune-box { text-align: center; margin: 3mm 0 5mm; }
-  .commune-title { font-size: 9pt; text-transform: uppercase; }
-  .commune-name { font-size: 12pt; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1.5px solid #000; display: inline-block; padding: 0 10mm; margin-top: 1mm; }
+        /* Bordure ornementale verte autour du document */
+        .border-ornament {
+            border: 4px double #1e5c33;
+            height: calc(100% - 10px);
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            right: 5px;
+            bottom: 5px;
+            pointer-events: none;
+            box-sizing: border-box;
+        }
 
-  /* ── TITRE PRINCIPAL ── */
-  .doc-title { text-align: center; margin: 5mm 0 4mm; }
-  .doc-title h1 { font-size: 17pt; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; border: 2px solid #000; display: inline-block; padding: 3mm 10mm; }
-  .doc-number { font-size: 10pt; margin-top: 3mm; }
+        /* Filigrane en diagonale "EXEMPLE DOCUMENT FICTIF" */
+        .watermark {
+            position: absolute;
+            top: 45%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-25deg);
+            font-size: 5rem;
+            font-weight: bold;
+            color: rgba(180, 180, 180, 0.18);
+            white-space: nowrap;
+            user-select: none;
+            pointer-events: none;
+            z-index: 1;
+            font-family: 'Roboto', sans-serif;
+        }
 
-  /* ── CORPS ── */
-  .body-text { line-height: 1.9; font-size: 10.5pt; text-align: justify; margin: 4mm 0; }
-  .body-text .field { border-bottom: 1px solid #333; display: inline-block; min-width: 50mm; padding: 0 1mm; font-weight: bold; }
-  .body-text .label { font-style: italic; }
+        /* En-tête principal */
+        .header-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
 
-  /* ── SECTIONS ── */
-  .section-title { font-size: 10pt; font-weight: bold; text-transform: uppercase; border-left: 3px solid #F77F00; padding-left: 3mm; margin: 5mm 0 2mm; letter-spacing: 0.5px; }
+        .header-left {
+            width: 25%;
+            text-align: center;
+            vertical-align: top;
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
 
-  .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1mm 6mm; margin: 2mm 0 4mm; }
-  .info-row { display: flex; align-items: baseline; gap: 2mm; font-size: 10pt; border-bottom: 0.5px dotted #aaa; padding: 1.5mm 0; }
-  .info-label { font-size: 9pt; color: #555; white-space: nowrap; min-width: 38mm; }
-  .info-value { font-weight: bold; flex: 1; }
+        .logo-placeholder {
+            width: 80px;
+            height: 80px;
+            border: 1px dashed #ccc;
+            margin: 0 auto 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: #777;
+        }
 
-  /* ── MENTIONS ── */
-  .mentions { font-size: 8.5pt; color: #555; border: 0.5px solid #ccc; padding: 3mm 4mm; margin: 4mm 0; background: #fafafa; }
+        .header-center {
+            width: 50%;
+            text-align: center;
+            vertical-align: top;
+        }
 
-  /* ── SIGNATURES ── */
-  .signatures { display: flex; justify-content: space-between; margin-top: 12mm; }
-  .sig-block { text-align: center; width: 55mm; }
-  .sig-title { font-size: 9pt; font-weight: bold; text-transform: uppercase; margin-bottom: 1mm; }
-  .sig-sub { font-size: 8pt; color: #555; }
-  .sig-line { border-bottom: 1px solid #000; height: 16mm; margin: 2mm 0; }
-  .sig-name { font-size: 9pt; }
+        .republique {
+            font-size: 16px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            margin-bottom: 2px;
+        }
 
-  /* ── PIED ── */
-  .footer { border-top: 1.5px solid #000; margin-top: 8mm; padding-top: 3mm; display: flex; justify-content: space-between; align-items: flex-end; }
-  .footer-left { font-size: 8pt; color: #555; }
-  .footer-right { font-size: 8pt; text-align: right; color: #555; }
-  .qr-placeholder { width: 20mm; height: 20mm; border: 1px solid #ccc; display: flex; align-items: center; justify-content: center; font-size: 6pt; color: #999; text-align: center; line-height: 1.3; }
+        .devise {
+            font-size: 11px;
+            font-style: italic;
+            margin-bottom: 15px;
+        }
 
-  @media print {
-    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .page { padding: 12mm 16mm 10mm; }
-  }
-</style>
+        .ministere {
+            font-size: 12px;
+            font-weight: bold;
+            line-height: 1.3;
+            margin-bottom: 15px;
+        }
+
+        .administration {
+            font-size: 11px;
+            font-weight: bold;
+            line-height: 1.3;
+        }
+
+        .header-right {
+            width: 25%;
+            text-align: center;
+            vertical-align: top;
+        }
+
+        .numero-acte {
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .timbre-numerique {
+            width: 120px;
+            height: 120px;
+            border: 2px solid #2b5797;
+            border-radius: 50%;
+            margin: 0 auto 5px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 9px;
+            color: #2b5797;
+            font-family: 'Roboto', sans-serif;
+            font-weight: bold;
+            text-align: center;
+            padding: 5px;
+            box-sizing: border-box;
+        }
+
+        .certif-box {
+            border: 1px solid #2b5797;
+            border-radius: 4px;
+            font-size: 9px;
+            color: #2b5797;
+            padding: 3px;
+            text-transform: uppercase;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 5px;
+        }
+
+        /* Titre du document */
+        .title-section {
+            text-align: center;
+            margin: 25px 0 15px;
+        }
+
+        .main-title {
+            color: #1e5c33;
+            font-size: 26px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            margin: 0 0 5px 0;
+        }
+
+        .subtitle {
+            font-size: 12px;
+            font-style: italic;
+            margin-bottom: 15px;
+        }
+
+        .intro-text {
+            font-size: 12px;
+            text-align: justify;
+            line-height: 1.5;
+            margin-bottom: 20px;
+            padding: 0 10px;
+        }
+
+        /* Layout du contenu central (Données à gauche, Illustrations/QR à droite) */
+        .content-container {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            z-index: 2;
+        }
+
+        .left-data-column {
+            width: 62%;
+        }
+
+        .right-meta-column {
+            width: 35%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Sections de données */
+        .section-title {
+            color: #1e5c33;
+            font-size: 13px;
+            font-weight: bold;
+            border-bottom: 1px none #ccc;
+            margin: 15px 0 8px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+
+        .data-table td {
+            padding: 3px 0;
+            vertical-align: top;
+        }
+
+        .label-cell {
+            width: 40%;
+            color: #333;
+        }
+
+        .separator-cell {
+            width: 5%;
+            text-align: center;
+        }
+
+        .value-cell {
+            width: 55%;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        /* Style spécifique pour mélanger minuscules/majuscules selon l'image */
+        .value-cell.mixed {
+            text-transform: none;
+        }
+
+        /* Éléments de la colonne de droite */
+        .commune-illustration {
+            width: 100%;
+            border: 1px dashed #ccc;
+            height: 110px;
+            margin-bottom: 25px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            color: #777;
+            text-align: center;
+        }
+
+        .qr-verification-box {
+            border: 1px solid #1e5c33;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            font-size: 10px;
+            font-family: 'Roboto', sans-serif;
+            background-color: #fff;
+            width: 90%;
+            box-sizing: border-box;
+        }
+
+        .qr-title {
+            font-weight: bold;
+            color: #1e5c33;
+            margin-bottom: 8px;
+            font-size: 11px;
+        }
+
+        .qr-placeholder {
+            width: 110px;
+            height: 110px;
+            border: 1px solid #000;
+            margin: 0 auto 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+        }
+
+        .qr-text {
+            line-height: 1.3;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .qr-code-verif {
+            font-weight: bold;
+            color: #2b5797;
+            margin: 5px 0;
+        }
+
+        /* Pied de page : Sceau et Signatures */
+        .signature-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding: 0 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .seal-placeholder {
+            width: 120px;
+            height: 120px;
+            border: 2px dashed #2b5797;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: #2b5797;
+            text-align: center;
+        }
+
+        .signature-box {
+            text-align: center;
+            font-size: 12px;
+            width: 220px;
+        }
+
+        .signature-title {
+            font-style: italic;
+            margin-bottom: 40px;
+        }
+
+        .signature-line {
+            height: 40px;
+            border-bottom: 1px dashed #777; /* Emplacement signature manuelle */
+        }
+
+        /* Note légale en bas */
+        .footer-legal-notice {
+            position: absolute;
+            bottom: 25px;
+            left: 40px;
+            right: 40px;
+            border: 1px solid #1e5c33;
+            padding: 10px;
+            font-size: 10px;
+            text-align: center;
+            line-height: 1.4;
+            background-color: #fff;
+            z-index: 2;
+        }
+
+        .footer-pedagogic {
+            margin-top: 5px;
+            font-weight: bold;
+            color: #1e5c33;
+        }
+    </style>
 </head>
 <body>
-<div class="page">
+    <div class="document-container">
+        <!-- Bordure décorative -->
+        <div class="border-ornament"></div>
 
-  <!-- EN-TÊTE -->
-  <div class="header">
-    <div class="header-left">
-      <div style="font-size:8pt">REPUBLIQUE DE</div>
-      <div style="font-weight:bold;font-size:10pt">CÔTE D'IVOIRE</div>
-      <div style="font-size:8pt;color:#555">Union — Discipline — Travail</div>
-      <div style="margin-top:4mm;font-size:8pt;font-weight:bold">MINISTÈRE DE L'INTÉRIEUR</div>
-      <div style="font-size:7.5pt;color:#444">Direction Générale<br>de la Décentralisation<br>et du Développement Local</div>
+        <!-- Filigrane de fond -->
+        <div class="watermark">EXEMPLE DOCUMENT FICTIF</div>
+
+        <!-- En-tête -->
+        <table class="header-table">
+            <tr>
+                <!-- Logo et République -->
+                <td class="header-left">
+                    <div class="logo-placeholder">Logo Armoiries<br>Côte d'Ivoire</div>
+                    RÉPUBLIQUE<br>DE CÔTE D'IVOIRE
+                </td>
+                
+                <!-- Bloc Administratif Central -->
+                <td class="header-center">
+                    <div class="republique">RÉPUBLIQUE DE CÔTE D'IVOIRE</div>
+                    <div class="devise">Union – Discipline – Travail</div>
+                    
+                    <div class="ministere">
+                        MINISTÈRE DE LA JUSTICE<br>ET DES DROITS DE L'HOMME
+                    </div>
+                    
+                    <div class="administration">
+                        DIRECTION GÉNÉRALE DES AFFAIRES CIVILES<br>ET DU SCEAU
+                    </div>
+                    <br>
+                    <div class="administration" style="font-weight: normal;">
+                        <strong>COMMUNE DE COCODY</strong><br>
+                        DÉPARTEMENT D'ABIDJAN
+                    </div>
+                </td>
+                
+                <!-- Timbre Numérique et N° d'acte -->
+                <td class="header-right">
+                    <div class="numero-acte">N° EA-COC-2024-0012345</div>
+                    <div class="timbre-numerique">
+                        <div>TIMBRE NUMÉRIQUE OFFICIEL</div>
+                        <div style="margin: 5px 0;">TN-24-5F7K-9M2P</div>
+                        <div>27/05/2024</div>
+                    </div>
+                    <div class="certif-box">Document Électronique<br>Certifié 🔒</div>
+                </td>
+            </tr>
+        </table>
+
+        <!-- Titre Principal -->
+        <div class="title-section">
+            <h1 class="main-title">EXTRAIT D'ACTE DE NAISSANCE</h1>
+            <div class="subtitle">(Article 100 du Code des Personnes et de la Famille)</div>
+        </div>
+
+        <div class="intro-text">
+            L'Officier de l'État Civil soussigné certifie qu'il résulte des registres des actes de naissance de la Commune de Cocody, que l'acte dont les éléments sont ci-dessous relatés, a été dressé.
+        </div>
+
+        <!-- Corps du document éclaté en deux colonnes (Données / Éléments Visuels) -->
+        <div class="content-container">
+            
+            <!-- Colonne de Gauche : Informations Textuelles -->
+            <div class="left-data-column">
+                
+                <div class="section-title">Détails de l'acte</div>
+                <table class="data-table">
+                    <tr>
+                        <td class="label-cell">Nom de l'enfant</td>
+                        <td class="separator-cell">:</td>
+                        <td class="value-cell">Doukouré</td>
+                    </tr>
+                    <tr>
+                        <td class="label-cell">Prénoms</td>
+                        <td class="separator-cell">:</td>
+                        <td class="value-cell">Kévin Alexis</td>
+                    </tr>
+                    <tr>
+                        <td class="label-cell">Sexe</td>
+                        <td class="separator-cell">:</td>
+                        <td class="value-cell">Masculin</td>
+                    </tr>
+                    <tr>
+                        <td class="label-cell">Date de naissance</td>
+                        <td class="separator-cell">:</td>
+                        <td class="value-cell mixed">12 Février 2024</td>
+                    </tr>
+                    <tr>
+                        <td class="label-cell">Heure de naissance</td>
+                        <td class="separator-cell">:</td>
+                        <td class="value-cell mixed">08 heures 45 minutes</td>
+                    </tr>
+                    <tr>
+                        <td class="label-cell">Lieu de naissance</td>
+                        <td class="separator-cell">:</td>
+                        <td class="value-cell mixed">Centre Hospitalier Universitaire de Cocody</td>
+                    </tr>
+                    <tr>
+                        <td class="label-cell">Commune de naissance</td>
+                        <td class="separator-cell">:</td>
+                        <td class="value-cell mixed">Cocody</td>
+                    </tr>
+                    <tr>
+                        <td class="label-cell">Pays</td>
+                        <td class="separator-cell">:</td>
+                        <td class="value-cell mixed">Côte d'Ivoire</td>
+                    </tr>
+                </table>
+
+                <div class="section-title">Filiation</div>
+                <table class="data-table">
+                    <tr>
+                        <td class="label-cell">Père</td>
+                        <td class="separator-cell">:</td>
+                        <td class="value-cell">Doukouré Youssouf</td>
+                    </tr>
+                    <tr>
+                        <td class="label-cell">Profession</td>
+                        <td class="separator-cell">:</td>
+                        <td class="value-cell mixed">Ingénieur en Informatique</td>
+                    </tr>
+                    <tr>
+                        <td class="label-cell">Mère</td>
+                        <td class="separator-cell">:</td>
+                        <td class="value-cell">Koné Aminata</td>
+                    </tr>
+                    <tr>
+                        <td class="label-cell">Profession</td>
+                        <td class="separator-cell">:</td>
+                        <td class="value-cell mixed">Enseignante</td>
+                    </tr>
+                </table>
+
+                <div class="section-title">Mentions de l'acte</div>
+                <table class="data-table">
+                    <tr>
+                        <td class="label-cell">Date de déclaration</td>
+                        <td class="separator-cell">:</td>
+                        <td class="value-cell mixed">13 Février 2024</td>
+                    </tr>
+                    <tr>
+                        <td class="label-cell">Déclarant</td>
+                        <td class="separator-cell">:</td>
+                        <td class="value-cell mixed">DOUKOURÉ YOUSSOUF (Père)</td>
+                    </tr>
+                    <tr>
+                        <td class="label-cell">Officier de l'état civil</td>
+                        <td class="separator-cell">:</td>
+                        <td class="value-cell">Kouassi N'Guessan Jean-Baptiste</td>
+                    </tr>
+                    <tr>
+                        <td class="label-cell">Date de délivrance</td>
+                        <td class="separator-cell">:</td>
+                        <td class="value-cell mixed">27 Mai 2024</td>
+                    </tr>
+                    <tr>
+                        <td class="label-cell">N° de l'acte</td>
+                        <td class="separator-cell">:</td>
+                        <td class="value-cell mixed">2024/COC/02/01567</td>
+                    </tr>
+                    <tr>
+                        <td class="label-cell">Observations</td>
+                        <td class="separator-cell">:</td>
+                        <td class="value-cell mixed">Néant</td>
+                    </tr>
+                </table>
+
+            </div>
+
+            <!-- Colonne de Droite : Graphismes, QR Code & Validation -->
+            <div class="right-meta-column">
+                
+                <!-- Illustration Mairie -->
+                <div class="commune-illustration">
+                    <strong style="color: #1e5c33;">COMMUNE DE COCODY</strong>
+                    <span style="font-size: 9px; margin-top:5px; color:#999;">[Illustration Mairie / Carte]</span>
+                </div>
+
+                <!-- Box de Vérification QR Code -->
+                <div class="qr-verification-box">
+                    <div class="qr-title">VÉRIFICATION EN LIGNE</div>
+                    <div class="qr-placeholder">Code QR</div>
+                    <div class="qr-text">
+                        Scannez ce QR code ou rendez-vous sur <strong>https://etatcivil.gouv.ci/verification</strong> pour vérifier l'authenticité de ce document.
+                    </div>
+                    <div class="qr-code-verif">Code de vérification : 7A2B-C9D8-EF4G-H5J6</div>
+                    <div class="qr-text" style="font-weight: bold; margin-top: 5px;">
+                        Ce document est signé et sécurisé numériquement.
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Zone Signature et Sceau de fin -->
+        <div class="signature-section">
+            <!-- Sceau rond Officier d'État civil -->
+            <div class="seal-placeholder">
+                Sceau Officiel<br>Commune de Cocody<br>République de Côte d'Ivoire
+            </div>
+
+            <!-- Bloc Signature Date -->
+            <div class="signature-box">
+                <div>Fait à Cocody, le 27 Mai 2024</div>
+                <div class="signature-title">L'Officier de l'État Civil</div>
+                <div class="signature-line"></div>
+                <div style="font-size: 10px; color:#777; margin-top:5px;">[Signature Numérique / Griffe]</div>
+            </div>
+        </div>
+
+        <!-- Mentions légales en bas de page -->
+        <div class="footer-legal-notice">
+            Le présent extrait est délivré par système électronique sécurisé et comporte un timbre numérique officiel. Il a la même valeur probante que l'original conformément aux dispositions de l'ordonnance n° 2019-312 du 20 mars 2019 relative à la dématérialisation des actes et documents administratifs.
+            <div class="footer-pedagogic">EXEMPLE – DOCUMENT FICTIF – À DES FINS PÉDAGOGIQUES UNIQUEMENT</div>
+        </div>
+
     </div>
-    <div class="header-center">
-      <div class="flag-bar"></div>
-      <div class="commune-box">
-        <div class="commune-title">Commune de</div>
-        <div class="commune-name">${data.commune || '___________________'}</div>
-      </div>
-      <div style="font-size:8pt;color:#666;margin-top:2mm">SERVICE DE L'ÉTAT CIVIL</div>
-    </div>
-    <div class="header-right">
-      <div class="qr-placeholder">QR<br>${data.numero}</div>
-      <div style="font-size:7pt;color:#888;margin-top:1mm">Vérification<br>en ligne</div>
-    </div>
-  </div>
 
-  <div class="flag-bar"></div>
-
-  <!-- TITRE -->
-  <div class="doc-title">
-    <h1>Acte de Naissance</h1>
-    <div class="doc-number">N° <strong>${data.numero}</strong></div>
-  </div>
-
-  <!-- CORPS RÉDIGÉ -->
-  <div class="body-text">
-    L'an deux mille vingt-cinq et le <span class="field">${data.dateNaissance}</span>
-    ${data.heureNaissance ? `à <span class="field">${data.heureNaissance}</span>` : ''},
-    par devant nous, Officier de l'État Civil de la Commune de <span class="field">${data.commune || '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'}</span>,
-    est comparu(e) le déclarant soussigné qui nous a présenté un enfant de sexe
-    <span class="field">${data.sexe || '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'}</span>
-    né(e) le <span class="field">${data.dateNaissance}</span>
-    à <span class="field">${data.lieuNaissance || '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'}</span>
-    et auquel il a été donné les prénoms et noms de :
-  </div>
-
-  <!-- NOM ENFANT EN GRAND -->
-  <div style="text-align:center;margin:4mm 0;padding:3mm;border:1.5px solid #000;">
-    <div style="font-size:7pt;letter-spacing:2px;color:#555;text-transform:uppercase;margin-bottom:1mm">Nom et prénoms de l'enfant</div>
-    <div style="font-size:16pt;font-weight:bold;text-transform:uppercase;letter-spacing:2px">${data.nom} ${data.prenom}</div>
-  </div>
-
-  <!-- INFORMATIONS DE L'ENFANT -->
-  <div class="section-title">Informations de l'enfant</div>
-  <div class="info-grid">
-    <div class="info-row"><span class="info-label">Nom de famille :</span><span class="info-value">${data.nom}</span></div>
-    <div class="info-row"><span class="info-label">Prénoms :</span><span class="info-value">${data.prenom}</span></div>
-    <div class="info-row"><span class="info-label">Date de naissance :</span><span class="info-value">${data.dateNaissance}</span></div>
-    <div class="info-row"><span class="info-label">Heure de naissance :</span><span class="info-value">${data.heureNaissance || '—'}</span></div>
-    <div class="info-row"><span class="info-label">Sexe :</span><span class="info-value">${data.sexe || '—'}</span></div>
-    <div class="info-row"><span class="info-label">Lieu de naissance :</span><span class="info-value">${data.lieuNaissance || '—'}</span></div>
-    <div class="info-row"><span class="info-label">Commune :</span><span class="info-value">${data.commune || '—'}</span></div>
-  </div>
-
-  <!-- PÈRE -->
-  <div class="section-title">Informations du père</div>
-  <div class="info-grid">
-    <div class="info-row"><span class="info-label">Nom et prénoms :</span><span class="info-value">${data.pereNom || '—'}</span></div>
-    <div class="info-row"><span class="info-label">Profession :</span><span class="info-value">${data.pereProf || '—'}</span></div>
-    <div class="info-row"><span class="info-label">Nationalité :</span><span class="info-value">${data.pereNat || 'Ivoirienne'}</span></div>
-  </div>
-
-  <!-- MÈRE -->
-  <div class="section-title">Informations de la mère</div>
-  <div class="info-grid">
-    <div class="info-row"><span class="info-label">Nom et prénoms :</span><span class="info-value">${data.mereName || '—'}</span></div>
-    <div class="info-row"><span class="info-label">Profession :</span><span class="info-value">${data.mereProf || '—'}</span></div>
-    <div class="info-row"><span class="info-label">Nationalité :</span><span class="info-value">${data.mereNat || 'Ivoirienne'}</span></div>
-  </div>
-
-  <!-- MENTIONS LÉGALES -->
-  <div class="mentions">
-    <strong>Mentions marginales :</strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    <br><br>
-    Dont acte a été dressé en présence des témoins soussignés et après lecture faite, les parties ont signé avec nous.
-  </div>
-
-  <!-- SIGNATURES -->
-  <div class="signatures">
-    <div class="sig-block">
-      <div class="sig-title">Le Père / Déclarant</div>
-      <div class="sig-line"></div>
-      <div class="sig-name">${data.pereNom || '&nbsp;'}</div>
-    </div>
-    <div class="sig-block">
-      <div class="sig-title">La Mère</div>
-      <div class="sig-line"></div>
-      <div class="sig-name">${data.mereName || '&nbsp;'}</div>
-    </div>
-    <div class="sig-block">
-      <div class="sig-title">L'Officier d'État Civil</div>
-      <div class="sig-sub">Commune de ${data.commune || '___'}</div>
-      <div class="sig-line"></div>
-      <div style="margin-top:1mm;font-size:8pt">Lu et approuvé</div>
-    </div>
-  </div>
-
-  <!-- PIED DE PAGE -->
-  <div class="footer">
-    <div class="footer-left">
-      <div>Délivré le : ${today}</div>
-      <div>Réf. GMDI/EC/${data.numero}</div>
-      <div style="margin-top:1mm;font-size:7.5pt;color:#888">Ce document est établi conformément à la loi n°83-799<br>du 02 août 1983 portant état civil en Côte d'Ivoire.</div>
-    </div>
-    <div class="footer-right">
-      <div style="font-size:7.5pt;color:#888">GMDI — Gestion Modernisée des Documents d'Identité</div>
-      <div style="font-size:7pt;color:#aaa;margin-top:1mm">Document généré électroniquement — Valable avec cachet officiel</div>
-    </div>
-  </div>
-
-</div>
-<script>window.onload = function(){ window.print(); }</script>
 </body>
-</html>`;
+</html>
+`;
 
     const win = window.open('', '_blank', 'width=900,height=700');
     if (win) {
