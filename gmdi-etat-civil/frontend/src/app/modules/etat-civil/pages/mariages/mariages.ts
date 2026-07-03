@@ -2,6 +2,7 @@ import { Component, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../../../services/api.service';
+import { qrVerification, codeVerification, formatDateFr, openPrintWindow } from '../../pdf-utils';
 
 @Component({
   selector: 'app-mariages',
@@ -16,12 +17,16 @@ export class MariagesComponent implements OnInit {
   showToast = signal(false);
   mariages = signal<any[]>([]);
 
-  bansForm = { epoux: '', epouse: '', pub: '', mar: '' };
-  mariageForm: { epNom: string; epProf: string; epNat: string; esNom: string; esProf: string; esNat: string; date: string; lieu: string; regime: string; temoin1: string; temoin2: string; cniEpoux: File | null; cniEpouse: File | null } = {
-    epNom: '', epProf: '', epNat: 'Ivoirienne',
-    esNom: '', esProf: '', esNat: 'Ivoirienne',
-    date: '', lieu: '', regime: 'Communauté de biens',
-    temoin1: '', temoin2: '', cniEpoux: null, cniEpouse: null
+  bansForm: { epoux: string; epouse: string; pub: string; mar: string; cniEpoux: File | null; cniEpouse: File | null } =
+    { epoux: '', epouse: '', pub: '', mar: '', cniEpoux: null, cniEpouse: null };
+  mariageForm: {
+    epNom: string; epPrenom: string; epNat: string; epProf: string; epTemoin: string; epTemoinProf: string;
+    esNom: string; esPrenom: string; esNat: string; esProf: string; esTemoin: string; esTemoinProf: string;
+    date: string; lieu: string; regime: string; cniEpoux: File | null; cniEpouse: File | null
+  } = {
+    epNom: '', epPrenom: '', epNat: 'Ivoirienne', epProf: '', epTemoin: '', epTemoinProf: '',
+    esNom: '', esPrenom: '', esNat: 'Ivoirienne', esProf: '', esTemoin: '', esTemoinProf: '',
+    date: '', lieu: '', regime: 'Communauté de biens', cniEpoux: null, cniEpouse: null
   };
 
   constructor(private api: ApiService) {}
@@ -39,62 +44,83 @@ export class MariagesComponent implements OnInit {
 
   onCniEpouxSelected(e: Event) { this.mariageForm.cniEpoux = (e.target as HTMLInputElement).files?.[0] ?? null; }
   onCniEpouseSelected(e: Event) { this.mariageForm.cniEpouse = (e.target as HTMLInputElement).files?.[0] ?? null; }
+  onBansCniEpouxSelected(e: Event) { this.bansForm.cniEpoux = (e.target as HTMLInputElement).files?.[0] ?? null; }
+  onBansCniEpouseSelected(e: Event) { this.bansForm.cniEpouse = (e.target as HTMLInputElement).files?.[0] ?? null; }
 
   publierBans() {
     if (!this.bansForm.epoux || !this.bansForm.epouse) { this.notify('Noms requis'); return; }
     this.notify(`Bans publiés pour ${this.bansForm.epoux} & ${this.bansForm.epouse}`);
-    this.bansForm = { epoux: '', epouse: '', pub: '', mar: '' };
+    this.bansForm = { epoux: '', epouse: '', pub: '', mar: '', cniEpoux: null, cniEpouse: null };
   }
 
   enregistrerMariage() {
     const f = this.mariageForm;
-    if (!f.epNom || !f.esNom || !f.date) { this.notify('Époux, épouse et date requis'); return; }
+    if (!f.epNom || !f.epPrenom || !f.esNom || !f.esPrenom || !f.date) {
+      this.notify('Nom et prénoms de l\'époux et de l\'épouse, et date requis (*)');
+      return;
+    }
     this.api.createMariage({
-      epoux_nom: f.epNom, epoux_prenom: '', epoux_profession: f.epProf, epoux_nationalite: f.epNat,
-      epouse_nom: f.esNom, epouse_prenom: '', epouse_profession: f.esProf, epouse_nationalite: f.esNat,
+      epoux_nom: f.epNom, epoux_prenom: f.epPrenom, epoux_profession: f.epProf, epoux_nationalite: f.epNat,
+      epouse_nom: f.esNom, epouse_prenom: f.esPrenom, epouse_profession: f.esProf, epouse_nationalite: f.esNat,
       date_mariage: f.date, lieu_mariage: f.lieu, regime_matrimonial: f.regime,
-      temoin1_nom: f.temoin1, temoin2_nom: f.temoin2
+      temoin1_nom: f.epTemoin, temoin1_profession: f.epTemoinProf,
+      temoin2_nom: f.esTemoin, temoin2_profession: f.esTemoinProf
     }).subscribe({
       next: res => {
         this.mariages.update(l => [res, ...l]);
         this.notify(`Mariage enregistré — N° ${res.numero}`);
-        this.genererActeMariagePDF({
+        genererActeMariagePDF({
           numero: res.numero,
-          epoux: f.epNom, epouxProf: f.epProf, epouxNat: f.epNat,
-          epouse: f.esNom, epouseProf: f.esProf, epouseNat: f.esNat,
+          epoux: `${f.epNom} ${f.epPrenom}`.trim(), epouxProf: f.epProf, epouxNat: f.epNat,
+          epouse: `${f.esNom} ${f.esPrenom}`.trim(), epouseProf: f.esProf, epouseNat: f.esNat,
           dateMariage: f.date, lieu: f.lieu, regime: f.regime,
-          temoin1: f.temoin1, temoin2: f.temoin2
+          temoin1: f.epTemoin, temoin1Prof: f.epTemoinProf,
+          temoin2: f.esTemoin, temoin2Prof: f.esTemoinProf
         });
-        this.mariageForm = { epNom: '', epProf: '', epNat: 'Ivoirienne', esNom: '', esProf: '', esNat: 'Ivoirienne', date: '', lieu: '', regime: 'Communauté de biens', temoin1: '', temoin2: '', cniEpoux: null, cniEpouse: null };
+        this.mariageForm = {
+          epNom: '', epPrenom: '', epNat: 'Ivoirienne', epProf: '', epTemoin: '', epTemoinProf: '',
+          esNom: '', esPrenom: '', esNat: 'Ivoirienne', esProf: '', esTemoin: '', esTemoinProf: '',
+          date: '', lieu: '', regime: 'Communauté de biens', cniEpoux: null, cniEpouse: null
+        };
       },
       error: () => this.notify("Erreur lors de l'enregistrement")
     });
   }
 
   imprimer(m: any): void {
-    this.genererActeMariagePDF({
+    genererActeMariagePDF({
       numero: m.numero,
       epoux: m.epoux,
       epouse: m.epouse,
       dateMariage: m.dateMariage,
       lieu: m.lieu,
       commune: m.commune,
-      regime: m.regime
+      regime: m.regime,
+      epouxProf: m.epouxProf, epouxNat: m.epouxNat,
+      epouseProf: m.epouseProf, epouseNat: m.epouseNat,
+      temoin1: m.temoin1, temoin1Prof: m.temoin1Prof,
+      temoin2: m.temoin2, temoin2Prof: m.temoin2Prof
     });
   }
 
-  genererActeMariagePDF(data: {
-    numero: string; epoux: string; epouse: string; dateMariage: string;
-    epouxProf?: string; epouxNat?: string; epouseProf?: string; epouseNat?: string;
-    lieu?: string; commune?: string; regime?: string; temoin1?: string; temoin2?: string;
-  }): void {
+}
+
+export async function genererActeMariagePDF(data: {
+  numero: string; epoux: string; epouse: string; dateMariage: string;
+  epouxProf?: string; epouxNat?: string; epouseProf?: string; epouseNat?: string;
+  lieu?: string; commune?: string; regime?: string;
+  temoin1?: string; temoin1Prof?: string; temoin2?: string; temoin2Prof?: string;
+}): Promise<void> {
     const today = new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
+    const commune = data.commune || 'Cocody';
+    const qr = await qrVerification(data.numero, 'Extrait de mariage', `${data.epoux} & ${data.epouse}`);
     const html =
       `
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <base href="${document.baseURI}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Extrait d'Acte de Mariage</title>
     <style>
@@ -459,7 +485,7 @@ export class MariagesComponent implements OnInit {
             <tr>
                 <td class="header-left">
                     <div class="logo-placeholder">
-                     <img src="/armoirie_0.jpg" alt="Description de l'image" width="82" height="82">
+                     <img src="armoirie_0.jpg" alt="Description de l'image" width="82" height="82">
                     </div>
                     RÉPUBLIQUE<br>DE CÔTE D'IVOIRE
                 </td>
@@ -477,7 +503,7 @@ export class MariagesComponent implements OnInit {
                     </div>
                     <br>
                     <div class="administration" style="font-weight: normal;">
-                        <strong>COMMUNE DE COCODY</strong><br>
+                        <strong>COMMUNE DE ${commune.toUpperCase()}</strong><br>
                         DÉPARTEMENT D'ABIDJAN
                     </div>
                 </td>
@@ -485,7 +511,7 @@ export class MariagesComponent implements OnInit {
                 <td class="header-right">
                     <div class="numero-acte">N° ${data.numero}</div>
                     <div class="timbre-numerique">
-                        <img src="/timbre_numerique1.png" height="130" weight="130">
+                        <img src="timbre_numerique1.png" height="130" weight="130">
                     </div>
                     <div class="certif-box">Document Électronique<br>Certifié</div>
                 </td>
@@ -498,7 +524,7 @@ export class MariagesComponent implements OnInit {
         </div>
 
         <div class="intro-text">
-            L'Officier de l'État Civil soussigné certifie qu'il résulte des registres des actes de mariage de la Commune de Cocody, que l'acte dont les éléments sont ci-dessous relatés, a été dressé.
+            L'Officier de l'État Civil soussigné certifie qu'il résulte des registres des actes de mariage de la Commune de ${commune}, que l'acte dont les éléments sont ci-dessous relatés, a été dressé.
         </div>
 
         <div class="content-container">
@@ -513,7 +539,7 @@ export class MariagesComponent implements OnInit {
                     <tr><td class="label-cell">Épouse</td><td class="separator-cell">:</td><td class="value-cell">${data.epouse}</td></tr>
                     <tr><td class="label-cell">Profession</td><td class="separator-cell">:</td><td class="value-cell mixed">${data.epouseProf || 'Non renseignée'}</td></tr>
                     <tr><td class="label-cell">Nationalité</td><td class="separator-cell">:</td><td class="value-cell mixed">${data.epouseNat || 'Non renseignée'}</td></tr>
-                    <tr><td class="label-cell">Date du mariage</td><td class="separator-cell">:</td><td class="value-cell mixed">${data.dateMariage}</td></tr>
+                    <tr><td class="label-cell">Date du mariage</td><td class="separator-cell">:</td><td class="value-cell mixed">${formatDateFr(data.dateMariage)}</td></tr>
                     <tr><td class="label-cell">Lieu du mariage</td><td class="separator-cell">:</td><td class="value-cell mixed">${data.lieu || 'Non renseigné'}</td></tr>
                     <tr><td class="label-cell">Commune</td><td class="separator-cell">:</td><td class="value-cell mixed">${data.commune || 'Cocody'}</td></tr>
                     <tr><td class="label-cell">Régime matrimonial</td><td class="separator-cell">:</td><td class="value-cell mixed">${data.regime || 'Non renseigné'}</td></tr>
@@ -521,8 +547,10 @@ export class MariagesComponent implements OnInit {
 
                 <div class="section-title">Témoins</div>
                 <table class="data-table">
-                    <tr><td class="label-cell">Témoin 1</td><td class="separator-cell">:</td><td class="value-cell mixed">${data.temoin1 || 'Non renseigné'}</td></tr>
-                    <tr><td class="label-cell">Témoin 2</td><td class="separator-cell">:</td><td class="value-cell mixed">${data.temoin2 || 'Non renseigné'}</td></tr>
+                    <tr><td class="label-cell">Témoin de l'époux</td><td class="separator-cell">:</td><td class="value-cell mixed">${data.temoin1 || 'Non renseigné'}</td></tr>
+                    <tr><td class="label-cell">Profession</td><td class="separator-cell">:</td><td class="value-cell mixed">${data.temoin1Prof || 'Non renseignée'}</td></tr>
+                    <tr><td class="label-cell">Témoin de l'épouse</td><td class="separator-cell">:</td><td class="value-cell mixed">${data.temoin2 || 'Non renseigné'}</td></tr>
+                    <tr><td class="label-cell">Profession</td><td class="separator-cell">:</td><td class="value-cell mixed">${data.temoin2Prof || 'Non renseignée'}</td></tr>
                 </table>
 
                 <div class="section-title">Mentions de l'acte</div>
@@ -538,18 +566,18 @@ export class MariagesComponent implements OnInit {
             <div class="right-meta-column">
 
                 <div class="commune-illustration">
-                  <img src="/Batiment_Mairie_Cocody.png" width="210" height="210">
+                  <img src="Batiment_Mairie_Cocody.png" width="210" height="210">
                 </div>
 
                 <div class="qr-verification-box">
                     <div class="qr-title">VÉRIFICATION EN LIGNE</div>
                       <div class="qr-placeholder">
-                        <img src="/Qr_Code.png" alt="Qr_Code.png" height="112" width="112">
+                        <img src="${qr}" alt="QR code de vérification" height="112" width="112">
                       </div>
                     <div class="qr-text">
                         Scannez ce QR code ou rendez-vous sur <strong>https://etatcivil.gouv.ci/verification</strong> pour vérifier l'authenticité de ce document.
                     </div>
-                    <div class="qr-code-verif">Code de vérification : ${data.numero}</div>
+                    <div class="qr-code-verif">Code de vérification : ${codeVerification(data.numero)}</div>
                     <div class="qr-text" style="font-weight: bold; margin-top: 5px;">
                         Ce document est signé et sécurisé numériquement.
                     </div>
@@ -559,12 +587,12 @@ export class MariagesComponent implements OnInit {
         </div>
 
         <div class="signature-section">
-            <img src="/seau.png" alt="sceau" width="" height="" class="seal-placeholder">
+            <img src="seau.png" alt="sceau" width="" height="" class="seal-placeholder">
             <div class="signature-box">
-                <div>Fait à Cocody, le ${today}</div>
+                <div>Fait à ${commune}, le ${today}</div>
                 <div class="signature-title">L'Officier de l'État Civil</div>
                 <div class="">
-                <img src="/Signature.png" alt="signature" width="150" height="60">
+                <img src="Signature.png" alt="signature" width="150" height="60">
                 <div>
             </div>
         </div>
@@ -580,10 +608,5 @@ export class MariagesComponent implements OnInit {
 </html>
 `;
 
-    const win = window.open('', '_blank', 'width=900,height=700');
-    if (win) {
-      win.document.write(html);
-      win.document.close();
-    }
-  }
+    openPrintWindow(html);
 }

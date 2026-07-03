@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../../../services/api.service';
 import { TOUTES_COMMUNES } from '../../../../communes.ci';
+import { QUARTIERS_CI } from '../../../../quartiers.ci';
+import { qrVerification, codeVerification, formatDateFr, openPrintWindow } from '../../pdf-utils';
 
 @Component({
   selector: 'app-certificats',
@@ -18,8 +20,9 @@ export class CertificatsComponent implements OnInit {
   certificats = signal<any[]>([]);
 
   communesList = TOUTES_COMMUNES;
-  celibatForm: { nom: string; prenom: string; dob: string; acteRef: string; cni: File | null } = { nom: '', prenom: '', dob: '', acteRef: '', cni: null };
-  residenceForm: { nom: string; prenom: string; adresse: string; commune: string; cni: File | null } = { nom: '', prenom: '', adresse: '', commune: '', cni: null };
+  quartiersList = QUARTIERS_CI;
+  celibatForm: { nom: string; prenom: string; dob: string; profession: string; acteRef: string; cni: File | null } = { nom: '', prenom: '', dob: '', profession: '', acteRef: '', cni: null };
+  residenceForm: { nom: string; prenom: string; adresse: string; quartier: string; commune: string; cni: File | null } = { nom: '', prenom: '', adresse: '', quartier: '', commune: '', cni: null };
   vieForm: { nom: string; prenom: string; dob: string; cni: File | null } = { nom: '', prenom: '', dob: '', cni: null };
 
   constructor(private api: ApiService) {}
@@ -40,9 +43,9 @@ export class CertificatsComponent implements OnInit {
   onCniVieSelected(e: Event) { this.vieForm.cni = (e.target as HTMLInputElement).files?.[0] ?? null; }
 
   delivrer(type: string) {
-    let nom = '', prenom = '', acteRef = '', typeLabel = '', dob = '', adresse = '', commune = '';
-    if (type === 'Célibat') { nom = this.celibatForm.nom; prenom = this.celibatForm.prenom; acteRef = this.celibatForm.acteRef; dob = this.celibatForm.dob; typeLabel = 'Célibat'; }
-    else if (type === 'Résidence') { nom = this.residenceForm.nom; prenom = this.residenceForm.prenom; adresse = this.residenceForm.adresse; commune = this.residenceForm.commune; typeLabel = 'Résidence'; }
+    let nom = '', prenom = '', acteRef = '', typeLabel = '', dob = '', adresse = '', quartier = '', commune = '', profession = '';
+    if (type === 'Célibat') { nom = this.celibatForm.nom; prenom = this.celibatForm.prenom; acteRef = this.celibatForm.acteRef; dob = this.celibatForm.dob; profession = this.celibatForm.profession; typeLabel = 'Célibat'; }
+    else if (type === 'Résidence') { nom = this.residenceForm.nom; prenom = this.residenceForm.prenom; adresse = this.residenceForm.adresse; quartier = this.residenceForm.quartier; commune = this.residenceForm.commune; typeLabel = 'Résidence'; }
     else if (type === 'Vie') { nom = this.vieForm.nom; prenom = this.vieForm.prenom; dob = this.vieForm.dob; typeLabel = 'Vie'; }
 
     if (!nom) { this.notify('Nom du bénéficiaire requis'); return; }
@@ -52,12 +55,12 @@ export class CertificatsComponent implements OnInit {
         next: res => {
           this.certificats.update(l => [res, ...l]);
           this.notify(`Certificat de ${typeLabel} délivré — N° ${res.numero}`);
-          this.genererCertificatPDF(typeLabel, {
-            numero: res.numero, nom, prenom, dob, acteRef, adresse, commune,
+          genererCertificatPDF(typeLabel, {
+            numero: res.numero, nom, prenom, dob, acteRef, adresse, quartier, commune, profession,
             dateDelivrance: res.dateDelivrance
           });
-          this.celibatForm = { nom: '', prenom: '', dob: '', acteRef: '', cni: null };
-          this.residenceForm = { nom: '', prenom: '', adresse: '', commune: '', cni: null };
+          this.celibatForm = { nom: '', prenom: '', dob: '', profession: '', acteRef: '', cni: null };
+          this.residenceForm = { nom: '', prenom: '', adresse: '', quartier: '', commune: '', cni: null };
           this.vieForm = { nom: '', prenom: '', dob: '', cni: null };
         },
         error: () => this.notify("Erreur lors de la délivrance")
@@ -66,7 +69,7 @@ export class CertificatsComponent implements OnInit {
 
   imprimer(c: any): void {
     const parts = (c.beneficiaire ?? '').trim().split(' ');
-    this.genererCertificatPDF(c.type, {
+    genererCertificatPDF(c.type, {
       numero: c.numero,
       nom: parts[0] ?? '',
       prenom: parts.slice(1).join(' '),
@@ -74,12 +77,16 @@ export class CertificatsComponent implements OnInit {
     });
   }
 
-  genererCertificatPDF(type: string, data: {
-    numero: string; nom: string; prenom: string;
-    dob?: string; acteRef?: string; adresse?: string; commune?: string; dateDelivrance?: string;
-  }): void {
+}
+
+export async function genererCertificatPDF(type: string, data: {
+  numero: string; nom: string; prenom: string;
+  dob?: string; acteRef?: string; adresse?: string; quartier?: string; commune?: string;
+  profession?: string; dateDelivrance?: string;
+}): Promise<void> {
     const today = new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
     const nomComplet = `${data.nom} ${data.prenom}`.trim();
+    const qr = await qrVerification(data.numero, `Certificat de ${type}`, nomComplet);
 
     let mainTitle = 'CERTIFICAT';
     let subtitle = '';
@@ -93,7 +100,8 @@ export class CertificatsComponent implements OnInit {
       detailRows = `
                     <tr><td class="label-cell">Nom</td><td class="separator-cell">:</td><td class="value-cell">${data.nom}</td></tr>
                     <tr><td class="label-cell">Prénoms</td><td class="separator-cell">:</td><td class="value-cell">${data.prenom}</td></tr>
-                    <tr><td class="label-cell">Date de naissance</td><td class="separator-cell">:</td><td class="value-cell mixed">${data.dob || 'Non renseignée'}</td></tr>
+                    <tr><td class="label-cell">Date de naissance</td><td class="separator-cell">:</td><td class="value-cell mixed">${formatDateFr(data.dob)}</td></tr>
+                    <tr><td class="label-cell">Profession</td><td class="separator-cell">:</td><td class="value-cell mixed">${data.profession || 'Non renseignée'}</td></tr>
                     <tr><td class="label-cell">Référence acte de naissance</td><td class="separator-cell">:</td><td class="value-cell mixed">${data.acteRef || 'Néant'}</td></tr>`;
     } else if (type === 'Résidence') {
       mainTitle = 'CERTIFICAT DE RÉSIDENCE';
@@ -103,6 +111,7 @@ export class CertificatsComponent implements OnInit {
                     <tr><td class="label-cell">Nom</td><td class="separator-cell">:</td><td class="value-cell">${data.nom}</td></tr>
                     <tr><td class="label-cell">Prénoms</td><td class="separator-cell">:</td><td class="value-cell">${data.prenom}</td></tr>
                     <tr><td class="label-cell">Adresse</td><td class="separator-cell">:</td><td class="value-cell mixed">${data.adresse || 'Non renseignée'}</td></tr>
+                    <tr><td class="label-cell">Quartier</td><td class="separator-cell">:</td><td class="value-cell mixed">${data.quartier || 'Non renseigné'}</td></tr>
                     <tr><td class="label-cell">Commune</td><td class="separator-cell">:</td><td class="value-cell mixed">${data.commune || 'Non renseignée'}</td></tr>`;
     } else {
       mainTitle = 'CERTIFICAT DE VIE INDIVIDUELLE';
@@ -111,7 +120,7 @@ export class CertificatsComponent implements OnInit {
       detailRows = `
                     <tr><td class="label-cell">Nom</td><td class="separator-cell">:</td><td class="value-cell">${data.nom}</td></tr>
                     <tr><td class="label-cell">Prénoms</td><td class="separator-cell">:</td><td class="value-cell">${data.prenom}</td></tr>
-                    <tr><td class="label-cell">Date de naissance</td><td class="separator-cell">:</td><td class="value-cell mixed">${data.dob || 'Non renseignée'}</td></tr>`;
+                    <tr><td class="label-cell">Date de naissance</td><td class="separator-cell">:</td><td class="value-cell mixed">${formatDateFr(data.dob)}</td></tr>`;
     }
 
     const html =
@@ -120,6 +129,7 @@ export class CertificatsComponent implements OnInit {
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <base href="${document.baseURI}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${mainTitle}</title>
     <style>
@@ -484,7 +494,7 @@ export class CertificatsComponent implements OnInit {
             <tr>
                 <td class="header-left">
                     <div class="logo-placeholder">
-                     <img src="/armoirie_0.jpg" alt="Description de l'image" width="82" height="82">
+                     <img src="armoirie_0.jpg" alt="Description de l'image" width="82" height="82">
                     </div>
                     RÉPUBLIQUE<br>DE CÔTE D'IVOIRE
                 </td>
@@ -502,7 +512,7 @@ export class CertificatsComponent implements OnInit {
                     </div>
                     <br>
                     <div class="administration" style="font-weight: normal;">
-                        <strong>COMMUNE DE COCODY</strong><br>
+                        <strong>COMMUNE DE ${(data.commune || 'Cocody').toUpperCase()}</strong><br>
                         DÉPARTEMENT D'ABIDJAN
                     </div>
                 </td>
@@ -510,7 +520,7 @@ export class CertificatsComponent implements OnInit {
                 <td class="header-right">
                     <div class="numero-acte">N° ${data.numero}</div>
                     <div class="timbre-numerique">
-                        <img src="/timbre_numerique1.png" height="130" weight="130">
+                        <img src="timbre_numerique1.png" height="130" weight="130">
                     </div>
                     <div class="certif-box">Document Électronique<br>Certifié</div>
                 </td>
@@ -548,18 +558,18 @@ export class CertificatsComponent implements OnInit {
             <div class="right-meta-column">
 
                 <div class="commune-illustration">
-                  <img src="/Batiment_Mairie_Cocody.png" width="210" height="210">
+                  <img src="Batiment_Mairie_Cocody.png" width="210" height="210">
                 </div>
 
                 <div class="qr-verification-box">
                     <div class="qr-title">VÉRIFICATION EN LIGNE</div>
                       <div class="qr-placeholder">
-                        <img src="/Qr_Code.png" alt="Qr_Code.png" height="112" width="112">
+                        <img src="${qr}" alt="QR code de vérification" height="112" width="112">
                       </div>
                     <div class="qr-text">
                         Scannez ce QR code ou rendez-vous sur <strong>https://etatcivil.gouv.ci/verification</strong> pour vérifier l'authenticité de ce document.
                     </div>
-                    <div class="qr-code-verif">Code de vérification : ${data.numero}</div>
+                    <div class="qr-code-verif">Code de vérification : ${codeVerification(data.numero)}</div>
                     <div class="qr-text" style="font-weight: bold; margin-top: 5px;">
                         Ce document est signé et sécurisé numériquement.
                     </div>
@@ -569,12 +579,12 @@ export class CertificatsComponent implements OnInit {
         </div>
 
         <div class="signature-section">
-            <img src="/seau.png" alt="sceau" width="" height="" class="seal-placeholder">
+            <img src="seau.png" alt="sceau" width="" height="" class="seal-placeholder">
             <div class="signature-box">
                 <div>Fait à Cocody, le ${today}</div>
                 <div class="signature-title">L'Officier de l'État Civil</div>
                 <div class="">
-                <img src="/Signature.png" alt="signature" width="150" height="60">
+                <img src="Signature.png" alt="signature" width="150" height="60">
                 <div>
             </div>
         </div>
@@ -590,10 +600,5 @@ export class CertificatsComponent implements OnInit {
 </html>
 `;
 
-    const win = window.open('', '_blank', 'width=900,height=700');
-    if (win) {
-      win.document.write(html);
-      win.document.close();
-    }
-  }
+    openPrintWindow(html);
 }

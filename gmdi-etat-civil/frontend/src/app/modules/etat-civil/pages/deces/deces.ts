@@ -2,6 +2,7 @@ import { Component, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../../../services/api.service';
+import { qrVerification, codeVerification, formatDateFr, openPrintWindow } from '../../pdf-utils';
 
 @Component({
   selector: 'app-deces',
@@ -16,7 +17,7 @@ export class DecesComponent implements OnInit {
   showToast = signal(false);
   deces = signal<any[]>([]);
 
-  decesForm: { nom: string; prenom: string; dob: string; date: string; heure: string; lieu: string; commune: string; cause: string; declarant: string; lien: string; cniMedecin: File | null; certificatDeces: File | null; cniDeclarant: File | null } = { nom: '', prenom: '', dob: '', date: '', heure: '', lieu: '', commune: '', cause: '', declarant: '', lien: '', cniMedecin: null, certificatDeces: null, cniDeclarant: null };
+  decesForm: { nom: string; prenom: string; dob: string; date: string; heure: string; lieu: string; commune: string; cause: string; declarant: string; lien: string; cniDefunt: File | null; certificatDeces: File | null; cniDeclarant: File | null } = { nom: '', prenom: '', dob: '', date: '', heure: '', lieu: '', commune: '', cause: '', declarant: '', lien: '', cniDefunt: null, certificatDeces: null, cniDeclarant: null };
 
   constructor(private api: ApiService) {}
 
@@ -31,13 +32,13 @@ export class DecesComponent implements OnInit {
     setTimeout(() => this.showToast.set(false), 3500);
   }
 
-  onCniMedecinSelected(e: Event) { this.decesForm.cniMedecin = (e.target as HTMLInputElement).files?.[0] ?? null; }
+  onCniDefuntSelected(e: Event) { this.decesForm.cniDefunt = (e.target as HTMLInputElement).files?.[0] ?? null; }
   onCertificatDecesSelected(e: Event) { this.decesForm.certificatDeces = (e.target as HTMLInputElement).files?.[0] ?? null; }
   onCniDeclarantSelected(e: Event) { this.decesForm.cniDeclarant = (e.target as HTMLInputElement).files?.[0] ?? null; }
 
   enregistrerDeces() {
     const f = this.decesForm;
-    if (!f.nom || !f.date || !f.lieu) { this.notify('Nom, date et lieu requis'); return; }
+    if (!f.nom || !f.prenom || !f.date || !f.lieu) { this.notify('Nom, prénom(s), date et lieu requis (*)'); return; }
     this.api.createDeces({
       nom: f.nom, prenom: f.prenom,
       date_naissance: f.dob || null,
@@ -49,43 +50,51 @@ export class DecesComponent implements OnInit {
       next: res => {
         this.deces.update(l => [res, ...l]);
         this.notify(`Acte de décès enregistré — N° ${res.numero}`);
-        this.genererActeDecesPDF({
+        genererActeDecesPDF({
           numero: res.numero,
           nom: f.nom, prenom: f.prenom, dob: f.dob,
           dateDeces: f.date, heureDeces: f.heure,
           lieuDeces: f.lieu, commune: f.commune,
           causeDeces: f.cause, declarant: f.declarant, lien: f.lien
         });
-        this.decesForm = { nom: '', prenom: '', dob: '', date: '', heure: '', lieu: '', commune: '', cause: '', declarant: '', lien: '', cniMedecin: null, certificatDeces: null, cniDeclarant: null };
+        this.decesForm = { nom: '', prenom: '', dob: '', date: '', heure: '', lieu: '', commune: '', cause: '', declarant: '', lien: '', cniDefunt: null, certificatDeces: null, cniDeclarant: null };
       },
       error: () => this.notify("Erreur lors de l'enregistrement")
     });
   }
 
   imprimer(d: any): void {
-    const parts = (d.nomComplet ?? '').trim().split(' ');
-    this.genererActeDecesPDF({
+    genererActeDecesPDF({
       numero: d.numero,
-      nom: parts[0] ?? '',
-      prenom: parts.slice(1).join(' '),
+      nom: d.nom ?? (d.nomComplet ?? '').trim().split(' ')[0] ?? '',
+      prenom: d.prenom ?? (d.nomComplet ?? '').trim().split(' ').slice(1).join(' '),
+      dob: d.dateNaissance,
       dateDeces: d.dateDeces,
+      heureDeces: d.heureDeces,
       lieuDeces: d.lieu,
-      commune: d.commune
+      commune: d.commune,
+      causeDeces: d.cause,
+      declarant: d.declarant,
+      lien: d.lien
     });
   }
+}
 
-  genererActeDecesPDF(data: {
-    numero: string; nom: string; prenom: string; dob?: string;
-    dateDeces: string; heureDeces?: string; lieuDeces?: string; commune?: string;
-    causeDeces?: string; declarant?: string; lien?: string;
-  }): void {
+export async function genererActeDecesPDF(data: {
+  numero: string; nom: string; prenom: string; dob?: string;
+  dateDeces: string; heureDeces?: string; lieuDeces?: string; commune?: string;
+  causeDeces?: string; declarant?: string; lien?: string;
+}): Promise<void> {
     const today = new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
+    const commune = data.commune || 'Cocody';
+    const qr = await qrVerification(data.numero, 'Extrait de décès', `${data.nom} ${data.prenom}`.trim());
     const html =
       `
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <base href="${document.baseURI}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Extrait d'Acte de Décès</title>
     <style>
@@ -450,7 +459,7 @@ export class DecesComponent implements OnInit {
             <tr>
                 <td class="header-left">
                     <div class="logo-placeholder">
-                     <img src="/armoirie_0.jpg" alt="Description de l'image" width="82" height="82">
+                     <img src="armoirie_0.jpg" alt="Description de l'image" width="82" height="82">
                     </div>
                     RÉPUBLIQUE<br>DE CÔTE D'IVOIRE
                 </td>
@@ -468,7 +477,7 @@ export class DecesComponent implements OnInit {
                     </div>
                     <br>
                     <div class="administration" style="font-weight: normal;">
-                        <strong>COMMUNE DE COCODY</strong><br>
+                        <strong>COMMUNE DE ${commune.toUpperCase()}</strong><br>
                         DÉPARTEMENT D'ABIDJAN
                     </div>
                 </td>
@@ -476,7 +485,7 @@ export class DecesComponent implements OnInit {
                 <td class="header-right">
                     <div class="numero-acte">N° ${data.numero}</div>
                     <div class="timbre-numerique">
-                        <img src="/timbre_numerique1.png" height="130" weight="130">
+                        <img src="timbre_numerique1.png" height="130" weight="130">
                     </div>
                     <div class="certif-box">Document Électronique<br>Certifié</div>
                 </td>
@@ -489,7 +498,7 @@ export class DecesComponent implements OnInit {
         </div>
 
         <div class="intro-text">
-            L'Officier de l'État Civil soussigné certifie qu'il résulte des registres des actes de décès de la Commune de Cocody, que l'acte dont les éléments sont ci-dessous relatés, a été dressé.
+            L'Officier de l'État Civil soussigné certifie qu'il résulte des registres des actes de décès de la Commune de ${commune}, que l'acte dont les éléments sont ci-dessous relatés, a été dressé.
         </div>
 
         <div class="content-container">
@@ -500,8 +509,8 @@ export class DecesComponent implements OnInit {
                 <table class="data-table">
                     <tr><td class="label-cell">Nom du défunt</td><td class="separator-cell">:</td><td class="value-cell">${data.nom}</td></tr>
                     <tr><td class="label-cell">Prénoms</td><td class="separator-cell">:</td><td class="value-cell">${data.prenom}</td></tr>
-                    <tr><td class="label-cell">Date de naissance</td><td class="separator-cell">:</td><td class="value-cell mixed">${data.dob || 'Non renseignée'}</td></tr>
-                    <tr><td class="label-cell">Date du décès</td><td class="separator-cell">:</td><td class="value-cell mixed">${data.dateDeces}</td></tr>
+                    <tr><td class="label-cell">Date de naissance</td><td class="separator-cell">:</td><td class="value-cell mixed">${formatDateFr(data.dob)}</td></tr>
+                    <tr><td class="label-cell">Date du décès</td><td class="separator-cell">:</td><td class="value-cell mixed">${formatDateFr(data.dateDeces)}</td></tr>
                     <tr><td class="label-cell">Heure du décès</td><td class="separator-cell">:</td><td class="value-cell mixed">${data.heureDeces || 'Non renseignée'}</td></tr>
                     <tr><td class="label-cell">Lieu du décès</td><td class="separator-cell">:</td><td class="value-cell mixed">${data.lieuDeces || 'Non renseigné'}</td></tr>
                     <tr><td class="label-cell">Commune</td><td class="separator-cell">:</td><td class="value-cell mixed">${data.commune || 'Non renseignée'}</td></tr>
@@ -528,18 +537,18 @@ export class DecesComponent implements OnInit {
             <div class="right-meta-column">
 
                 <div class="commune-illustration">
-                  <img src="/Batiment_Mairie_Cocody.png" width="210" height="210">
+                  <img src="Batiment_Mairie_Cocody.png" width="210" height="210">
                 </div>
 
                 <div class="qr-verification-box">
                     <div class="qr-title">VÉRIFICATION EN LIGNE</div>
                       <div class="qr-placeholder">
-                        <img src="/Qr_Code.png" alt="Qr_Code.png" height="112" width="112">
+                        <img src="${qr}" alt="QR code de vérification" height="112" width="112">
                       </div>
                     <div class="qr-text">
                         Scannez ce QR code ou rendez-vous sur <strong>https://etatcivil.gouv.ci/verification</strong> pour vérifier l'authenticité de ce document.
                     </div>
-                    <div class="qr-code-verif">Code de vérification : ${data.numero}</div>
+                    <div class="qr-code-verif">Code de vérification : ${codeVerification(data.numero)}</div>
                     <div class="qr-text" style="font-weight: bold; margin-top: 5px;">
                         Ce document est signé et sécurisé numériquement.
                     </div>
@@ -549,12 +558,12 @@ export class DecesComponent implements OnInit {
         </div>
 
         <div class="signature-section">
-            <img src="/seau.png" alt="sceau" width="" height="" class="seal-placeholder">
+            <img src="seau.png" alt="sceau" width="" height="" class="seal-placeholder">
             <div class="signature-box">
-                <div>Fait à Cocody, le ${today}</div>
+                <div>Fait à ${commune}, le ${today}</div>
                 <div class="signature-title">L'Officier de l'État Civil</div>
                 <div class="">
-                <img src="/Signature.png" alt="signature" width="150" height="60">
+                <img src="Signature.png" alt="signature" width="150" height="60">
                 <div>
             </div>
         </div>
@@ -570,10 +579,5 @@ export class DecesComponent implements OnInit {
 </html>
 `;
 
-    const win = window.open('', '_blank', 'width=900,height=700');
-    if (win) {
-      win.document.write(html);
-      win.document.close();
-    }
-  }
+    openPrintWindow(html);
 }

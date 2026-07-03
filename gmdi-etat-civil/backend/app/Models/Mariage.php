@@ -12,7 +12,8 @@ class Mariage extends Model
         'epouse_nom', 'epouse_prenom', 'epouse_date_naissance',
         'epouse_nationalite', 'epouse_profession',
         'date_mariage', 'lieu_mariage', 'commune',
-        'regime_matrimonial', 'temoin1_nom', 'temoin2_nom', 'statut',
+        'regime_matrimonial', 'temoin1_nom', 'temoin1_profession',
+        'temoin2_nom', 'temoin2_profession', 'statut',
     ];
 
     protected $casts = [

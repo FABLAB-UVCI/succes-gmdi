@@ -280,7 +280,7 @@
                     <td>{{ r.lieu }}</td>
                     <td><span class="chip cv">{{ r.statut }}</span></td>
                     <td>
-                      <button class="btn-print" (click)="imprimer.emit({ type: r.typeLabel, numero: r.numero })">
+                      <button class="btn-print" (click)="imprimerResultat(r)">
                         <i class="ti ti-printer"></i> Imprimer
                       </button>
                     </td>

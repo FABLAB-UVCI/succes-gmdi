@@ -3,6 +3,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TOUTES_COMMUNES } from '../../../../communes.ci';
 import { ApiService } from '../../../../services/api.service';
+import { qrVerification, codeVerification, formatDateFr, formatHeureFr, openPrintWindow } from '../../pdf-utils';
+import { genererActeMariagePDF } from '../mariages/mariages';
+import { genererActeDecesPDF } from '../deces/deces';
 
 @Component({
   selector: 'app-naissances',
@@ -48,11 +51,13 @@ export class NaissancesComponent implements OnInit {
     commune: 'Cocody',
 
     pNom: '',
+    pPrenom: '',
     pProf: '',
     pNat: '',
     piecePere: null as File | null,
 
     mNom: '',
+    mPrenom: '',
     mProf: '',
     mNat: '',
     pieceMere: null as File | null
@@ -215,10 +220,13 @@ export class NaissancesComponent implements OnInit {
 
   duplicataForm = {
     type: 'naissance',
-    num: '',
+    recherche: '',
     dem: '',
     motif: ''
   };
+
+  duplicataResults = signal<any[]>([]);
+  duplicataSearched = signal(false);
 
   switchTab(section: string, tab: string): void {
     this.currentTabs.update(tabs => ({
@@ -254,39 +262,42 @@ export class NaissancesComponent implements OnInit {
   }
 
   enregistrerNaissance(): void {
-    if (!this.naissanceForm.nom || !this.naissanceForm.prenom || !this.naissanceForm.date) {
-      this.showToast.emit('Veuillez remplir les champs obligatoires');
+    const f = this.naissanceForm;
+    if (!f.nom || !f.prenom || !f.date || !f.sexe || !f.commune || !f.pNom || !f.pPrenom || !f.mNom || !f.mPrenom) {
+      this.showToast.emit('Veuillez remplir les champs obligatoires (*)');
       return;
     }
 
+    const pereNomComplet = `${f.pNom} ${f.pPrenom}`.trim();
+    const mereNomComplet = `${f.mNom} ${f.mPrenom}`.trim();
+
     const payload = {
-      nom: this.naissanceForm.nom,
-      prenom: this.naissanceForm.prenom,
-      date_naissance: this.naissanceForm.date,
-      heure_naissance: this.naissanceForm.heure,
-      sexe: this.naissanceForm.sexe,
-      lieu_naissance: this.naissanceForm.lieu,
-      commune: this.naissanceForm.commune,
-      pere_nom: this.naissanceForm.pNom,
-      pere_profession: this.naissanceForm.pProf,
-      pere_nationalite: this.naissanceForm.pNat,
-      mere_nom: this.naissanceForm.mNom,
-      mere_profession: this.naissanceForm.mProf,
-      mere_nationalite: this.naissanceForm.mNat,
+      nom: f.nom,
+      prenom: f.prenom,
+      date_naissance: f.date,
+      heure_naissance: f.heure,
+      sexe: f.sexe,
+      lieu_naissance: f.lieu,
+      commune: f.commune,
+      pere_nom: pereNomComplet,
+      pere_profession: f.pProf,
+      pere_nationalite: f.pNat,
+      mere_nom: mereNomComplet,
+      mere_profession: f.mProf,
+      mere_nationalite: f.mNat,
     };
 
     this.api.createNaissance(payload).subscribe({
       next: (res) => {
         this.naissancesDB = [res, ...this.naissancesDB];
         this.showToast.emit('Naissance enregistrée avec succès — N° ' + res.numero);
-        const f = this.naissanceForm;
-        this.genererPDF({
+        genererExtraitNaissancePDF({
           numero: res.numero,
           nom: f.nom, prenom: f.prenom,
           dateNaissance: f.date, heureNaissance: f.heure,
           sexe: f.sexe, lieuNaissance: f.lieu, commune: f.commune,
-          pereNom: f.pNom, pereProf: f.pProf, pereNat: f.pNat,
-          mereName: f.mNom, mereProf: f.mProf, mereNat: f.mNat,
+          pereNom: pereNomComplet, pereProf: f.pProf, pereNat: f.pNat,
+          mereNom: mereNomComplet, mereProf: f.mProf, mereNat: f.mNat,
         });
         this.resetForm('naissance');
       },
@@ -343,9 +354,95 @@ export class NaissancesComponent implements OnInit {
     });
   }
 
-  delivrerDuplicata(): void {
-    console.log('Duplicata demandé', this.duplicataForm);
-    this.showToast.emit('Duplicata généré');
+  resetRechercheDuplicata(): void {
+    this.duplicataResults.set([]);
+    this.duplicataSearched.set(false);
+  }
+
+  rechercherDuplicata(): void {
+    const q = this.duplicataForm.recherche.trim();
+    if (!q) {
+      this.showToast.emit('Saisissez un nom ou un numéro d\'acte');
+      return;
+    }
+    const type = this.duplicataForm.type;
+
+    if (type === 'mariage') {
+      this.api.getMariages(q).subscribe({
+        next: rows => {
+          this.duplicataResults.set(rows.map(m => ({
+            id: m.id, numero: m.numero,
+            nomComplet: `${m.epoux} & ${m.epouse}`,
+            date: m.dateMariage, type: 'Mariage', raw: m
+          })));
+          this.duplicataSearched.set(true);
+        },
+        error: () => this.showToast.emit('Erreur lors de la recherche')
+      });
+    } else if (type === 'deces') {
+      this.api.getDeces(q).subscribe({
+        next: rows => {
+          this.duplicataResults.set(rows.map(d => ({
+            id: d.id, numero: d.numero,
+            nomComplet: d.nomComplet,
+            date: d.dateDeces, type: 'Décès', raw: d
+          })));
+          this.duplicataSearched.set(true);
+        },
+        error: () => this.showToast.emit('Erreur lors de la recherche')
+      });
+    } else {
+      const typeAttendu = type === 'jugement' ? 'Jugement' : type === 'adoption' ? 'Adoption' : 'Déclaration';
+      this.api.getNaissances(q).subscribe({
+        next: rows => {
+          this.duplicataResults.set(rows
+            .filter(n => (n.type ?? 'Déclaration') === typeAttendu)
+            .map(n => ({
+              id: n.id, numero: n.numero,
+              nomComplet: n.nomComplet,
+              date: n.dateNaissance, type: n.type ?? 'Déclaration', raw: n
+            })));
+          this.duplicataSearched.set(true);
+        },
+        error: () => this.showToast.emit('Erreur lors de la recherche')
+      });
+    }
+  }
+
+  imprimerDuplicata(r: any): void {
+    const item = r.raw;
+    if (r.type === 'Mariage') {
+      genererActeMariagePDF({
+        numero: item.numero, epoux: item.epoux, epouse: item.epouse,
+        dateMariage: item.dateMariage, lieu: item.lieu, commune: item.commune,
+        regime: item.regime,
+        epouxProf: item.epouxProf, epouxNat: item.epouxNat,
+        epouseProf: item.epouseProf, epouseNat: item.epouseNat,
+        temoin1: item.temoin1, temoin1Prof: item.temoin1Prof,
+        temoin2: item.temoin2, temoin2Prof: item.temoin2Prof
+      });
+    } else if (r.type === 'Décès') {
+      genererActeDecesPDF({
+        numero: item.numero, nom: item.nom ?? '', prenom: item.prenom ?? '',
+        dob: item.dateNaissance, dateDeces: item.dateDeces, heureDeces: item.heureDeces,
+        lieuDeces: item.lieu, commune: item.commune,
+        causeDeces: item.cause, declarant: item.declarant, lien: item.lien
+      });
+    } else {
+      genererExtraitNaissancePDF({
+        numero: item.numero,
+        nom: item.nom ?? item.nomComplet?.split(' ')[0] ?? '',
+        prenom: item.prenom ?? item.nomComplet?.split(' ').slice(1).join(' ') ?? '',
+        dateNaissance: item.dateNaissance ?? '',
+        heureNaissance: item.heureNaissance ?? '',
+        sexe: item.sexe ?? '',
+        lieuNaissance: item.lieu ?? '',
+        commune: item.commune ?? '',
+        pereNom: item.pereNom ?? '', pereProf: item.pereProf ?? '', pereNat: item.pereNat ?? '',
+        mereNom: item.mereNom ?? '', mereProf: item.mereProf ?? '', mereNat: item.mereNat ?? ''
+      });
+    }
+    this.showToast.emit(`Duplicata délivré — N° ${r.numero}`);
   }
 
   exportJSON(type: string): void {
@@ -372,34 +469,70 @@ export class NaissancesComponent implements OnInit {
   imprimer(type: string, numero: string): void {
     const item = this.naissancesDB.find(n => n.numero === numero);
     if (item) {
-      this.genererPDF({
+      genererExtraitNaissancePDF({
         numero: item.numero,
-        nom: item.nomComplet?.split(' ')[0] ?? '',
-        prenom: item.nomComplet?.split(' ').slice(1).join(' ') ?? '',
+        nom: item.nom ?? item.nomComplet?.split(' ')[0] ?? '',
+        prenom: item.prenom ?? item.nomComplet?.split(' ').slice(1).join(' ') ?? '',
         dateNaissance: item.dateNaissance ?? '',
-        heureNaissance: '',
-        sexe: '',
+        heureNaissance: item.heureNaissance ?? '',
+        sexe: item.sexe ?? '',
         lieuNaissance: item.lieu ?? '',
         commune: item.commune ?? '',
         pereNom: item.pereNom ?? '',
-        mereName: item.mereNom ?? '',
+        pereProf: item.pereProf ?? '',
+        pereNat: item.pereNat ?? '',
+        mereNom: item.mereNom ?? '',
+        mereProf: item.mereProf ?? '',
+        mereNat: item.mereNat ?? '',
       });
     }
   }
 
-  genererPDF(data: {
-    numero: string; nom: string; prenom: string;
-    dateNaissance: string; heureNaissance: string; sexe: string;
-    lieuNaissance: string; commune: string; pereNom: string; mereName: string;
-    pereProf?: string; mereProf?: string; pereNat?: string; mereNat?: string;
-  }): void {
+  resetForm(type: string): void {
+
+    if (type === 'naissance') {
+
+      this.naissanceForm = {
+        nom: '',
+        prenom: '',
+        date: '',
+        heure: '',
+        sexe: '',
+        lieu: '',
+        commune: '',
+
+        pNom: '',
+        pPrenom: '',
+        pProf: '',
+        pNat: '',
+        piecePere: null,
+
+        mNom: '',
+        mPrenom: '',
+        mProf: '',
+        mNat: '',
+        pieceMere: null
+      };
+    }
+  }
+}
+
+export async function genererExtraitNaissancePDF(data: {
+  numero: string; nom: string; prenom: string;
+  dateNaissance: string; heureNaissance: string; sexe: string;
+  lieuNaissance: string; commune: string; pereNom: string; mereNom: string;
+  pereProf?: string; mereProf?: string; pereNat?: string; mereNat?: string;
+}): Promise<void> {
     const today = new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
+    const commune = data.commune || 'Cocody';
+    const qr = await qrVerification(data.numero, 'Extrait de naissance', `${data.nom} ${data.prenom}`.trim());
     const html =
       `
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <base href="${document.baseURI}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Extrait d'Acte de Naissance</title>
     <style>
@@ -780,7 +913,7 @@ export class NaissancesComponent implements OnInit {
                 <!-- Logo et République -->
                 <td class="header-left">
                     <div class="logo-placeholder">
-                     <img src="/armoirie_0.jpg" alt="Description de l'image" width="82" height="82">
+                     <img src="armoirie_0.jpg" alt="Description de l'image" width="82" height="82">
                     </div>
                     RÉPUBLIQUE<br>DE CÔTE D'IVOIRE
                 </td>
@@ -799,21 +932,21 @@ export class NaissancesComponent implements OnInit {
                     </div>
                     <br>
                     <div class="administration" style="font-weight: normal;">
-                        <strong>COMMUNE DE COCODY</strong><br>
+                        <strong>COMMUNE DE ${commune.toUpperCase()}</strong><br>
                         DÉPARTEMENT D'ABIDJAN
                     </div>
                 </td>
-                
+
                 <!-- Timbre Numérique et N° d'acte -->
                 <td class="header-right">
-                    <div class="numero-acte">N° EA-COC-2024-0012345</div>
+                    <div class="numero-acte">N° ${data.numero}</div>
                     <div class="timbre-numerique">   
                         
                        <!--<div>TIMBRE NUMÉRIQUE OFFICIEL</div>
                         <div style="margin: 5px 0;">TN-24-5F7K-9M2P</div>
                         <div>27/05/2024</div>-->
 
-                        <img src="/timbre_numerique1.png" height="130" weight="130">
+                        <img src="timbre_numerique1.png" height="130" weight="130">
 
 
 
@@ -830,7 +963,7 @@ export class NaissancesComponent implements OnInit {
         </div>
 
         <div class="intro-text">
-            L'Officier de l'État Civil soussigné certifie qu'il résulte des registres des actes de naissance de la Commune de Cocody, que l'acte dont les éléments sont ci-dessous relatés, a été dressé.
+            L'Officier de l'État Civil soussigné certifie qu'il résulte des registres des actes de naissance de la Commune de ${commune}, que l'acte dont les éléments sont ci-dessous relatés, a été dressé.
         </div>
 
         <!-- Corps du document éclaté en deux colonnes (Données / Éléments Visuels) -->
@@ -844,37 +977,37 @@ export class NaissancesComponent implements OnInit {
                     <tr>
                         <td class="label-cell">Nom de l'enfant</td>
                         <td class="separator-cell">:</td>
-                        <td class="value-cell">Doukouré</td>
+                        <td class="value-cell">${data.nom}</td>
                     </tr>
                     <tr>
                         <td class="label-cell">Prénoms</td>
                         <td class="separator-cell">:</td>
-                        <td class="value-cell">Kévin Alexis</td>
+                        <td class="value-cell">${data.prenom}</td>
                     </tr>
                     <tr>
                         <td class="label-cell">Sexe</td>
                         <td class="separator-cell">:</td>
-                        <td class="value-cell">Masculin</td>
+                        <td class="value-cell">${data.sexe || '—'}</td>
                     </tr>
                     <tr>
                         <td class="label-cell">Date de naissance</td>
                         <td class="separator-cell">:</td>
-                        <td class="value-cell mixed">12 Février 2024</td>
+                        <td class="value-cell mixed">${formatDateFr(data.dateNaissance)}</td>
                     </tr>
                     <tr>
                         <td class="label-cell">Heure de naissance</td>
                         <td class="separator-cell">:</td>
-                        <td class="value-cell mixed">08 heures 45 minutes</td>
+                        <td class="value-cell mixed">${formatHeureFr(data.heureNaissance)}</td>
                     </tr>
                     <tr>
                         <td class="label-cell">Lieu de naissance</td>
                         <td class="separator-cell">:</td>
-                        <td class="value-cell mixed">Centre Hospitalier Universitaire de Cocody</td>
+                        <td class="value-cell mixed">${data.lieuNaissance || '—'}</td>
                     </tr>
                     <tr>
                         <td class="label-cell">Commune de naissance</td>
                         <td class="separator-cell">:</td>
-                        <td class="value-cell mixed">Cocody</td>
+                        <td class="value-cell mixed">${commune}</td>
                     </tr>
                     <tr>
                         <td class="label-cell">Pays</td>
@@ -888,22 +1021,32 @@ export class NaissancesComponent implements OnInit {
                     <tr>
                         <td class="label-cell">Père</td>
                         <td class="separator-cell">:</td>
-                        <td class="value-cell">Doukouré Youssouf</td>
+                        <td class="value-cell">${data.pereNom || '—'}</td>
                     </tr>
                     <tr>
                         <td class="label-cell">Profession</td>
                         <td class="separator-cell">:</td>
-                        <td class="value-cell mixed">Ingénieur en Informatique</td>
+                        <td class="value-cell mixed">${data.pereProf || '—'}</td>
+                    </tr>
+                    <tr>
+                        <td class="label-cell">Nationalité</td>
+                        <td class="separator-cell">:</td>
+                        <td class="value-cell mixed">${data.pereNat || '—'}</td>
                     </tr>
                     <tr>
                         <td class="label-cell">Mère</td>
                         <td class="separator-cell">:</td>
-                        <td class="value-cell">Koné Aminata</td>
+                        <td class="value-cell">${data.mereNom || '—'}</td>
                     </tr>
                     <tr>
                         <td class="label-cell">Profession</td>
                         <td class="separator-cell">:</td>
-                        <td class="value-cell mixed">Enseignante</td>
+                        <td class="value-cell mixed">${data.mereProf || '—'}</td>
+                    </tr>
+                    <tr>
+                        <td class="label-cell">Nationalité</td>
+                        <td class="separator-cell">:</td>
+                        <td class="value-cell mixed">${data.mereNat || '—'}</td>
                     </tr>
                 </table>
 
@@ -912,12 +1055,12 @@ export class NaissancesComponent implements OnInit {
                     <tr>
                         <td class="label-cell">Date de déclaration</td>
                         <td class="separator-cell">:</td>
-                        <td class="value-cell mixed">13 Février 2024</td>
+                        <td class="value-cell mixed">${today}</td>
                     </tr>
                     <tr>
                         <td class="label-cell">Déclarant</td>
                         <td class="separator-cell">:</td>
-                        <td class="value-cell mixed">DOUKOURÉ YOUSSOUF (Père)</td>
+                        <td class="value-cell mixed">${data.pereNom ? data.pereNom.toUpperCase() + ' (Père)' : '—'}</td>
                     </tr>
                     <tr>
                         <td class="label-cell">Officier de l'état civil</td>
@@ -927,12 +1070,12 @@ export class NaissancesComponent implements OnInit {
                     <tr>
                         <td class="label-cell">Date de délivrance</td>
                         <td class="separator-cell">:</td>
-                        <td class="value-cell mixed">27 Mai 2024</td>
+                        <td class="value-cell mixed">${today}</td>
                     </tr>
                     <tr>
                         <td class="label-cell">N° de l'acte</td>
                         <td class="separator-cell">:</td>
-                        <td class="value-cell mixed">2024/COC/02/01567</td>
+                        <td class="value-cell mixed">${data.numero}</td>
                     </tr>
                     <tr>
                         <td class="label-cell">Observations</td>
@@ -948,19 +1091,19 @@ export class NaissancesComponent implements OnInit {
                 
                 <!-- Illustration Mairie -->
                 <div class="commune-illustration">
-                  <img src="/Batiment_Mairie_Cocody.png" width="210" height="210">
+                  <img src="Batiment_Mairie_Cocody.png" width="210" height="210">
                 </div>
 
                 <!-- Box de Vérification QR Code -->
                 <div class="qr-verification-box">
                     <div class="qr-title">VÉRIFICATION EN LIGNE</div>
                       <div class="qr-placeholder">
-                        <img src="/Qr_Code.png" alt="Qr_Code.png" height="112" width="112">
+                        <img src="${qr}" alt="QR code de vérification" height="112" width="112">
                       </div>
                     <div class="qr-text">
                         Scannez ce QR code ou rendez-vous sur <strong>https://etatcivil.gouv.ci/verification</strong> pour vérifier l'authenticité de ce document.
                     </div>
-                    <div class="qr-code-verif">Code de vérification : 7A2B-C9D8-EF4G-H5J6</div>
+                    <div class="qr-code-verif">Code de vérification : ${codeVerification(data.numero)}</div>
                     <div class="qr-text" style="font-weight: bold; margin-top: 5px;">
                         Ce document est signé et sécurisé numériquement.
                     </div>
@@ -972,13 +1115,13 @@ export class NaissancesComponent implements OnInit {
         <!-- Zone Signature et Sceau de fin -->
         <div class="signature-section">
             <!-- Sceau rond Officier d'État civil -->
-            <img src="/seau.png" alt="sceau" width="" height="" class="seal-placeholder">
+            <img src="seau.png" alt="sceau" width="" height="" class="seal-placeholder">
             <!-- Bloc Signature Date -->
             <div class="signature-box">
-                <div>Fait à Cocody, le 27 Mai 2024</div>
+                <div>Fait à ${commune}, le ${today}</div>
                 <div class="signature-title">L'Officier de l'État Civil</div>
                 <div class="">
-                <img src="/Signature.png" alt="signature" width="150" height="60">
+                <img src="Signature.png" alt="signature" width="150" height="60">
                 <div>
             </div>
         </div>
@@ -995,36 +1138,5 @@ export class NaissancesComponent implements OnInit {
 </html>
 `;
 
-    const win = window.open('', '_blank', 'width=900,height=700');
-    if (win) {
-      win.document.write(html);
-      win.document.close();
-    }
-  }
-
-  resetForm(type: string): void {
-
-    if (type === 'naissance') {
-
-      this.naissanceForm = {
-        nom: '',
-        prenom: '',
-        date: '',
-        heure: '',
-        sexe: '',
-        lieu: '',
-        commune: '',
-
-        pNom: '',
-        pProf: '',
-        pNat: '',
-        piecePere: null,
-
-        mNom: '',
-        mProf: '',
-        mNat: '',
-        pieceMere: null
-      };
-    }
-  }
+    openPrintWindow(html);
 }

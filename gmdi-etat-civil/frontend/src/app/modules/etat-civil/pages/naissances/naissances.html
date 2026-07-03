@@ -26,13 +26,13 @@
         <div class="pb">
             <div class="fsec">Informations de l'enfant</div>
             <div class="form-grid">
-            <div class="fg"><div class="fl">Nom de famille</div><input class="fi" [(ngModel)]="naissanceForm.nom" type="text" placeholder="Ex: KONAN"></div>
-            <div class="fg"><div class="fl">Prénoms</div><input class="fi" [(ngModel)]="naissanceForm.prenom" type="text" placeholder="Ex: Yao Emmanuel"></div>
+            <div class="fg"><div class="fl">Nom de famille <span class="req">*</span></div><input class="fi" [(ngModel)]="naissanceForm.nom" type="text" placeholder="Ex: KONAN"></div>
+            <div class="fg"><div class="fl">Prénoms <span class="req">*</span></div><input class="fi" [(ngModel)]="naissanceForm.prenom" type="text" placeholder="Ex: Yao Emmanuel"></div>
             </div>
             <div class="form-grid-3">
-            <div class="fg"><div class="fl">Date de naissance</div><input class="fi" [(ngModel)]="naissanceForm.date" type="date"></div>
+            <div class="fg"><div class="fl">Date de naissance <span class="req">*</span></div><input class="fi" [(ngModel)]="naissanceForm.date" type="date"></div>
             <div class="fg"><div class="fl">Heure de naissance</div><input class="fi" [(ngModel)]="naissanceForm.heure" type="time"></div>
-            <div class="fg"><div class="fl">Sexe</div><select class="fs" [(ngModel)]="naissanceForm.sexe"><option value="">--</option><option>Masculin</option><option>Féminin</option></select></div>
+            <div class="fg"><div class="fl">Sexe <span class="req">*</span></div><select class="fs" [(ngModel)]="naissanceForm.sexe"><option value="">--</option><option>Masculin</option><option>Féminin</option></select></div>
             </div>
 
             <div class="form-grid">
@@ -41,7 +41,7 @@
                 <input class="fi" [(ngModel)]="naissanceForm.lieu" type="text" placeholder="Ex: CHU Cocody, Clinique Sainte Marie...">
             </div>
             <div class="fg">
-                <div class="fl">Commune d'enregistrement</div>
+                <div class="fl">Commune d'enregistrement <span class="req">*</span></div>
                 <select class="fs" [(ngModel)]="naissanceForm.commune" required>
                 <option value="" disabled selected>-- Sélectionnez une commune --</option>
                 @for (commune of communesList; track commune) {
@@ -53,7 +53,8 @@
             
             <div class="fsec">Informations des parents</div>
             <div class="form-grid-3">
-                <div class="fg"><div class="fl">Nom Complet Père</div><input class="fi" [(ngModel)]="naissanceForm.pNom" type="text"></div>
+                <div class="fg"><div class="fl">Nom du Père <span class="req">*</span></div><input class="fi" [(ngModel)]="naissanceForm.pNom" type="text" placeholder="Ex: DOUKOURÉ"></div>
+                <div class="fg"><div class="fl">Prénoms du Père <span class="req">*</span></div><input class="fi" [(ngModel)]="naissanceForm.pPrenom" type="text" placeholder="Ex: Youssouf"></div>
                 <div class="fg"><div class="fl">Profession Père</div><input class="fi" [(ngModel)]="naissanceForm.pProf" type="text"></div>
                 <div class="fg"><div class="fl">Nationalité Père</div><input class="fi" [(ngModel)]="naissanceForm.pNat" type="text"></div>
                 <div class="fg">
@@ -65,7 +66,8 @@
                 </div>
             </div>
             <div class="form-grid-3">
-                <div class="fg"><div class="fl">Nom Complet Mère</div><input class="fi" [(ngModel)]="naissanceForm.mNom" type="text"></div>
+                <div class="fg"><div class="fl">Nom de la Mère <span class="req">*</span></div><input class="fi" [(ngModel)]="naissanceForm.mNom" type="text" placeholder="Ex: KONÉ"></div>
+                <div class="fg"><div class="fl">Prénoms de la Mère <span class="req">*</span></div><input class="fi" [(ngModel)]="naissanceForm.mPrenom" type="text" placeholder="Ex: Aminata"></div>
                 <div class="fg"><div class="fl">Profession Mère</div><input class="fi" [(ngModel)]="naissanceForm.mProf" type="text"></div>
                 <div class="fg"><div class="fl">Nationalité Mère</div><input class="fi" [(ngModel)]="naissanceForm.mNat" type="text"></div>
                 <div class="fg">
@@ -121,7 +123,7 @@
             
             <div class="form-grid">
                 <div class="fg">
-                <div class="fl">Nom complet du bénéficiaire</div>
+                <div class="fl">Nom complet du bénéficiaire <span class="req">*</span></div>
                 <input class="fi" [(ngModel)]="jugementForm.nom" type="text" placeholder="Ex: KONAN Yao">
                 </div>
                 <div class="fg">
@@ -132,7 +134,7 @@
             
             <div class="form-grid-3">
                 <div class="fg">
-                <div class="fl">Date de naissance fixée</div>
+                <div class="fl">Date de naissance fixée <span class="req">*</span></div>
                 <input class="fi" [(ngModel)]="jugementForm.date" type="date">
                 </div>
                 <div class="fg">
@@ -184,7 +186,7 @@
             <div class="fsec">Informations de l'enfant</div>
             <div class="form-grid">
                 <div class="fg">
-                <div class="fl">Nom complet de l'enfant</div>
+                <div class="fl">Nom complet de l'enfant <span class="req">*</span></div>
                 <input class="fi" [(ngModel)]="adoptionForm.enfantNom" type="text" placeholder="Ex: KOUADIO Ange">
                 </div>
                 <div class="fg">
@@ -198,7 +200,7 @@
             <!-- Adoptant 1 (Père adoptant) -->
             <div class="form-grid-3">
                 <div class="fg">
-                <div class="fl">Nom complet adoptant (Père)</div>
+                <div class="fl">Nom complet adoptant (Père) <span class="req">*</span></div>
                 <input class="fi" [(ngModel)]="adoptionForm.adoptantPereNom" type="text" placeholder="Ex: KOUADIO Jean">
                 </div>
                 <div class="fg">
@@ -224,7 +226,7 @@
             <!-- Adoptant 2 (Mère adoptante) -->
             <div class="form-grid-3">
                 <div class="fg">
-                <div class="fl">Nom complet adoptant (Mère)</div>
+                <div class="fl">Nom complet adoptant (Mère) <span class="req">*</span></div>
                 <input class="fi" [(ngModel)]="adoptionForm.adoptantMereNom" type="text" placeholder="Ex: KOUADIO Marie">
                 </div>
                 <div class="fg">
@@ -261,7 +263,7 @@
                 </select>
                 </div>
                 <div class="fg">
-                <div class="fl">Date du jugement d'adoption</div>
+                <div class="fl">Date du jugement d'adoption <span class="req">*</span></div>
                 <input class="fi" [(ngModel)]="adoptionForm.dateJugement" type="date">
                 </div>
                 <div class="fg">
@@ -297,9 +299,47 @@
         <div>
         <div class="ph"><div class="pt"><i class="ti ti-copy"></i>Demande de Duplicata / Extrait d'Acte</div></div>
         <div class="pb">
-            <div class="form-grid"><div class="fg"><div class="fl">Type d'acte requis</div><select class="fs" [(ngModel)]="duplicataForm.type"><option value="naissance">Extrait de Naissance</option><option value="mariage">Extrait de Mariage</option><option value="deces">Extrait de Décès</option><option value="jugement">Jugement supplétif</option><option value="adoption">Adoption</option></select></div><div class="fg"><div class="fl">Numéro de l'acte original</div><input class="fi" [(ngModel)]="duplicataForm.num" type="text"></div></div>
-            <div class="form-grid"><div class="fg"><div class="fl">Nom du demandeur</div><input class="fi" [(ngModel)]="duplicataForm.dem" type="text"></div><div class="fg"><div class="fl">Motif de la demande</div><input class="fi" [(ngModel)]="duplicataForm.motif" type="text"></div></div>
-            <div class="fa"><button class="btn-p" (click)="delivrerDuplicata()"><i class="ti ti-printer"></i>Délivrer et imprimer l'extrait</button></div>
+            <div class="form-grid">
+              <div class="fg"><div class="fl">Type d'acte requis <span class="req">*</span></div>
+                <select class="fs" [(ngModel)]="duplicataForm.type" (ngModelChange)="resetRechercheDuplicata()">
+                  <option value="naissance">Extrait de Naissance</option>
+                  <option value="jugement">Jugement supplétif</option>
+                  <option value="adoption">Adoption</option>
+                  <option value="mariage">Extrait de Mariage</option>
+                  <option value="deces">Extrait de Décès</option>
+                </select>
+              </div>
+              <div class="fg"><div class="fl">Nom ou numéro de l'acte <span class="req">*</span></div>
+                <input class="fi" [(ngModel)]="duplicataForm.recherche" (keyup.enter)="rechercherDuplicata()" type="text" placeholder="Ex: KONAN ou CI-CC-2026-N-000012">
+              </div>
+            </div>
+            <div class="form-grid">
+              <div class="fg"><div class="fl">Nom du demandeur</div><input class="fi" [(ngModel)]="duplicataForm.dem" type="text"></div>
+              <div class="fg"><div class="fl">Motif de la demande</div><input class="fi" [(ngModel)]="duplicataForm.motif" type="text"></div>
+            </div>
+            <div class="fa"><button class="btn-p" (click)="rechercherDuplicata()"><i class="ti ti-search"></i>Rechercher l'acte</button></div>
+
+            @if (duplicataSearched()) {
+              <div class="tbl-wrap" style="margin-top:1rem">
+                <table>
+                  <thead><tr><th>N° Acte</th><th>Nom complet</th><th>Date</th><th>Type</th><th>Actions</th></tr></thead>
+                  <tbody>
+                    @for (r of duplicataResults(); track r.id) {
+                      <tr>
+                        <td style="font-family:monospace;font-size:11px">{{ r.numero }}</td>
+                        <td><strong>{{ r.nomComplet }}</strong></td>
+                        <td>{{ r.date }}</td>
+                        <td><span class="chip cv">{{ r.type }}</span></td>
+                        <td><button class="btn-p" style="padding:3px 8px;font-size:11px" (click)="imprimerDuplicata(r)"><i class="ti ti-printer"></i>Délivrer l'extrait</button></td>
+                      </tr>
+                    }
+                    @if (duplicataResults().length === 0) {
+                      <tr><td colspan="5" style="text-align:center;color:#aaa;padding:2rem">Aucun acte trouvé pour « {{ duplicataForm.recherche }} »</td></tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            }
         </div>
         </div>
     }

@@ -272,3 +272,6 @@ tr:hover td {
   .fa { flex-direction: column; }
   .btn-p, .btn-s { width: 100%; justify-content: center; }
 }
+
+/* Etoile des champs obligatoires */
+.req { color: #d32f2f; font-weight: 700; }

@@ -14,11 +14,14 @@
         <div class="ph"><div class="pt"><i class="ti ti-certificate"></i>Certificat de Célibat</div></div>
         <div class="pb">
           <div class="form-grid">
-            <div class="fg"><div class="fl">Nom</div><input class="fi" [(ngModel)]="celibatForm.nom" type="text" placeholder="Ex: KONAN"></div>
+            <div class="fg"><div class="fl">Nom <span class="req">*</span></div><input class="fi" [(ngModel)]="celibatForm.nom" type="text" placeholder="Ex: KONAN"></div>
             <div class="fg"><div class="fl">Prénom(s)</div><input class="fi" [(ngModel)]="celibatForm.prenom" type="text" placeholder="Ex: Kouassi"></div>
           </div>
           <div class="form-grid">
             <div class="fg"><div class="fl">Date de naissance</div><input class="fi" [(ngModel)]="celibatForm.dob" type="date"></div>
+            <div class="fg"><div class="fl">Profession</div><input class="fi" [(ngModel)]="celibatForm.profession" type="text" placeholder="Ex: Commerçant"></div>
+          </div>
+          <div class="form-grid">
             <div class="fg"><div class="fl">Référence acte de naissance</div><input class="fi" [(ngModel)]="celibatForm.acteRef" type="text" placeholder="Ex: CI-CC-2000-N-001234"></div>
           </div>
           <div class="form-grid">
@@ -37,11 +40,17 @@
         <div class="ph"><div class="pt"><i class="ti ti-home"></i>Certificat de Résidence</div></div>
         <div class="pb">
           <div class="form-grid">
-            <div class="fg"><div class="fl">Nom</div><input class="fi" [(ngModel)]="residenceForm.nom" type="text" placeholder="Ex: TRAORÉ"></div>
+            <div class="fg"><div class="fl">Nom <span class="req">*</span></div><input class="fi" [(ngModel)]="residenceForm.nom" type="text" placeholder="Ex: TRAORÉ"></div>
             <div class="fg"><div class="fl">Prénom(s)</div><input class="fi" [(ngModel)]="residenceForm.prenom" type="text" placeholder="Ex: Aminata"></div>
           </div>
-          <div class="form-grid">
+          <div class="form-grid-3">
             <div class="fg"><div class="fl">Adresse complète</div><input class="fi" [(ngModel)]="residenceForm.adresse" type="text" placeholder="Ex: 12 Rue des Jardins, Cocody"></div>
+            <div class="fg"><div class="fl">Quartier</div>
+              <select class="fs" [(ngModel)]="residenceForm.quartier">
+                <option value="">-- Sélectionner un quartier --</option>
+                @for (q of quartiersList; track q) { <option [value]="q">{{ q }}</option> }
+              </select>
+            </div>
             <div class="fg"><div class="fl">Commune</div>
               <select class="fs" [(ngModel)]="residenceForm.commune">
                 <option value="">-- Sélectionner une commune --</option>
@@ -65,7 +74,7 @@
         <div class="ph"><div class="pt"><i class="ti ti-heart-pulse"></i>Certificat de Vie Individuelle</div></div>
         <div class="pb">
           <div class="form-grid">
-            <div class="fg"><div class="fl">Nom</div><input class="fi" [(ngModel)]="vieForm.nom" type="text" placeholder="Ex: KOUADIO"></div>
+            <div class="fg"><div class="fl">Nom <span class="req">*</span></div><input class="fi" [(ngModel)]="vieForm.nom" type="text" placeholder="Ex: KOUADIO"></div>
             <div class="fg"><div class="fl">Prénom(s)</div><input class="fi" [(ngModel)]="vieForm.prenom" type="text" placeholder="Ex: Jean"></div>
           </div>
           <div class="form-grid">

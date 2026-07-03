@@ -1,7 +1,12 @@
 // recherche.component.ts
-import { Component, signal, Input, Output, EventEmitter } from '@angular/core';
+import { Component, signal, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ApiService } from '../../../../services/api.service';
+import { genererExtraitNaissancePDF } from '../naissances/naissances';
+import { genererActeMariagePDF } from '../mariages/mariages';
+import { genererActeDecesPDF } from '../deces/deces';
+import { genererCertificatPDF } from '../certificats/certificats';
 
 interface ActeNaissance {
   id: string;
@@ -73,17 +78,108 @@ interface ResultatRecherche {
   templateUrl: './recherche.html',
   styleUrls: ['./recherche.css']
 })
-export class RechercheComponent {
-  // Inputs reçus du parent (AppComponent)
+export class RechercheComponent implements OnInit {
+  // Données chargées depuis l'API (le composant est routé : pas de parent qui fournit des @Input)
   @Input() naissances: ActeNaissance[] = [];
   @Input() mariages: Mariage[] = [];
   @Input() deces: Deces[] = [];
   @Input() certificats: Certificat[] = [];
   @Input() adoptions: Adoption[] = [];
-  
-  // Outputs pour communiquer avec le parent
+
+  // Lignes brutes de l'API, conservées pour l'impression des extraits
+  private naissancesRaw: any[] = [];
+  private mariagesRaw: any[] = [];
+  private decesRaw: any[] = [];
+  private certificatsRaw: any[] = [];
+
   @Output() showToast = new EventEmitter<string>();
-  @Output() imprimer = new EventEmitter<{type: string, numero: string}>();
+
+  constructor(private api: ApiService) {}
+
+  ngOnInit() {
+    this.api.getNaissances().subscribe({
+      next: rows => {
+        this.naissancesRaw = rows;
+        this.naissances = rows.filter((n: any) => n.type !== 'Adoption') as any;
+        this.adoptions = rows.filter((n: any) => n.type === 'Adoption').map((n: any) => ({
+          id: n.id, numero: n.numero,
+          enfantNom: n.nomComplet, enfantDateNaissance: n.dateNaissance ?? '',
+          adoptantNom: [n.pereNom, n.mereNom].filter(Boolean).join(' & ') || '—',
+          dateJugement: n.dateJugement ?? '', tribunal: n.tribunal ?? '—',
+          statut: n.statut, qrCode: ''
+        })) as any;
+      },
+      error: () => {}
+    });
+    this.api.getMariages().subscribe({
+      next: rows => { this.mariagesRaw = rows; this.mariages = rows as any; },
+      error: () => {}
+    });
+    this.api.getDeces().subscribe({
+      next: rows => {
+        this.decesRaw = rows;
+        this.deces = rows.map((d: any) => ({ ...d, defunt: d.nomComplet, cause: d.cause ?? '' })) as any;
+      },
+      error: () => {}
+    });
+    this.api.getCertificats().subscribe({
+      next: rows => {
+        this.certificatsRaw = rows;
+        this.certificats = rows.map((c: any) => ({ ...c, demandeur: c.beneficiaire, dateExpiration: '' })) as any;
+      },
+      error: () => {}
+    });
+  }
+
+  imprimerResultat(r: ResultatRecherche): void {
+    if (r.type === 'mariage') {
+      const m = this.mariagesRaw.find(x => x.numero === r.numero);
+      if (m) {
+        genererActeMariagePDF({
+          numero: m.numero, epoux: m.epoux, epouse: m.epouse,
+          dateMariage: m.dateMariage, lieu: m.lieu, commune: m.commune, regime: m.regime,
+          epouxProf: m.epouxProf, epouxNat: m.epouxNat,
+          epouseProf: m.epouseProf, epouseNat: m.epouseNat,
+          temoin1: m.temoin1, temoin1Prof: m.temoin1Prof,
+          temoin2: m.temoin2, temoin2Prof: m.temoin2Prof
+        });
+      }
+    } else if (r.type === 'deces') {
+      const d = this.decesRaw.find(x => x.numero === r.numero);
+      if (d) {
+        genererActeDecesPDF({
+          numero: d.numero, nom: d.nom ?? '', prenom: d.prenom ?? '',
+          dob: d.dateNaissance, dateDeces: d.dateDeces, heureDeces: d.heureDeces,
+          lieuDeces: d.lieu, commune: d.commune,
+          causeDeces: d.cause, declarant: d.declarant, lien: d.lien
+        });
+      }
+    } else if (r.type === 'certificat') {
+      const c = this.certificatsRaw.find(x => x.numero === r.numero);
+      if (c) {
+        const parts = (c.beneficiaire ?? '').trim().split(' ');
+        genererCertificatPDF(c.type, {
+          numero: c.numero,
+          nom: parts[0] ?? '',
+          prenom: parts.slice(1).join(' '),
+          dateDelivrance: c.dateDelivrance
+        });
+      }
+    } else {
+      // naissance, jugement supplétif ou adoption : tous dans le registre des naissances
+      const n = this.naissancesRaw.find(x => x.numero === r.numero);
+      if (n) {
+        genererExtraitNaissancePDF({
+          numero: n.numero,
+          nom: n.nom ?? '', prenom: n.prenom ?? '',
+          dateNaissance: n.dateNaissance ?? '', heureNaissance: n.heureNaissance ?? '',
+          sexe: n.sexe ?? '', lieuNaissance: n.lieu ?? '', commune: n.commune ?? '',
+          pereNom: n.pereNom ?? '', pereProf: n.pereProf ?? '', pereNat: n.pereNat ?? '',
+          mereNom: n.mereNom ?? '', mereProf: n.mereProf ?? '', mereNat: n.mereNat ?? ''
+        });
+      }
+    }
+  }
 
   // État local
   currentTab = signal<string>('global');

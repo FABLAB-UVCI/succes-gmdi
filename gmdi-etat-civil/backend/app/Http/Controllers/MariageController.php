@@ -28,6 +28,14 @@ class MariageController extends Controller
             'lieu' => $m->lieu_mariage,
             'commune' => $m->commune,
             'regime' => $m->regime_matrimonial,
+            'epouxProf' => $m->epoux_profession,
+            'epouxNat' => $m->epoux_nationalite,
+            'epouseProf' => $m->epouse_profession,
+            'epouseNat' => $m->epouse_nationalite,
+            'temoin1' => $m->temoin1_nom,
+            'temoin1Prof' => $m->temoin1_profession,
+            'temoin2' => $m->temoin2_nom,
+            'temoin2Prof' => $m->temoin2_profession,
             'statut' => $m->statut,
         ]));
     }
@@ -50,7 +58,9 @@ class MariageController extends Controller
             'commune' => 'nullable|string',
             'regime_matrimonial' => 'nullable|string',
             'temoin1_nom' => 'nullable|string',
+            'temoin1_profession' => 'nullable|string',
             'temoin2_nom' => 'nullable|string',
+            'temoin2_profession' => 'nullable|string',
         ]);
 
         $data['epoux_prenom']  = $data['epoux_prenom']  ?? '';
@@ -66,6 +76,17 @@ class MariageController extends Controller
             'epoux' => $mariage->epoux_nom . ' ' . $mariage->epoux_prenom,
             'epouse' => $mariage->epouse_nom . ' ' . $mariage->epouse_prenom,
             'dateMariage' => $mariage->date_mariage?->format('d/m/Y'),
+            'lieu' => $mariage->lieu_mariage,
+            'commune' => $mariage->commune,
+            'regime' => $mariage->regime_matrimonial,
+            'epouxProf' => $mariage->epoux_profession,
+            'epouxNat' => $mariage->epoux_nationalite,
+            'epouseProf' => $mariage->epouse_profession,
+            'epouseNat' => $mariage->epouse_nationalite,
+            'temoin1' => $mariage->temoin1_nom,
+            'temoin1Prof' => $mariage->temoin1_profession,
+            'temoin2' => $mariage->temoin2_nom,
+            'temoin2Prof' => $mariage->temoin2_profession,
             'statut' => $mariage->statut,
         ], 201);
     }

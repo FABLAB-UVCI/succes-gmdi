@@ -23,9 +23,16 @@ class DecesController extends Controller
             'id' => $d->id,
             'numero' => $d->numero,
             'nomComplet' => $d->nom . ' ' . $d->prenom,
+            'nom' => $d->nom,
+            'prenom' => $d->prenom,
+            'dateNaissance' => $d->date_naissance?->format('d/m/Y'),
             'dateDeces' => $d->date_deces?->format('d/m/Y'),
+            'heureDeces' => $d->heure_deces,
             'lieu' => $d->lieu_deces,
             'commune' => $d->commune,
+            'cause' => $d->cause_deces,
+            'declarant' => $d->declarant_nom,
+            'lien' => $d->declarant_lien,
             'statut' => $d->statut,
         ]));
     }
