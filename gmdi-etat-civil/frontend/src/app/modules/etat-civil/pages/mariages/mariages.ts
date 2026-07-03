@@ -2,7 +2,11 @@ import { Component, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../../../services/api.service';
+<<<<<<< HEAD
 import { qrVerification, codeVerification, formatDateFr, openPrintWindow } from '../../pdf-utils';
+=======
+import { PrintService } from '../../../../services/print.service';
+>>>>>>> b5dbce35a5970a980cbad1edf363124bdb390f4a
 
 @Component({
   selector: 'app-mariages',
@@ -29,7 +33,7 @@ export class MariagesComponent implements OnInit {
     date: '', lieu: '', regime: 'Communauté de biens', cniEpoux: null, cniEpouse: null
   };
 
-  constructor(private api: ApiService) {}
+  constructor(private api: ApiService, private printService: PrintService) {}
 
   ngOnInit() {
     this.api.getMariages().subscribe({ next: d => this.mariages.set(d), error: () => {} });
@@ -130,20 +134,40 @@ export async function genererActeMariagePDF(data: {
             font-family: 'Times New Roman', Times, serif;
             background-color: #f0f0f0;
             margin: 0;
-            padding: 20px;
+            padding: 10px;
             display: flex;
             justify-content: center;
+            align-items: flex-start;
         }
 
         .document-container {
-            width: 800px;
-            min-height: 1130px;
+            width: 210mm;
+            height: 297mm;
             background-color: #ffffff;
-            padding: 40px;
+            padding: 20mm;
             box-sizing: border-box;
             position: relative;
             box-shadow: 0 0 15px rgba(0,0,0,0.2);
             overflow: hidden;
+            page-break-after: always;
+            margin: 0;
+        }
+
+        @media print {
+            body {
+                background-color: #ffffff;
+                margin: 0;
+                padding: 0;
+            }
+
+            .document-container {
+                box-shadow: none;
+                margin: 0;
+                padding: 20mm;
+                width: 100%;
+                height: 100%;
+                page-break-after: always;
+            }
         }
 
         .border-ornament {
@@ -608,5 +632,10 @@ export async function genererActeMariagePDF(data: {
 </html>
 `;
 
+<<<<<<< HEAD
     openPrintWindow(html);
+=======
+    this.printService.printDocument(html, 'Extrait-Acte-Mariage');
+  }
+>>>>>>> b5dbce35a5970a980cbad1edf363124bdb390f4a
 }

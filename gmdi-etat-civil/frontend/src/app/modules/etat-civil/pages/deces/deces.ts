@@ -2,7 +2,11 @@ import { Component, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../../../services/api.service';
+<<<<<<< HEAD
 import { qrVerification, codeVerification, formatDateFr, openPrintWindow } from '../../pdf-utils';
+=======
+import { PrintService } from '../../../../services/print.service';
+>>>>>>> b5dbce35a5970a980cbad1edf363124bdb390f4a
 
 @Component({
   selector: 'app-deces',
@@ -19,7 +23,7 @@ export class DecesComponent implements OnInit {
 
   decesForm: { nom: string; prenom: string; dob: string; date: string; heure: string; lieu: string; commune: string; cause: string; declarant: string; lien: string; cniDefunt: File | null; certificatDeces: File | null; cniDeclarant: File | null } = { nom: '', prenom: '', dob: '', date: '', heure: '', lieu: '', commune: '', cause: '', declarant: '', lien: '', cniDefunt: null, certificatDeces: null, cniDeclarant: null };
 
-  constructor(private api: ApiService) {}
+  constructor(private api: ApiService, private printService: PrintService) {}
 
   ngOnInit() {
     this.api.getDeces().subscribe({ next: d => this.deces.set(d), error: () => {} });
@@ -104,20 +108,40 @@ export async function genererActeDecesPDF(data: {
             font-family: 'Times New Roman', Times, serif;
             background-color: #f0f0f0;
             margin: 0;
-            padding: 20px;
+            padding: 10px;
             display: flex;
             justify-content: center;
+            align-items: flex-start;
         }
 
         .document-container {
-            width: 800px;
-            min-height: 1130px;
+            width: 210mm;
+            height: 297mm;
             background-color: #ffffff;
-            padding: 40px;
+            padding: 20mm;
             box-sizing: border-box;
             position: relative;
             box-shadow: 0 0 15px rgba(0,0,0,0.2);
             overflow: hidden;
+            page-break-after: always;
+            margin: 0;
+        }
+
+        @media print {
+            body {
+                background-color: #ffffff;
+                margin: 0;
+                padding: 0;
+            }
+
+            .document-container {
+                box-shadow: none;
+                margin: 0;
+                padding: 20mm;
+                width: 100%;
+                height: 100%;
+                page-break-after: always;
+            }
         }
 
         .border-ornament {
@@ -579,5 +603,10 @@ export async function genererActeDecesPDF(data: {
 </html>
 `;
 
+<<<<<<< HEAD
     openPrintWindow(html);
+=======
+    this.printService.printDocument(html, 'Extrait-Acte-Deces');
+  }
+>>>>>>> b5dbce35a5970a980cbad1edf363124bdb390f4a
 }

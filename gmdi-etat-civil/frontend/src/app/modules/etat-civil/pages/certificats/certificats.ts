@@ -3,8 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../../../services/api.service';
 import { TOUTES_COMMUNES } from '../../../../communes.ci';
+<<<<<<< HEAD
 import { QUARTIERS_CI } from '../../../../quartiers.ci';
 import { qrVerification, codeVerification, formatDateFr, openPrintWindow } from '../../pdf-utils';
+=======
+import { PrintService } from '../../../../services/print.service';
+>>>>>>> b5dbce35a5970a980cbad1edf363124bdb390f4a
 
 @Component({
   selector: 'app-certificats',
@@ -25,7 +29,7 @@ export class CertificatsComponent implements OnInit {
   residenceForm: { nom: string; prenom: string; adresse: string; quartier: string; commune: string; cni: File | null } = { nom: '', prenom: '', adresse: '', quartier: '', commune: '', cni: null };
   vieForm: { nom: string; prenom: string; dob: string; cni: File | null } = { nom: '', prenom: '', dob: '', cni: null };
 
-  constructor(private api: ApiService) {}
+  constructor(private api: ApiService, private printService: PrintService) {}
 
   ngOnInit() {
     this.api.getCertificats().subscribe({ next: d => this.certificats.set(d), error: () => {} });
@@ -139,20 +143,40 @@ export async function genererCertificatPDF(type: string, data: {
             font-family: 'Times New Roman', Times, serif;
             background-color: #f0f0f0;
             margin: 0;
-            padding: 20px;
+            padding: 10px;
             display: flex;
             justify-content: center;
+            align-items: flex-start;
         }
 
         .document-container {
-            width: 800px;
-            min-height: 1130px;
+            width: 210mm;
+            height: 297mm;
             background-color: #ffffff;
-            padding: 40px;
+            padding: 20mm;
             box-sizing: border-box;
             position: relative;
             box-shadow: 0 0 15px rgba(0,0,0,0.2);
             overflow: hidden;
+            page-break-after: always;
+            margin: 0;
+        }
+
+        @media print {
+            body {
+                background-color: #ffffff;
+                margin: 0;
+                padding: 0;
+            }
+
+            .document-container {
+                box-shadow: none;
+                margin: 0;
+                padding: 20mm;
+                width: 100%;
+                height: 100%;
+                page-break-after: always;
+            }
         }
 
         .border-ornament {
@@ -600,5 +624,10 @@ export async function genererCertificatPDF(type: string, data: {
 </html>
 `;
 
+<<<<<<< HEAD
     openPrintWindow(html);
+=======
+    this.printService.printDocument(html, `Certificat-${data.type}`);
+  }
+>>>>>>> b5dbce35a5970a980cbad1edf363124bdb390f4a
 }
