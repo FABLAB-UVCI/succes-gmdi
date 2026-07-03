@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TOUTES_COMMUNES } from '../../../../communes.ci';
 import { ApiService } from '../../../../services/api.service';
+import { PrintService } from '../../../../services/print.service';
 
 @Component({
   selector: 'app-naissances',
@@ -19,7 +20,7 @@ export class NaissancesComponent implements OnInit {
 
   naissancesDB: any[] = [];
 
-  constructor(private api: ApiService) { }
+  constructor(private api: ApiService, private printService: PrintService) { }
 
   ngOnInit() {
     this.api.getNaissances().subscribe({
@@ -387,6 +388,45 @@ export class NaissancesComponent implements OnInit {
     }
   }
 
+  /**
+   * Formate une date au format français
+   */
+  formatDate(dateString: string): string {
+    if (!dateString) return '';
+    try {
+      const date = new Date(dateString + 'T00:00:00');
+      return date.toLocaleDateString('fr-FR', { 
+        day: '2-digit', 
+        month: 'long', 
+        year: 'numeric' 
+      });
+    } catch {
+      return dateString;
+    }
+  }
+
+  /**
+   * Formate une heure au format français (HH:MM)
+   */
+  formatHeure(heureString: string): string {
+    if (!heureString) return '';
+    try {
+      const [heures, minutes] = heureString.split(':');
+      const h = parseInt(heures) || 0;
+      const m = parseInt(minutes) || 0;
+      
+      const heuresText = h > 0 ? `${h} heure${h > 1 ? 's' : ''}` : '';
+      const minutesText = m > 0 ? `${m} minute${m > 1 ? 's' : ''}` : '';
+      
+      if (heuresText && minutesText) {
+        return `${heuresText} ${minutesText}`;
+      }
+      return heuresText || minutesText || heureString;
+    } catch {
+      return heureString;
+    }
+  }
+
   genererPDF(data: {
     numero: string; nom: string; prenom: string;
     dateNaissance: string; heureNaissance: string; sexe: string;
@@ -394,8 +434,7 @@ export class NaissancesComponent implements OnInit {
     pereProf?: string; mereProf?: string; pereNat?: string; mereNat?: string;
   }): void {
     const today = new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
-    const html =
-      `
+    const html = `
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -405,25 +444,49 @@ export class NaissancesComponent implements OnInit {
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Times+New+Roman&family=Roboto:wght@400;700&display=swap');
 
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Times New Roman', Times, serif;
             background-color: #f0f0f0;
             margin: 0;
-            padding: 20px;
+            padding: 10px;
             display: flex;
             justify-content: center;
+            align-items: flex-start;
         }
 
         /* Conteneur principal simulant le format A4 papier */
         .document-container {
-            width: 800px;
-            min-height: 1130px;
+            width: 210mm;
+            height: 297mm;
             background-color: #ffffff;
-            padding: 40px;
+            padding: 20mm;
             box-sizing: border-box;
             position: relative;
             box-shadow: 0 0 15px rgba(0,0,0,0.2);
             overflow: hidden;
+            page-break-after: always;
+            margin: 0;
+        }
+
+        @media print {
+            body {
+                background-color: #ffffff;
+                margin: 0;
+                padding: 0;
+            }
+
+            .document-container {
+                box-shadow: none;
+                margin: 0;
+                padding: 20mm;
+                width: 100%;
+                height: 100%;
+                page-break-after: always;
+            }
         }
 
         /* Bordure ornementale verte autour du document */
@@ -844,37 +907,37 @@ export class NaissancesComponent implements OnInit {
                     <tr>
                         <td class="label-cell">Nom de l'enfant</td>
                         <td class="separator-cell">:</td>
-                        <td class="value-cell">Doukouré</td>
+                        <td class="value-cell">${data.nom || '.......................'}</td>
                     </tr>
                     <tr>
                         <td class="label-cell">Prénoms</td>
                         <td class="separator-cell">:</td>
-                        <td class="value-cell">Kévin Alexis</td>
+                        <td class="value-cell">${data.prenom || '.......................'}</td>
                     </tr>
                     <tr>
                         <td class="label-cell">Sexe</td>
                         <td class="separator-cell">:</td>
-                        <td class="value-cell">Masculin</td>
+                        <td class="value-cell">${data.sexe || '.......................'}</td>
                     </tr>
                     <tr>
                         <td class="label-cell">Date de naissance</td>
                         <td class="separator-cell">:</td>
-                        <td class="value-cell mixed">12 Février 2024</td>
+                        <td class="value-cell mixed">${this.formatDate(data.dateNaissance) || '.......................'}</td>
                     </tr>
                     <tr>
                         <td class="label-cell">Heure de naissance</td>
                         <td class="separator-cell">:</td>
-                        <td class="value-cell mixed">08 heures 45 minutes</td>
+                        <td class="value-cell mixed">${data.heureNaissance ? this.formatHeure(data.heureNaissance) : '.......................'}</td>
                     </tr>
                     <tr>
                         <td class="label-cell">Lieu de naissance</td>
                         <td class="separator-cell">:</td>
-                        <td class="value-cell mixed">Centre Hospitalier Universitaire de Cocody</td>
+                        <td class="value-cell mixed">${data.lieuNaissance || '.......................'}</td>
                     </tr>
                     <tr>
                         <td class="label-cell">Commune de naissance</td>
                         <td class="separator-cell">:</td>
-                        <td class="value-cell mixed">Cocody</td>
+                        <td class="value-cell mixed">${data.commune || '.......................'}</td>
                     </tr>
                     <tr>
                         <td class="label-cell">Pays</td>
@@ -888,22 +951,32 @@ export class NaissancesComponent implements OnInit {
                     <tr>
                         <td class="label-cell">Père</td>
                         <td class="separator-cell">:</td>
-                        <td class="value-cell">Doukouré Youssouf</td>
+                        <td class="value-cell">${data.pereNom || '.......................'}</td>
                     </tr>
                     <tr>
                         <td class="label-cell">Profession</td>
                         <td class="separator-cell">:</td>
-                        <td class="value-cell mixed">Ingénieur en Informatique</td>
+                        <td class="value-cell mixed">${data.pereProf || '.......................'}</td>
+                    </tr>
+                    <tr>
+                        <td class="label-cell">Nationalité</td>
+                        <td class="separator-cell">:</td>
+                        <td class="value-cell mixed">${data.pereNat || 'Ivoirienne'}</td>
                     </tr>
                     <tr>
                         <td class="label-cell">Mère</td>
                         <td class="separator-cell">:</td>
-                        <td class="value-cell">Koné Aminata</td>
+                        <td class="value-cell">${data.mereName || '.......................'}</td>
                     </tr>
                     <tr>
                         <td class="label-cell">Profession</td>
                         <td class="separator-cell">:</td>
-                        <td class="value-cell mixed">Enseignante</td>
+                        <td class="value-cell mixed">${data.mereProf || '.......................'}</td>
+                    </tr>
+                    <tr>
+                        <td class="label-cell">Nationalité</td>
+                        <td class="separator-cell">:</td>
+                        <td class="value-cell mixed">${data.mereNat || 'Ivoirienne'}</td>
                     </tr>
                 </table>
 
@@ -912,12 +985,12 @@ export class NaissancesComponent implements OnInit {
                     <tr>
                         <td class="label-cell">Date de déclaration</td>
                         <td class="separator-cell">:</td>
-                        <td class="value-cell mixed">13 Février 2024</td>
+                        <td class="value-cell mixed">${today}</td>
                     </tr>
                     <tr>
                         <td class="label-cell">Déclarant</td>
                         <td class="separator-cell">:</td>
-                        <td class="value-cell mixed">DOUKOURÉ YOUSSOUF (Père)</td>
+                        <td class="value-cell mixed">${data.pereNom || '.......................'}</td>
                     </tr>
                     <tr>
                         <td class="label-cell">Officier de l'état civil</td>
@@ -927,12 +1000,12 @@ export class NaissancesComponent implements OnInit {
                     <tr>
                         <td class="label-cell">Date de délivrance</td>
                         <td class="separator-cell">:</td>
-                        <td class="value-cell mixed">27 Mai 2024</td>
+                        <td class="value-cell mixed">${today}</td>
                     </tr>
                     <tr>
                         <td class="label-cell">N° de l'acte</td>
                         <td class="separator-cell">:</td>
-                        <td class="value-cell mixed">2024/COC/02/01567</td>
+                        <td class="value-cell mixed">${data.numero || '.......................'}</td>
                     </tr>
                     <tr>
                         <td class="label-cell">Observations</td>
@@ -995,11 +1068,24 @@ export class NaissancesComponent implements OnInit {
 </html>
 `;
 
-    const win = window.open('', '_blank', 'width=900,height=700');
-    if (win) {
-      win.document.write(html);
-      win.document.close();
-    }
+    // Utiliser le service d'impression pour afficher le document
+    this.printService.printDocument(html, 'Extrait-Acte-Naissance');
+  }
+
+  /**
+   * Imprime le document (extrait d'acte de naissance)
+   */
+  imprimerDocument(html: string, nomDocument: string = 'Extrait-Acte-Naissance'): void {
+    this.printService.printDocument(html, nomDocument);
+    this.showToast.emit('Document ouvert pour impression...');
+  }
+
+  /**
+   * Télécharge le document en PDF
+   */
+  telechargerPDF(html: string, nomFichier: string = 'extrait-acte-naissance'): void {
+    this.printService.downloadAsPDF(html, nomFichier);
+    this.showToast.emit('Préparation du téléchargement PDF...');
   }
 
   resetForm(type: string): void {

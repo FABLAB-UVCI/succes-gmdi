@@ -2,6 +2,7 @@ import { Component, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../../../services/api.service';
+import { PrintService } from '../../../../services/print.service';
 
 @Component({
   selector: 'app-deces',
@@ -18,7 +19,7 @@ export class DecesComponent implements OnInit {
 
   decesForm: { nom: string; prenom: string; dob: string; date: string; heure: string; lieu: string; commune: string; cause: string; declarant: string; lien: string; cniMedecin: File | null; certificatDeces: File | null; cniDeclarant: File | null } = { nom: '', prenom: '', dob: '', date: '', heure: '', lieu: '', commune: '', cause: '', declarant: '', lien: '', cniMedecin: null, certificatDeces: null, cniDeclarant: null };
 
-  constructor(private api: ApiService) {}
+  constructor(private api: ApiService, private printService: PrintService) {}
 
   ngOnInit() {
     this.api.getDeces().subscribe({ next: d => this.deces.set(d), error: () => {} });
@@ -95,20 +96,40 @@ export class DecesComponent implements OnInit {
             font-family: 'Times New Roman', Times, serif;
             background-color: #f0f0f0;
             margin: 0;
-            padding: 20px;
+            padding: 10px;
             display: flex;
             justify-content: center;
+            align-items: flex-start;
         }
 
         .document-container {
-            width: 800px;
-            min-height: 1130px;
+            width: 210mm;
+            height: 297mm;
             background-color: #ffffff;
-            padding: 40px;
+            padding: 20mm;
             box-sizing: border-box;
             position: relative;
             box-shadow: 0 0 15px rgba(0,0,0,0.2);
             overflow: hidden;
+            page-break-after: always;
+            margin: 0;
+        }
+
+        @media print {
+            body {
+                background-color: #ffffff;
+                margin: 0;
+                padding: 0;
+            }
+
+            .document-container {
+                box-shadow: none;
+                margin: 0;
+                padding: 20mm;
+                width: 100%;
+                height: 100%;
+                page-break-after: always;
+            }
         }
 
         .border-ornament {
@@ -570,10 +591,6 @@ export class DecesComponent implements OnInit {
 </html>
 `;
 
-    const win = window.open('', '_blank', 'width=900,height=700');
-    if (win) {
-      win.document.write(html);
-      win.document.close();
-    }
+    this.printService.printDocument(html, 'Extrait-Acte-Deces');
   }
 }
