@@ -1,0 +1,120 @@
+<div>
+  @if (showToast()) {
+    <div class="success-toast"><i class="ti ti-check"></i><span>{{ toastMsg() }}</span></div>
+  }
+  <div class="tabs">
+    <div class="tab" [class.act]="currentTab() === 'celibat'" (click)="switchTab('celibat')"><i class="ti ti-user-check"></i>Célibat</div>
+    <div class="tab" [class.act]="currentTab() === 'residence'" (click)="switchTab('residence')"><i class="ti ti-home"></i>Résidence</div>
+    <div class="tab" [class.act]="currentTab() === 'vie'" (click)="switchTab('vie')"><i class="ti ti-heart-pulse"></i>Vie Individuelle</div>
+    <div class="tab" [class.act]="currentTab() === 'historique'" (click)="switchTab('historique')"><i class="ti ti-list"></i>Historique</div>
+  </div>
+  <div class="panel notop">
+    @if (currentTab() === 'celibat') {
+      <div>
+        <div class="ph"><div class="pt"><i class="ti ti-certificate"></i>Certificat de Célibat</div></div>
+        <div class="pb">
+          <div class="form-grid">
+            <div class="fg"><div class="fl">Nom <span class="req">*</span></div><input class="fi" [(ngModel)]="celibatForm.nom" type="text" placeholder="Ex: KONAN"></div>
+            <div class="fg"><div class="fl">Prénom(s)</div><input class="fi" [(ngModel)]="celibatForm.prenom" type="text" placeholder="Ex: Kouassi"></div>
+          </div>
+          <div class="form-grid">
+            <div class="fg"><div class="fl">Date de naissance</div><input class="fi" [(ngModel)]="celibatForm.dob" type="date"></div>
+            <div class="fg"><div class="fl">Profession</div><input class="fi" [(ngModel)]="celibatForm.profession" type="text" placeholder="Ex: Commerçant"></div>
+          </div>
+          <div class="form-grid">
+            <div class="fg"><div class="fl">Référence acte de naissance</div><input class="fi" [(ngModel)]="celibatForm.acteRef" type="text" placeholder="Ex: CI-CC-2000-N-001234"></div>
+          </div>
+          <div class="form-grid">
+            <div class="fg" style="max-width:340px">
+              <div class="fl">CNI / Passeport du demandeur</div>
+              <input style="font-size:11px;padding:4px 6px" class="fi" type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="onCniCelibatSelected($event)">
+              @if (celibatForm.cni) { <small style="color:green">✓ {{ celibatForm.cni.name }}</small> }
+            </div>
+          </div>
+          <div class="fa"><button class="btn-p" (click)="delivrer('Célibat')"><i class="ti ti-printer"></i>Établir & Imprimer</button></div>
+        </div>
+      </div>
+    }
+    @if (currentTab() === 'residence') {
+      <div>
+        <div class="ph"><div class="pt"><i class="ti ti-home"></i>Certificat de Résidence</div></div>
+        <div class="pb">
+          <div class="form-grid">
+            <div class="fg"><div class="fl">Nom <span class="req">*</span></div><input class="fi" [(ngModel)]="residenceForm.nom" type="text" placeholder="Ex: TRAORÉ"></div>
+            <div class="fg"><div class="fl">Prénom(s)</div><input class="fi" [(ngModel)]="residenceForm.prenom" type="text" placeholder="Ex: Aminata"></div>
+          </div>
+          <div class="form-grid-3">
+            <div class="fg"><div class="fl">Adresse complète</div><input class="fi" [(ngModel)]="residenceForm.adresse" type="text" placeholder="Ex: 12 Rue des Jardins, Cocody"></div>
+            <div class="fg"><div class="fl">Quartier</div>
+              <select class="fs" [(ngModel)]="residenceForm.quartier">
+                <option value="">-- Sélectionner un quartier --</option>
+                @for (q of quartiersList; track q) { <option [value]="q">{{ q }}</option> }
+              </select>
+            </div>
+            <div class="fg"><div class="fl">Commune</div>
+              <select class="fs" [(ngModel)]="residenceForm.commune">
+                <option value="">-- Sélectionner une commune --</option>
+                @for (c of communesList; track c) { <option [value]="c">{{ c }}</option> }
+              </select>
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="fg" style="max-width:340px">
+              <div class="fl">CNI / Passeport du demandeur</div>
+              <input style="font-size:11px;padding:4px 6px" class="fi" type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="onCniResidenceSelected($event)">
+              @if (residenceForm.cni) { <small style="color:green">✓ {{ residenceForm.cni.name }}</small> }
+            </div>
+          </div>
+          <div class="fa"><button class="btn-p" (click)="delivrer('Résidence')"><i class="ti ti-printer"></i>Établir & Imprimer</button></div>
+        </div>
+      </div>
+    }
+    @if (currentTab() === 'vie') {
+      <div>
+        <div class="ph"><div class="pt"><i class="ti ti-heart-pulse"></i>Certificat de Vie Individuelle</div></div>
+        <div class="pb">
+          <div class="form-grid">
+            <div class="fg"><div class="fl">Nom <span class="req">*</span></div><input class="fi" [(ngModel)]="vieForm.nom" type="text" placeholder="Ex: KOUADIO"></div>
+            <div class="fg"><div class="fl">Prénom(s)</div><input class="fi" [(ngModel)]="vieForm.prenom" type="text" placeholder="Ex: Jean"></div>
+          </div>
+          <div class="form-grid">
+            <div class="fg"><div class="fl">Date de naissance</div><input class="fi" [(ngModel)]="vieForm.dob" type="date"></div>
+          </div>
+          <div class="form-grid">
+            <div class="fg" style="max-width:340px">
+              <div class="fl">CNI / Passeport du demandeur</div>
+              <input style="font-size:11px;padding:4px 6px" class="fi" type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="onCniVieSelected($event)">
+              @if (vieForm.cni) { <small style="color:green">✓ {{ vieForm.cni.name }}</small> }
+            </div>
+          </div>
+          <div class="fa"><button class="btn-p" (click)="delivrer('Vie')"><i class="ti ti-printer"></i>Établir & Imprimer</button></div>
+        </div>
+      </div>
+    }
+    @if (currentTab() === 'historique') {
+      <div>
+        <div class="ph"><div class="pt"><i class="ti ti-list"></i>Historique des certificats délivrés</div></div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>N° Certificat</th><th>Type</th><th>Bénéficiaire</th><th>Date Délivrance</th><th>Statut</th><th>Actions</th></tr></thead>
+            <tbody>
+              @for (c of certificats(); track c.id) {
+                <tr>
+                  <td style="font-family:monospace;font-size:11px">{{ c.numero }}</td>
+                  <td><strong>{{ c.type }}</strong></td>
+                  <td>{{ c.beneficiaire }}</td>
+                  <td>{{ c.dateDelivrance }}</td>
+                  <td><span class="chip cv">{{ c.statut }}</span></td>
+                  <td><button class="btn-s" style="padding:3px 8px;font-size:11px" (click)="imprimer(c)"><i class="ti ti-printer"></i>Imprimer</button></td>
+                </tr>
+              }
+              @if (certificats().length === 0) {
+                <tr><td colspan="6" style="text-align:center;color:#aaa;padding:2rem">Aucun certificat délivré</td></tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+  </div>
+</div>

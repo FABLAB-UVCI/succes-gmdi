@@ -1,0 +1,15 @@
+<nav class="sidebar">
+  @for (item of menuItems; track item.label) {
+    @if (item.type === 'section') {
+      <div class="sb-sec">{{ item.label }}</div>
+    }
+    @if (item.type === 'item') {
+      <div
+        class="sb-item"
+        [class.act]="isActive(item.route)"
+        (click)="navigate(item)">
+        <i [class]="item.icon"></i>{{ item.label }}
+      </div>
+    }
+  }
+</nav>
