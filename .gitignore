@@ -1,0 +1,26 @@
+# === Dépendances ===
+**/node_modules/
+**/vendor/
+
+# === Builds / sorties ===
+**/dist/
+**/.angular/
+**/build/
+**/public/build/
+
+# === Environnement & secrets ===
+**/.env
+**/.env.*
+!**/.env.example
+
+# === Logs ===
+**/*.log
+**/npm-debug.log*
+**/storage/logs/*
+
+# === Divers ===
+**/.DS_Store
+**/Thumbs.db
+**/.idea/
+**/.vscode/
+*.cache
