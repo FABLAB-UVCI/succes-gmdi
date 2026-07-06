@@ -59,3 +59,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::apiResource('departs', DepartController::class);
     });
 });
+
+/*
+|--------------------------------------------------------------------------
+| Autres modules (chaque fichier applique son propre middleware auth:sanctum)
+|--------------------------------------------------------------------------
+*/
+require __DIR__.'/modules/communication.php';       // préfixe interne: com
+require __DIR__.'/modules/finances.php';            // préfixes: recettes, depenses, budget, …
+require __DIR__.'/modules/patrimoine.php';          // préfixe interne: patrimoine
+require __DIR__.'/modules/services-techniques.php'; // préfixe interne: st
+require __DIR__.'/modules/urbanisme.php';           // préfixe interne: urb
