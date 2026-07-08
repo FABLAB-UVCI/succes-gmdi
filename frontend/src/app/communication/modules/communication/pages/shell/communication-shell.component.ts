@@ -240,7 +240,7 @@ export type Section = 'actualites' | 'reseaux' | 'relations' | 'documents' | 'ci
     .flag-v { background:#009A44; }
     .sb-maire-title { color:rgba(255,255,255,.8);font-size:11px;font-weight:700;display:flex;align-items:center;gap:5px;letter-spacing:.3px; }
     .sb-maire-title i { color:#F77F00; }
-    .sb-maire-scroll{ padding:4px 12px;display:flex;flex-direction:column;gap:6px;max-height:150px;overflow-y:auto; }
+    .sb-maire-scroll{ padding:4px 12px;display:flex;flex-direction:column;gap:6px;max-height:none;overflow-y:visible; }
     .sb-ann-item    { display:flex;align-items:flex-start;gap:8px;padding:6px 0; }
     .ann-dot        { width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.3);margin-top:4px;flex-shrink:0; }
     .ann-dot-urgent { background:#e63946; }
