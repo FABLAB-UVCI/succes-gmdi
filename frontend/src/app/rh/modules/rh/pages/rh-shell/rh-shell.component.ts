@@ -39,8 +39,8 @@ interface NavItem { id: Section; label: string; icon: string; }
     <div class="tb-user">
       <div class="av">{{ initiales() }}</div>
       <span class="tb-name"><strong>{{ auth.currentUser()?.name ?? '' }}</strong> — {{ auth.currentUser()?.role?.toUpperCase() ?? '' }}</span>
-      <button class="tb-logout" (click)="auth.logout()" title="Se déconnecter">
-        <i class="ti ti-logout" aria-hidden="true"></i>
+      <button class="tb-logout" (click)="auth.backToModules()" title="Retour aux modules">
+        <i class="ti ti-layout-grid" aria-hidden="true"></i>
       </button>
     </div>
   </div>

@@ -49,6 +49,11 @@ export class AuthService {
     return this._token();
   }
 
+  /** Reste connecte, revient juste au selecteur de modules. */
+  backToModules(): void {
+    this.router.navigate(['/accueil']);
+  }
+
   private _clear() {
     localStorage.removeItem(this.TOKEN_KEY);
     localStorage.removeItem(this.USER_KEY);

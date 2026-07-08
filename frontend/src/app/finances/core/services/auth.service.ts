@@ -51,6 +51,11 @@ export class AuthService {
     this.router.navigate(['/login']);
   }
 
+  /** Reste connecte, revient juste au selecteur de modules. */
+  backToModules(): void {
+    this.router.navigate(['/accueil']);
+  }
+
   private lireUser(): User | null {
     try {
       const raw = localStorage.getItem(USER_KEY);

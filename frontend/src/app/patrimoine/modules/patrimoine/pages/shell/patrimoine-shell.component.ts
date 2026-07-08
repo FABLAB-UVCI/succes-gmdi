@@ -51,9 +51,9 @@ export type Section = 'inventaire' | 'immobilier' | 'affectation' | 'maintenance
           <div style="font-size:10px;color:rgba(255,255,255,.45);text-transform:capitalize">{{ auth.currentUser()?.role ?? 'agent' }}</div>
         </div>
       </div>
-      <button (click)="auth.logout()" class="btn-logout">
-        <i class="ti ti-logout"></i>
-        <span class="logout-label">Déconnexion</span>
+      <button (click)="auth.backToModules()" class="btn-logout" title="Retour aux modules">
+        <i class="ti ti-layout-grid"></i>
+        <span class="logout-label">Modules</span>
       </button>
     </div>
   </div>

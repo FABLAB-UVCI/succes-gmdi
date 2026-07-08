@@ -52,9 +52,9 @@ export type Section = 'voirie' | 'eclairage' | 'eau' | 'batiments' | 'interventi
           <div style="font-size:10px;color:var(--ci-green);font-weight:600">Services Techniques</div>
         </div>
       </div>
-      <button (click)="auth.logout()" class="btn-logout" title="Déconnexion">
-        <i class="ti ti-logout" style="font-size:15px"></i>
-        <span class="logout-label">Déconnexion</span>
+      <button (click)="auth.backToModules()" class="btn-logout" title="Retour aux modules">
+        <i class="ti ti-layout-grid" style="font-size:15px"></i>
+        <span class="logout-label">Modules</span>
       </button>
     </div>
   </div>

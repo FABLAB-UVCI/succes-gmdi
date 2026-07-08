@@ -36,6 +36,11 @@ export class AuthService {
     this.router.navigate(['/login']);
   }
 
+  /** Reste connecte, revient juste au selecteur de modules. */
+  backToModules(): void {
+    this.router.navigate(['/accueil']);
+  }
+
   isLoggedIn(): boolean {
     return !!localStorage.getItem('gmdi_token');
   }

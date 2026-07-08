@@ -59,8 +59,8 @@ export type Section = 'foncier' | 'permis' | 'cartographie' | 'projets' | 'geolo
         <div class="av">{{ initiales() }}</div>
         <span class="user-name">{{ auth.currentUser()?.name ?? 'Responsable' }}</span>
       </div>
-      <button class="logout-btn" (click)="auth.logout()" title="Déconnexion">
-        ⏻
+      <button class="logout-btn" (click)="auth.backToModules()" title="Retour aux modules">
+        ⊞
       </button>
     </div>
   </header>

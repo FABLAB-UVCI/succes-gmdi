@@ -28,6 +28,11 @@ export class AuthService {
     this.http.post(`${environment.apiUrl}/auth/logout`, {}).subscribe({ complete: () => this._clear(), error: () => this._clear() });
   }
 
+  /** Reste connecte, revient juste au selecteur de modules. */
+  backToModules(): void {
+    this.router.navigate(['/accueil']);
+  }
+
   refreshToken() {
     return this.http.post<LoginResponse>(`${environment.apiUrl}/auth/refresh`, {}).pipe(
       tap(r => { localStorage.setItem(TK, r.token); this._token.set(r.token); })

@@ -33,8 +33,8 @@ import { ToastService } from '../../core/services/toast.service';
               <span style="opacity:.6"> — {{ auth.user()?.role ?? 'Finances' }}</span>
             </span>
           </div>
-          <button (click)="auth.logout()" class="btn-logout">
-            <i class="ti ti-logout" style="font-size:14px"></i><span class="logout-label">Déconnexion</span>
+          <button (click)="auth.backToModules()" class="btn-logout" title="Retour aux modules">
+            <i class="ti ti-layout-grid" style="font-size:14px"></i><span class="logout-label">Modules</span>
           </button>
         </div>
       </div>

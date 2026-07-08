@@ -45,8 +45,8 @@ export type Section = 'actualites' | 'reseaux' | 'relations' | 'documents' | 'ci
         <div class="av">{{initiales()}}</div>
         <span class="tb-name">{{auth.currentUser()?.name ?? 'Chef Communication'}}<span style="opacity:.6"> — {{roleLabel()}}</span></span>
       </div>
-      <button (click)="auth.logout()" class="btn-logout">
-        <i class="ti ti-logout" style="font-size:14px"></i><span class="logout-label">Déconnexion</span>
+      <button (click)="auth.backToModules()" class="btn-logout" title="Retour aux modules">
+        <i class="ti ti-layout-grid" style="font-size:14px"></i><span class="logout-label">Modules</span>
       </button>
     </div>
   </div>

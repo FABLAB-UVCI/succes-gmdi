@@ -20,6 +20,6 @@ export class TopbarComponent {
   });
 
   logout() {
-    this.auth.logout();
+    this.auth.backToModules();
   }
 }

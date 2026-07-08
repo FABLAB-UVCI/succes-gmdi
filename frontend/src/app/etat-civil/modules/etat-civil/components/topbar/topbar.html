@@ -13,9 +13,9 @@
   <div class="topbar-user">
     <div class="av">{{ userInitials() }}</div>
     <span><strong>{{ userName() }}</strong> — {{ userRole() }}</span>
-    <button class="logout-btn" (click)="logout()">
-      <i class="ti ti-logout"></i>
-      <span class="logout-label">Déconnexion</span>
+    <button class="logout-btn" (click)="logout()" title="Retour aux modules">
+      <i class="ti ti-layout-grid"></i>
+      <span class="logout-label">Modules</span>
     </button>
   </div>
 </header>
