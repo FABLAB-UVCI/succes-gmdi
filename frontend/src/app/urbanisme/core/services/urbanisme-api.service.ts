@@ -7,6 +7,7 @@ import {
   LotApi, LotCreateRequest,
   TitreFoncierApi, TitreFoncierCreateRequest,
   ReserveAdministrativeApi, ReserveAdministrativeCreateRequest,
+  PermisApi, PermisCreateRequest,
   PermisConstruireApi, PermisConstruireCreateRequest,
   PermisDemolirApi, CertificatUrbanismeApi,
   AutorisationOccupationApi, AutorisationCreateRequest,
@@ -96,6 +97,22 @@ export class ReserveApiService {
 // ════════════════════════════════════════════════════════════════════════════
 //  PERMIS & AUTORISATIONS
 // ════════════════════════════════════════════════════════════════════════════
+
+@Injectable({ providedIn: 'root' })
+export class PermisApiService {
+  private http = inject(HttpClient);
+  private base = `${BASE()}/urb/permis`;
+
+  getAll(f: { type?: string; statut?: string; quartier?: string; page?: number } = {}): Observable<PaginatedResponse<PermisApi>> {
+    return this.http.get<PaginatedResponse<PermisApi>>(this.base, { params: p(f) });
+  }
+  create(data: PermisCreateRequest): Observable<ApiResponse<PermisApi>> {
+    return this.http.post<ApiResponse<PermisApi>>(this.base, data);
+  }
+  decider(id: number, decision: 'accorde' | 'refuse', motif?: string): Observable<ApiResponse<PermisApi>> {
+    return this.http.patch<ApiResponse<PermisApi>>(`${this.base}/${id}/decider`, { statut: decision, motif_refus: motif });
+  }
+}
 
 @Injectable({ providedIn: 'root' })
 export class PermisConstruireApiService {

@@ -96,6 +96,24 @@ export interface PermisConstruireCreateRequest {
   nombre_etages?: number; superficie?: number; cout_estime?: number;
 }
 
+// ── Permis & autorisations (route générique, tous types confondus) ───────────
+export interface PermisApi {
+  id: number; reference: string; type: string; demandeur: string; beneficiaire: string;
+  telephone: string | null; localisation: string; adresse_travaux: string; adresse: string;
+  quartier: string; surface_plancher: number | null; superficie: number | null;
+  nombre_etages: number | null; cout_estime: number | null; instructeur: string | null;
+  motif_refus: string | null; date_depot: string; date_instruction: string | null;
+  date_decision: string | null; date_expiration: string | null; statut: string;
+  agent: string | null; observations: string | null; created_at: string;
+}
+export interface PermisCreateRequest {
+  type: string; demandeur: string; telephone?: string | null; localisation?: string;
+  quartier?: string; ilot?: string | null; lot?: string | null; section?: string | null;
+  numero_piece?: string | null; type_piece?: string | null;
+  surface_plancher?: number | null; lat?: number | null; lng?: number | null;
+  agent?: string | null; observations?: string | null;
+}
+
 // ── Permis de démolir ─────────────────────────────────────────────────────────
 export interface PermisDemolirApi {
   id: number; reference: string; demandeur: string;

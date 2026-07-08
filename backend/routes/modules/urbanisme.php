@@ -87,6 +87,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get( 'permis/{id}',                          [PermisController::class, 'show']);
         Route::put( 'permis/{id}',                          [PermisController::class, 'update']);
         Route::patch('permis/{id}/statut',                  [PermisController::class, 'updateStatut']);
+        Route::patch('permis/{id}/decider',                 [PermisController::class, 'decider']);
 
         // ════════════════════════════════════════════════════════════════════
         //  SIG — routes directes + alias sous /sig/

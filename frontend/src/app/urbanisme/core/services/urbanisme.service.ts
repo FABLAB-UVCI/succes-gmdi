@@ -2,15 +2,14 @@ import { Injectable, signal, inject, computed } from '@angular/core';
 import { Observable, tap, map } from 'rxjs';
 import {
   Parcelle, Lot, TitreFoncier, ReserveAdministrative,
-  PermisConstruire, PermisDemlir, CertificatUrbanisme, AutorisationOccupation,
+  PermisConstruire,
   QuartierSIG, VoirieSIG, ReseauSIG,
   Lotissement, AmenagementUrbain, SuiviChantier,
   EquipementPublic, KpiUrbanisme
 } from '../models/urbanisme.models';
 import {
   ParcelleApiService, LotApiService, TitreFoncierApiService, ReserveApiService,
-  PermisConstruireApiService, PermisDemolirApiService,
-  CertificatUrbanismeApiService, AutorisationOccupationApiService,
+  PermisApiService,
   QuartierSIGApiService, VoirieSIGApiService, ReseauSIGApiService,
   LotissementApiService, AmenagementApiService, SuiviChantierApiService,
   EquipementPublicApiService, StatsUrbanismeApiService
@@ -24,10 +23,7 @@ export class UrbanismeService {
   private lotApi       = inject(LotApiService);
   private titreApi     = inject(TitreFoncierApiService);
   private reserveApi   = inject(ReserveApiService);
-  private pcApi        = inject(PermisConstruireApiService);
-  private pdApi        = inject(PermisDemolirApiService);
-  private cuApi        = inject(CertificatUrbanismeApiService);
-  private aoApi        = inject(AutorisationOccupationApiService);
+  private permisApi    = inject(PermisApiService);
   private quartierApi  = inject(QuartierSIGApiService);
   private voirieApi    = inject(VoirieSIGApiService);
   private reseauApi    = inject(ReseauSIGApiService);
@@ -43,10 +39,7 @@ export class UrbanismeService {
   readonly titresFonciers    = signal<TitreFoncier[]>([]);
   readonly reserves          = signal<ReserveAdministrative[]>([]);
 
-  readonly permisConstruire  = signal<PermisConstruire[]>([]);
-  readonly permisDemolir     = signal<PermisDemlir[]>([]);
-  readonly certificats       = signal<CertificatUrbanisme[]>([]);
-  readonly autorisations     = signal<AutorisationOccupation[]>([]);
+  readonly permis            = signal<PermisConstruire[]>([]);
 
   readonly quartiers         = signal<QuartierSIG[]>([]);
   readonly voiries           = signal<VoirieSIG[]>([]);
@@ -183,101 +176,53 @@ export class UrbanismeService {
   //  PERMIS & AUTORISATIONS
   // ═══════════════════════════════════════════════════════════════════════════
 
-  loadPermisConstruire(f: { statut?: string } = {}): void {
+  loadPermis(f: { statut?: string; type?: string } = {}): void {
     this.loadingPermis.set(true);
-    this.pcApi.getAll(f).pipe(
+    this.permisApi.getAll(f).pipe(
       tap(r => {
-        this.permisConstruire.set(r.data.map(x => ({
+        this.permis.set(r.data.map(x => ({
           id: String(x.id), reference: x.reference, demandeur: x.demandeur,
-          adresseTravaux: x.adresse_travaux, typeConstruire: x.type_construire as any,
+          localisation: x.localisation, quartier: x.quartier, agent: x.agent ?? undefined,
+          surfacePlancher: x.surface_plancher ?? undefined,
+          adresseTravaux: x.adresse_travaux, typeConstruire: x.type as any,
           nombreEtages: x.nombre_etages ?? undefined, superficie: x.superficie ?? undefined,
           coutEstime: x.cout_estime ?? undefined, dateDepot: x.date_depot,
           dateDecision: x.date_decision ?? undefined, instructeur: x.instructeur ?? undefined,
           statut: x.statut as any, motifRefus: x.motif_refus ?? undefined,
-          type: x.type_construire ?? undefined
-        })));
+          type: x.type ?? undefined
+        } as any)));
         this.loadingPermis.set(false);
       })
     ).subscribe({ error: () => this.loadingPermis.set(false) });
   }
 
-  deposerPermisConstruire(f: { demandeur: string; adresseTravaux?: string; localisation?: string; quartier?: string; ilot?: string; lot?: string; section?: string; telephone?: string; numeroPiece?: string; typePiece?: string; lat?: number; lng?: number; agent?: string; observations?: string; surfacePlancher?: number; typeConstruire?: string; nombreEtages?: number; superficie?: number; coutEstime?: number; [key: string]: any }): Observable<PermisConstruire> {
-    return this.pcApi.create({
+  creerPermis(f: { type?: string; demandeur: string; telephone?: string; localisation?: string; quartier?: string; ilot?: string; lot?: string; section?: string; numeroPiece?: string; typePiece?: string; surfacePlancher?: number; lat?: number; lng?: number; agent?: string; observations?: string; [key: string]: any }): Observable<PermisConstruire> {
+    return this.permisApi.create({
+      type: f.type ?? 'construire',
       demandeur: f.demandeur,
-      adresse_travaux: f.adresseTravaux ?? f.localisation ?? '',
-      localisation: f.localisation ?? f.adresseTravaux ?? '',
-      quartier: f.quartier ?? '', ilot: f.ilot ?? null, lot: f.lot ?? null, section: f.section ?? null,
       telephone: f.telephone ?? null,
+      localisation: f.localisation ?? '',
+      quartier: f.quartier ?? '', ilot: f.ilot ?? null, lot: f.lot ?? null, section: f.section ?? null,
       numero_piece: f.numeroPiece ?? null, type_piece: f.typePiece ?? null,
+      surface_plancher: f.surfacePlancher ?? null,
       lat: f.lat || null, lng: f.lng || null,
       agent: f.agent ?? null, observations: f.observations ?? null,
-      surface_plancher: f.surfacePlancher ?? f.superficie ?? null,
-      type_construire: f.typeConstruire ?? 'villa', nombre_etages: f.nombreEtages,
-      superficie: f.superficie, cout_estime: f.coutEstime
     }).pipe(
-      map(r => ({ id: String(r.data.id), reference: r.data.reference, demandeur: r.data.demandeur, adresseTravaux: r.data.adresse_travaux, typeConstruire: r.data.type_construire as any, dateDepot: r.data.date_depot, statut: r.data.statut as any })),
-      tap(pc => {
-        this.permisConstruire.update(l => [pc, ...l]);
+      map(r => ({ id: String(r.data.id), reference: r.data.reference, demandeur: r.data.demandeur, localisation: r.data.localisation, type: r.data.type, dateDepot: r.data.date_depot, statut: r.data.statut as any } as any)),
+      tap(pm => {
+        this.permis.update(l => [pm, ...l]);
         this.kpi.update(k => ({ ...k, permisEnCours: k.permisEnCours + 1 }));
       })
     );
   }
 
-  deciderPermis(id: string, decision: 'accorde' | 'refuse', motif?: string): void {
-    this.pcApi.decider(Number(id), decision, motif).pipe(
+  updateStatutPermis(id: string, decision: 'accorde' | 'refuse', motif?: string): Observable<PermisConstruire> {
+    return this.permisApi.decider(Number(id), decision, motif).pipe(
+      map(r => ({ id: String(r.data.id), reference: r.data.reference, demandeur: r.data.demandeur, statut: r.data.statut as any } as any)),
       tap(() => {
-        this.permisConstruire.update(l => l.map(p => p.id === id ? { ...p, statut: decision as any } : p));
+        this.permis.update(l => l.map(p => p.id === id ? { ...p, statut: decision as any } : p));
         if (decision === 'accorde') this.kpi.update(k => ({ ...k, permisAccordes: k.permisAccordes + 1, permisEnCours: Math.max(0, k.permisEnCours - 1) }));
       })
-    ).subscribe();
-  }
-
-  loadPermisDemolir(): void {
-    this.pdApi.getAll().pipe(
-      tap(r => this.permisDemolir.set(r.data.map(x => ({
-        id: String(x.id), reference: x.reference, demandeur: x.demandeur,
-        adresseTravaux: x.adresse_travaux, descriptionBatiment: x.description_batiment,
-        dateDepot: x.date_depot, statut: x.statut as any
-      }))))
-    ).subscribe();
-  }
-
-  loadCertificats(): void {
-    this.cuApi.getAll().pipe(
-      tap(r => this.certificats.set(r.data.map(x => ({
-        id: String(x.id), reference: x.reference, demandeur: x.demandeur,
-        adresse: x.adresse, type: x.type as any, dateDepot: x.date_depot,
-        dateDelivrance: x.date_delivrance ?? undefined,
-        dateExpiration: x.date_expiration ?? undefined, statut: x.statut as any
-      }))))
-    ).subscribe();
-  }
-
-  delivrerCertificat(id: string): void {
-    this.cuApi.delivrer(Number(id)).pipe(
-      tap(() => this.certificats.update(l => l.map(c => c.id === id ? { ...c, statut: 'delivre' as const } : c)))
-    ).subscribe();
-  }
-
-  loadAutorisations(): void {
-    this.aoApi.getAll().pipe(
-      tap(r => this.autorisations.set(r.data.map(x => ({
-        id: String(x.id), reference: x.reference, beneficiaire: x.beneficiaire,
-        typeOccupation: x.type_occupation, localisation: x.localisation,
-        superficie: x.superficie ?? undefined, dateDebut: x.date_debut, dateFin: x.date_fin,
-        montantRedevance: x.montant_redevance ?? undefined, statut: x.statut as any
-      }))))
-    ).subscribe();
-  }
-
-  creerAutorisation(f: { beneficiaire: string; typeOccupation: string; localisation: string; superficie?: number; dateDebut: string; dateFin: string; montantRedevance?: number }): Observable<AutorisationOccupation> {
-    return this.aoApi.create({
-      beneficiaire: f.beneficiaire, type_occupation: f.typeOccupation,
-      localisation: f.localisation, superficie: f.superficie,
-      date_debut: f.dateDebut, date_fin: f.dateFin, montant_redevance: f.montantRedevance
-    }).pipe(
-      map(r => ({ id: String(r.data.id), reference: r.data.reference, beneficiaire: r.data.beneficiaire, typeOccupation: r.data.type_occupation, localisation: r.data.localisation, dateDebut: r.data.date_debut, dateFin: r.data.date_fin, statut: r.data.statut as any })),
-      tap(a => this.autorisations.update(l => [a, ...l]))
     );
   }
 
@@ -427,17 +372,10 @@ export class UrbanismeService {
 
   // ── Alias pour compatibilité composants ───────────────────────────────────
 
-  /** Alias de permisConstruire */
-  readonly permis = this.permisConstruire;
-
   /** Réseaux filtrés par type électrique */
   readonly reseauxElec = computed(() => this.reseaux().filter(r => r.type === 'electrique'));
   /** Réseaux filtrés par type hydraulique */
   readonly reseauxHydro = computed(() => this.reseaux().filter(r => r.type === 'hydraulique'));
-
-  loadPermis(f: { statut?: string; type?: string } = {}): void {
-    this.loadPermisConstruire(f);
-  }
 
   loadReseauxElec(): void { this.loadReseaux({ type: 'electrique' }); }
   loadReseauxHydro(): void { this.loadReseaux({ type: 'hydraulique' }); }
@@ -539,18 +477,6 @@ export class UrbanismeService {
       observations: f.observations,
       recommandations: f.recommandations,
       controleur: f.controleur ?? 'Système',
-    });
-  }
-
-  creerPermis(f: { demandeur: string; [key: string]: any }): Observable<PermisConstruire> {
-    return this.deposerPermisConstruire({ ...f, typeConstruire: f.typeConstruire ?? f.type ?? 'villa' });
-  }
-
-  updateStatutPermis(id: string, decision: 'accorde' | 'refuse', motif?: string): Observable<void> {
-    return new Observable(obs => {
-      this.deciderPermis(id, decision, motif);
-      obs.next();
-      obs.complete();
     });
   }
 
