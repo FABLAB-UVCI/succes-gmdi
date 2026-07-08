@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { AuthService } from '../communication/core/services/auth.service';
 
 interface ModuleCard { titre: string; description: string; route: string; icone: string; }
 
@@ -11,6 +12,10 @@ interface ModuleCard { titre: string; description: string; route: string; icone:
   template: `
 <div class="portal">
   <div class="flag-bar"><span class="f-o"></span><span class="f-w"></span><span class="f-v"></span></div>
+
+  <button class="btn-disconnect" (click)="auth.logout()" title="Se déconnecter">
+    <i class="ti ti-logout"></i><span>Se déconnecter</span>
+  </button>
 
   <header class="portal-head">
     <div class="emblem">🇨🇮</div>
@@ -37,12 +42,27 @@ interface ModuleCard { titre: string; description: string; route: string; icone:
 
 <style>
 .portal {
+  position: relative;
   min-height: 100vh;
   padding: 0 1.5rem 3rem;
   background: linear-gradient(180deg, var(--ci-creme, #FFF8EE) 0%, #fdf1de 100%);
   color: var(--ci-brun, #3D1F00);
   font-family: var(--font-sans, 'Inter', system-ui, sans-serif);
 }
+.btn-disconnect {
+  position: absolute; top: 1.25rem; right: 1.5rem; z-index: 5;
+  display: flex; align-items: center; gap: .4rem;
+  padding: .5rem .9rem;
+  border-radius: 8px;
+  border: 1px solid var(--color-border-secondary, #e0cdb5);
+  background: #fff;
+  color: var(--ci-brun, #3D1F00);
+  font-size: .8rem; font-weight: 600;
+  cursor: pointer;
+  transition: border-color .15s ease, color .15s ease, box-shadow .15s ease;
+}
+.btn-disconnect i { font-size: 15px; }
+.btn-disconnect:hover { border-color: #e63946; color: #e63946; box-shadow: 0 2px 8px rgba(230,57,70,.15); }
 .flag-bar { display: flex; height: 6px; margin: 0 -1.5rem 2.5rem; }
 .f-o, .f-w, .f-v { flex: 1; }
 .f-o { background: var(--ci-orange, #F77F00); }
@@ -99,6 +119,8 @@ interface ModuleCard { titre: string; description: string; route: string; icone:
   `
 })
 export class PortalHomeComponent {
+  readonly auth = inject(AuthService);
+
   modules: ModuleCard[] = [
     { titre: 'Communication',       description: 'Actualités, réseaux, réclamations', route: 'communication',       icone: '📣' },
     { titre: 'État civil',          description: 'Naissances, mariages, décès',        route: 'etat-civil',          icone: '📄' },
