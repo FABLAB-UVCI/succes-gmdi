@@ -219,7 +219,7 @@ export class GeolocalisationComponent implements OnInit {
   coordToY(lat: number): number { return Math.max(2, Math.min(96, ((this.LAT_MAX - lat) / (this.LAT_MAX - this.LAT_MIN)) * 100)); }
 
   ajouterEquipement(): void {
-    if (!this.fEq.nom || !this.fEq.adresse) { this.toast.show('geo', 'Nom et adresse obligatoires'); return; }
+    if (!this.fEq.nom || !this.fEq.adresse || !this.fEq.quartier || !this.fEq.lat || !this.fEq.lng) { this.toast.showError('geo', 'Nom, adresse, quartier et coordonnées GPS (latitude/longitude) obligatoires'); return; }
     this.saving.set(true);
     this.urb.ajouterEquipement({
       nom: this.fEq.nom, type: this.fEq.type, adresse: this.fEq.adresse, quartier: this.fEq.quartier,

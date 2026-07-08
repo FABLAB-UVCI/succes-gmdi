@@ -34,7 +34,7 @@ interface CritereEval {
 @if (activeTab() === 'plan') {
   <div class="card">
     <div class="ch"><h3><i class="ti ti-list-check"></i>Plan de formation 2025</h3></div>
-    <app-toast [visible]="toast.get('f')?.visible ?? false" [message]="toast.get('f')?.message ?? ''" />
+    <app-toast [visible]="toast.get('f')?.visible ?? false" [message]="toast.get('f')?.message ?? ''" [type]="toast.get('f')?.type ?? 'success'" />
     <div class="pb">
       <div class="fs">Nouvelle formation</div>
       
@@ -119,7 +119,7 @@ interface CritereEval {
 @if (activeTab() === 'eval') {
   <div class="card">
     <div class="ch"><h3><i class="ti ti-star"></i>Grille d'évaluation des agents</h3></div>
-    <app-toast [visible]="toast.get('ev')?.visible ?? false" [message]="toast.get('ev')?.message ?? ''" />
+    <app-toast [visible]="toast.get('ev')?.visible ?? false" [message]="toast.get('ev')?.message ?? ''" [type]="toast.get('ev')?.type ?? 'success'" />
     <div class="pb">
       
       <!-- Informations de l'agent -->
@@ -334,7 +334,7 @@ interface CritereEval {
 @if (activeTab() === 'certif') {
   <div class="card">
     <div class="ch"><h3><i class="ti ti-certificate"></i>Certifications et attestations</h3></div>
-    <app-toast [visible]="toast.get('cf')?.visible ?? false" [message]="toast.get('cf')?.message ?? ''" />
+    <app-toast [visible]="toast.get('cf')?.visible ?? false" [message]="toast.get('cf')?.message ?? ''" [type]="toast.get('cf')?.type ?? 'success'" />
     <div class="pb">
       <div class="fr">
         <div class="fg"><div class="fl">Matricule <span class="req">*</span></div><input class="fi" [(ngModel)]="cf.matricule" placeholder="Matricule de l'agent"></div>
@@ -439,7 +439,7 @@ export class FormationComponent {
       this.toast.show('ev', `Agent trouvé: ${agent.nomComplet}`);
     } else {
       this.ev.nomAgent = '';
-      this.toast.show('ev', 'Agent non trouvé. Vérifiez le matricule.');
+      this.toast.showError('ev', 'Agent non trouvé. Vérifiez le matricule.');
     }
   }
 
@@ -468,7 +468,7 @@ export class FormationComponent {
   // Enregistrer l'évaluation
   enregistrerEval(): void {
     if (!this.ev.matricule || !this.ev.nomAgent) {
-      this.toast.show('ev', 'Veuillez entrer un matricule valide');
+      this.toast.showError('ev', 'Veuillez entrer un matricule valide');
       return;
     }
 
@@ -505,12 +505,12 @@ export class FormationComponent {
   // Planifier une formation
   planifier(): void {
     if (!this.fo.titre || !this.fo.organisme) { 
-      this.toast.show('f', 'Titre et organisme obligatoires'); 
+      this.toast.showError('f', 'Titre et organisme obligatoires'); 
       return; 
     }
     
     if (!this.fo.formateur) {
-      this.toast.show('f', 'Nom du formateur obligatoire');
+      this.toast.showError('f', 'Nom du formateur obligatoire');
       return;
     }
     
@@ -524,7 +524,7 @@ export class FormationComponent {
       cout: this.fo.cout || 0
     }).subscribe({
       next: () => this.toast.show('f', `Formation planifiée — ${this.fo.titre} (Formateur: ${this.fo.formateur})`),
-      error: () => this.toast.show('f', 'Erreur lors de la planification'),
+      error: () => this.toast.showError('f', 'Erreur lors de la planification'),
     });
     
     this.fo = { 
@@ -541,7 +541,7 @@ export class FormationComponent {
   // Émettre une attestation
   emettreAttestation(): void {
     if (!this.cf.matricule) { 
-      this.toast.show('cf', 'Matricule obligatoire'); 
+      this.toast.showError('cf', 'Matricule obligatoire'); 
       return; 
     }
     this.toast.show('cf', `Attestation émise — ${this.cf.matricule} — ${this.cf.type}`);

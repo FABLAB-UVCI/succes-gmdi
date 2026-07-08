@@ -220,7 +220,7 @@ export class VoirieComponent implements OnInit {
   ngOnInit(): void { this.st.loadRoutes(); this.st.loadEntretiensVoirie(); this.st.loadReparationsVoirie(); }
 
   ajouterRoute(): void {
-    if (!this.fRoute.nom || !this.fRoute.quartier) { this.toast.show('v', 'Nom et quartier obligatoires'); return; }
+    if (!this.fRoute.nom || !this.fRoute.quartier || !this.fRoute.longueur) { this.toast.showError('v', 'Nom, quartier et longueur obligatoires'); return; }
     this.saving.set(true);
     this.st.ajouterRoute(this.fRoute).subscribe({
       next: r => { this.toast.show('v', `Route enregistrée — ${r.nom}`); this.saving.set(false); this.showAddRoute.set(false); this.fRoute = { nom:'', quartier:'', longueur:0, type:'bitumee', etat:'bon' }; },
@@ -229,7 +229,7 @@ export class VoirieComponent implements OnInit {
   }
 
   planifierEntretien(): void {
-    if (!this.fEnt.route || !this.fEnt.dateDebut) { this.toast.show('v', 'Route et date obligatoires'); return; }
+    if (!this.fEnt.route || !this.fEnt.dateDebut) { this.toast.showError('v', 'Route et date obligatoires'); return; }
     this.saving.set(true);
     this.st.planifierEntretienVoirie({ route: this.fEnt.route, typeEntretien: this.fEnt.typeEntretien, dateDebut: this.fEnt.dateDebut, dateFin: this.fEnt.dateFin, equipe: this.fEnt.equipe, coutEstime: this.fEnt.coutEstime }).subscribe({
       next: e => { this.toast.show('v', `Entretien planifié — ${e.route}`); this.saving.set(false); this.showAddEnt.set(false); this.fEnt = { route:'', typeEntretien:'Curage des caniveaux', dateDebut:'', dateFin:'', equipe:'', coutEstime:0 }; },
@@ -238,7 +238,7 @@ export class VoirieComponent implements OnInit {
   }
 
   signalerReparation(): void {
-    if (!this.fRep.route || !this.fRep.description) { this.toast.show('v', 'Localisation et description obligatoires'); return; }
+    if (!this.fRep.route || !this.fRep.description) { this.toast.showError('v', 'Localisation et description obligatoires'); return; }
     this.saving.set(true);
     this.st.signalerReparation({ route: this.fRep.route, description: this.fRep.description, priorite: this.fRep.priorite, signalePar: this.fRep.signalePar || 'Anonyme' }).subscribe({
       next: () => { this.toast.show('v', 'Réparation enregistrée'); this.saving.set(false); this.showAddRep.set(false); this.fRep = { route:'', description:'', priorite:'normale', signalePar:'' }; },

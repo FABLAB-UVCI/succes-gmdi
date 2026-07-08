@@ -16,7 +16,7 @@ export class AuthService {
   }
 
   login(email: string, password: string) {
-    return this.http.post<{ token: string; user: any }>(`${API}/login`, { email, password }).pipe(
+    return this.http.post<{ token: string; user: any }>(`${API}/auth/login`, { email, password }).pipe(
       tap(res => {
         localStorage.setItem('gmdi_token', res.token);
         localStorage.setItem('gmdi_user', JSON.stringify(res.user));
@@ -28,7 +28,7 @@ export class AuthService {
   logout() {
     const token = localStorage.getItem('gmdi_token');
     if (token) {
-      this.http.post(`${API}/logout`, {}).subscribe();
+      this.http.post(`${API}/auth/logout`, {}).subscribe();
     }
     localStorage.removeItem('gmdi_token');
     localStorage.removeItem('gmdi_user');

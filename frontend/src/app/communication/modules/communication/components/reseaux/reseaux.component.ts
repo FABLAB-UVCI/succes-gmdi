@@ -71,7 +71,7 @@ const PLATEFORMES = [
 <!-- ── Publier ────────────────────────────────────────────────────────── -->
 @if (active()==='publier') {
   <div class="ph"><div class="pt"><i class="ti ti-send"></i>Publier sur les réseaux sociaux</div></div>
-  @if (toast.get('rs')?.visible) { <div class="success-toast show" style="margin:.5rem 1rem"><i class="ti ti-check"></i>{{toast.get('rs')?.message}}</div> }
+  @if (toast.get('rs')?.visible) { <div class="show" [ngClass]="toast.get('rs')?.type==='error' ? 'error-toast' : 'success-toast'" style="margin:.5rem 1rem"><i class="ti" [ngClass]="toast.get('rs')?.type==='error' ? 'ti-alert-circle' : 'ti-check'"></i>{{toast.get('rs')?.message}}</div> }
   <div class="pb">
     <div class="fg" style="margin-bottom:8px">
       <div class="fl">Message / Publication <span style="color:#e63946">*</span></div>
@@ -107,7 +107,7 @@ const PLATEFORMES = [
 @if (active()==='calendrier') {
   <div class="ph">
     <div class="pt"><i class="ti ti-calendar"></i>Calendrier éditorial — {{moisCourant()}}</div>
-    <button class="btn-p" (click)="toast.show('cal','Nouveau post ajouté au calendrier')"><i class="ti ti-plus"></i>Ajouter un post</button>
+    <button class="btn-p" (click)="active.set('publier')"><i class="ti ti-plus"></i>Ajouter un post</button>
   </div>
   <div class="tbl-wrap">
     <table>
@@ -130,7 +130,7 @@ const PLATEFORMES = [
       </tbody>
     </table>
   </div>
-  @if (toast.get('cal')?.visible) { <div class="success-toast show" style="margin:8px 1rem"><i class="ti ti-check"></i>{{toast.get('cal')?.message}}</div> }
+  @if (toast.get('cal')?.visible) { <div class="show" [ngClass]="toast.get('cal')?.type==='error' ? 'error-toast' : 'success-toast'" style="margin:8px 1rem"><i class="ti" [ngClass]="toast.get('cal')?.type==='error' ? 'ti-alert-circle' : 'ti-check'"></i>{{toast.get('cal')?.message}}</div> }
 }
 </div>
   `
@@ -164,12 +164,12 @@ export class ReseauxComponent implements OnInit {
   }
 
   publierPost(): void {
-    if (!this.fPost.message) { this.toast.show('rs', 'Message obligatoire'); return; }
-    if (!this.fPost.plateformes.length) { this.toast.show('rs', 'Sélectionnez au moins une plateforme'); return; }
+    if (!this.fPost.message) { this.toast.showError('rs', 'Message obligatoire'); return; }
+    if (!this.fPost.plateformes.length) { this.toast.showError('rs', 'Sélectionnez au moins une plateforme'); return; }
     this.saving.set(true);
     this.com.publierPost({ contenu: this.fPost.message, plateformes: this.fPost.plateformes, programme: this.fPost.quand === 'programme', date: this.fPost.date }).subscribe({
       next: () => { this.toast.show('rs', 'Publié sur : ' + this.fPost.plateformes.join(', ')); this.saving.set(false); this.fPost = { message:'', plateformes:[], quand:'maintenant', date:'' }; },
-      error: () => this.saving.set(false)
+      error: (err) => { this.saving.set(false); this.toast.showError('rs', err?.error?.message || 'Une erreur est survenue.'); }
     });
   }
 

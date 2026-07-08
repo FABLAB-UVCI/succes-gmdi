@@ -37,7 +37,7 @@ type Tab = 'salaires' | 'primes' | 'bulletins';
         <button class="bs"><i class="ti ti-download"></i>État de paie</button>
         <button class="bd"><i class="ti ti-printer"></i>Imprimer tous les bulletins</button>
       </div>
-      <app-toast [visible]="toast.get('pa')?.visible ?? false" [message]="toast.get('pa')?.message ?? ''" />
+      <app-toast [visible]="toast.get('pa')?.visible ?? false" [message]="toast.get('pa')?.message ?? ''" [type]="toast.get('pa')?.type ?? 'success'" />
       <div class="fs">Extrait du journal de paie</div>
       <table class="tbl">
         <thead><tr>
@@ -68,7 +68,7 @@ type Tab = 'salaires' | 'primes' | 'bulletins';
 @if (activeTab() === 'primes') {
   <div class="card">
     <div class="ch"><h3><i class="ti ti-star"></i>Primes et indemnités</h3></div>
-    <app-toast [visible]="toast.get('pr')?.visible ?? false" [message]="toast.get('pr')?.message ?? ''" />
+    <app-toast [visible]="toast.get('pr')?.visible ?? false" [message]="toast.get('pr')?.message ?? ''" [type]="toast.get('pr')?.type ?? 'success'" />
     <div class="pb">
       <div class="fs">Attribuer une prime</div>
       <div class="fr3">
@@ -188,7 +188,7 @@ export class PaieComponent {
 
   attribuerPrime(): void {
     if (!this.prime.matricule || !this.prime.type || !this.prime.montant) {
-      this.toast.show('pr', 'Remplir tous les champs obligatoires'); return;
+      this.toast.showError('pr', 'Remplir tous les champs obligatoires'); return;
     }
     this.toast.show('pr', `Prime attribuée — ${this.prime.matricule} — ${this.prime.type} : ${this.rh.formaterFCFA(this.prime.montant)}`);
     this.prime = { matricule: '', type: '', montant: null, mois: 'Mai 2025', justification: '' };

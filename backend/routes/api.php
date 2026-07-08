@@ -9,6 +9,7 @@ use App\Modules\EtatCivil\Controllers\MariageController;
 use App\Modules\EtatCivil\Controllers\DecesController;
 use App\Modules\EtatCivil\Controllers\CertificatController;
 use App\Modules\EtatCivil\Controllers\StatistiquesController;
+use App\Modules\EtatCivil\Controllers\PublicationBansController;
 
 // Modules — RH
 use App\Modules\Rh\Controllers\AgentController;
@@ -46,6 +47,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::apiResource('mariages', MariageController::class)->only(['index', 'store', 'destroy']);
         Route::apiResource('deces', DecesController::class)->only(['index', 'store', 'destroy']);
         Route::apiResource('certificats', CertificatController::class)->only(['index', 'store', 'destroy']);
+        Route::apiResource('publications-bans', PublicationBansController::class)->only(['index', 'store', 'destroy']);
         Route::get('statistiques', [StatistiquesController::class, 'index']);
     });
 

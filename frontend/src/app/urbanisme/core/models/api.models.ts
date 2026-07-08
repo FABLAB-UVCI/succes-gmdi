@@ -20,6 +20,7 @@ export interface ParcelleApi {
   id: number; reference: string; section: string; numero: number;
   superficie: number; localisation: string; quartier: string;
   proprietaire: string | null; titre_foncier: string | null;
+  usage: string | null;
   statut: string; valeur_estimee: number | null;
   date_enregistrement: string | null;
   lat: number | null; lng: number | null;
@@ -28,7 +29,7 @@ export interface ParcelleApi {
 export interface ParcelleCreateRequest {
   section: string; numero: number; superficie: number;
   localisation: string; quartier: string; proprietaire?: string;
-  titre_foncier?: string; statut?: string; valeur_estimee?: number;
+  titre_foncier?: string; statut?: string; usage?: string; valeur_estimee?: number;
   lat?: number; lng?: number;
 }
 

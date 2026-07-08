@@ -78,7 +78,7 @@ export class UrbanismeService {
           id: String(x.id), reference: x.reference, section: x.section,
           numero: x.numero, superficie: x.superficie, localisation: x.localisation,
           quartier: x.quartier, proprietaire: x.proprietaire ?? undefined,
-          titreFoncier: x.titre_foncier ?? undefined, statut: x.statut as any,
+          titreFoncier: x.titre_foncier ?? undefined, usage: x.usage ?? undefined, statut: x.statut as any,
           valeurEstimee: x.valeur_estimee ?? undefined,
           dateEnregistrement: x.date_enregistrement ?? undefined,
           coordonnees: (x.lat && x.lng) ? { lat: x.lat, lng: x.lng } : undefined
@@ -91,17 +91,24 @@ export class UrbanismeService {
   enregistrerParcelle(f: {
     section: string; numero: number; superficie: number;
     localisation: string; quartier: string; proprietaire?: string;
-    titreFoncier?: string; statut?: string; valeurEstimee?: number;
+    titreFoncier?: string; statut?: string; usage?: string; valeurEstimee?: number;
     lat?: number; lng?: number;
   }): Observable<Parcelle> {
     return this.parcelleApi.create({
       section: f.section, numero: f.numero, superficie: f.superficie,
       localisation: f.localisation, quartier: f.quartier,
       proprietaire: f.proprietaire, titre_foncier: f.titreFoncier,
-      statut: f.statut, valeur_estimee: f.valeurEstimee,
+      statut: f.statut, usage: f.usage, valeur_estimee: f.valeurEstimee,
       lat: f.lat, lng: f.lng
     }).pipe(
-      map(r => ({ id: String(r.data.id), reference: r.data.reference, section: r.data.section, numero: r.data.numero, superficie: r.data.superficie, localisation: r.data.localisation, quartier: r.data.quartier, statut: r.data.statut as any })),
+      map(r => ({
+        id: String(r.data.id), reference: r.data.reference, section: r.data.section, numero: r.data.numero,
+        superficie: r.data.superficie, localisation: r.data.localisation, quartier: r.data.quartier,
+        proprietaire: r.data.proprietaire ?? undefined, titreFoncier: r.data.titre_foncier ?? undefined,
+        usage: r.data.usage ?? undefined, valeurEstimee: r.data.valeur_estimee ?? undefined,
+        statut: r.data.statut as any,
+        coordonnees: (r.data.lat && r.data.lng) ? { lat: r.data.lat, lng: r.data.lng } : undefined,
+      })),
       tap(p => this.parcelles.update(l => [p, ...l]))
     );
   }
@@ -445,6 +452,7 @@ export class UrbanismeService {
       proprietaire: f.proprietaire,
       titreFoncier: f.titreFoncier,
       statut: f.statut,
+      usage: f.usage,
       valeurEstimee: f.valeurEstimee,
       lat: f.lat, lng: f.lng,
     });

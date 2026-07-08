@@ -220,7 +220,7 @@ export class MaintenanceComponent implements OnInit {
   ngOnInit(): void { this.st.loadPlanningMaintenance(); this.st.loadMaintenanceCorrective(); }
 
   planifier(): void {
-    if (!this.fPrev.equipement || !this.fPrev.datePrevue) { this.toast.show('maint', 'Équipement et date obligatoires'); return; }
+    if (!this.fPrev.equipement || !this.fPrev.datePrevue || !this.fPrev.responsable) { this.toast.showError('maint', 'Équipement, responsable et date obligatoires'); return; }
     this.saving.set(true);
     this.st.planifierMaintenance({
       equipement: this.fPrev.equipement, service: this.fPrev.service,
@@ -234,7 +234,7 @@ export class MaintenanceComponent implements OnInit {
   }
 
   signalerPanne(): void {
-    if (!this.fCorr.equipement || !this.fCorr.panne) { this.toast.show('maint', 'Équipement et description obligatoires'); return; }
+    if (!this.fCorr.equipement || !this.fCorr.panne) { this.toast.showError('maint', 'Équipement et description obligatoires'); return; }
     this.saving.set(true);
     this.st.signalerPanneMaintenance(this.fCorr).subscribe({
       next: () => { this.toast.show('maint', 'Panne signalée'); this.saving.set(false); this.showCorr.set(false); this.fCorr = { equipement:'', service:'Bâtiments', panne:'', priorite:'normale' }; },

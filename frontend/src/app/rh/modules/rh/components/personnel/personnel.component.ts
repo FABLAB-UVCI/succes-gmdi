@@ -27,7 +27,7 @@ type Tab = 'fiche' | 'liste' | 'fonct' | 'contrat' | 'stage';
 @if (activeTab() === 'fiche') {
   <div class="card">
     <div class="ch"><h3><i class="ti ti-user-plus"></i>Nouvelle fiche agent</h3></div>
-    <app-toast [visible]="toast.get('p')?.visible ?? false" [message]="toast.get('p')?.message ?? ''" />
+    <app-toast [visible]="toast.get('p')?.visible ?? false" [message]="toast.get('p')?.message ?? ''" [type]="toast.get('p')?.type ?? 'success'" />
     <div class="pb">
       <div class="fs">Identité</div>
       <div class="fr3">
@@ -49,8 +49,8 @@ type Tab = 'fiche' | 'liste' | 'fonct' | 'contrat' | 'stage';
         </div>
       </div>
       <div class="fr">
-        <div class="fg"><div class="fl">Téléphone</div><input class="fi" [(ngModel)]="form.telephone" placeholder="+225 07 ..."></div>
-        <div class="fg"><div class="fl">Email professionnel</div><input class="fi" type="email" [(ngModel)]="form.email" placeholder="agent@mairie.ci"></div>
+        <div class="fg"><div class="fl">Téléphone <span class="req">*</span></div><input class="fi" [(ngModel)]="form.telephone" placeholder="+225 07 ..."></div>
+        <div class="fg"><div class="fl">Email professionnel <span class="req">*</span></div><input class="fi" type="email" [(ngModel)]="form.email" placeholder="agent@mairie.ci"></div>
       </div>
 
       <div class="fs">Poste et contrat</div>
@@ -115,7 +115,7 @@ type Tab = 'fiche' | 'liste' | 'fonct' | 'contrat' | 'stage';
           </select>
         </div>
 
-        <div class="fg"><div class="fl">Grade</div><input class="fi" [(ngModel)]="form.grade" placeholder="Ex: Administrateur Principal"></div>
+        <div class="fg"><div class="fl">Grade <span class="req">*</span></div><input class="fi" [(ngModel)]="form.grade" placeholder="Ex: Administrateur Principal"></div>
         <div class="fg"><div class="fl">Date d'embauche <span class="req">*</span></div><input class="fi" type="date" [(ngModel)]="form.dateEmbauche"></div>
       </div>
       <div class="fr">
@@ -208,8 +208,10 @@ type Tab = 'fiche' | 'liste' | 'fonct' | 'contrat' | 'stage';
               <td class="right">{{ a.salaireBrut | fcfa }}</td>
               <td><span class="chip" [ngClass]="a.statut === 'actif' ? 'cv' : 'cp'">{{ a.statut === 'actif' ? 'Actif' : 'En congé' }}</span></td>
               <td>
-                <button class="bti" title="Voir fiche"><i class="ti ti-eye"></i></button>
-                <button class="bti ok" title="Valider"><i class="ti ti-check"></i></button>
+                <button class="bti" title="Voir fiche" (click)="voirFiche(a)"><i class="ti ti-eye"></i></button>
+                @if (a.statut !== 'actif') {
+                  <button class="bti ok" title="Remettre actif" (click)="reactiverAgent(a)"><i class="ti ti-check"></i></button>
+                }
               </td>
             </tr>
           }
@@ -222,13 +224,13 @@ type Tab = 'fiche' | 'liste' | 'fonct' | 'contrat' | 'stage';
 <!-- ── Fonctionnaires ───────────────────────────────────────────────────── -->
 @if (activeTab() === 'fonct') {
   <div class="card">
-    <div class="ch"><h3><i class="ti ti-building"></i>Fonctionnaires — 280 agents</h3></div>
+    <div class="ch"><h3><i class="ti ti-building"></i>Fonctionnaires — {{ rh.totalFonct() }} agent(s)</h3></div>
     <div class="pb">
       <div class="kpi4">
-        <div class="kcard"><div class="kv" style="color:#185FA5">280</div><div class="kl">Total fonctionnaires</div></div>
-        <div class="kcard"><div class="kv" style="color:#009A44">45</div><div class="kl">Catégorie A</div><div class="ks">Cadres supérieurs</div></div>
-        <div class="kcard"><div class="kv" style="color:#C9A84C">112</div><div class="kl">Catégorie B</div><div class="ks">Cadres moyens</div></div>
-        <div class="kcard"><div class="kv" style="color:#F77F00">123</div><div class="kl">Catégorie C</div><div class="ks">Agents d'exécution</div></div>
+        <div class="kcard"><div class="kv" style="color:#185FA5">{{ rh.totalFonct() }}</div><div class="kl">Total fonctionnaires</div></div>
+        <div class="kcard"><div class="kv" style="color:#009A44">{{ rh.parCategorie().A }}</div><div class="kl">Catégorie A</div><div class="ks">Cadres supérieurs</div></div>
+        <div class="kcard"><div class="kv" style="color:#C9A84C">{{ rh.parCategorie().B }}</div><div class="kl">Catégorie B</div><div class="ks">Cadres moyens</div></div>
+        <div class="kcard"><div class="kv" style="color:#F77F00">{{ rh.parCategorie().C }}</div><div class="kl">Catégorie C</div><div class="ks">Agents d'exécution</div></div>
       </div>
     </div>
   </div>
@@ -237,14 +239,29 @@ type Tab = 'fiche' | 'liste' | 'fonct' | 'contrat' | 'stage';
 <!-- ── Contractuels ────────────────────────────────────────────────────── -->
 @if (activeTab() === 'contrat') {
   <div class="card">
-    <div class="ch"><h3><i class="ti ti-file-text"></i>Contractuels — 52 agents</h3></div>
+    <div class="ch"><h3><i class="ti ti-file-text"></i>Contractuels — {{ rh.totalContrat() }} agent(s)</h3></div>
     <div class="pb">
       <div class="kpi4">
-        <div class="kcard"><div class="kv" style="color:#F77F00">52</div><div class="kl">Total contractuels</div></div>
-        <div class="kcard"><div class="kv" style="color:#009A44">38</div><div class="kl">CDD en cours</div></div>
-        <div class="kcard"><div class="kv" style="color:#E24B4A">8</div><div class="kl">Expiration &lt; 3 mois</div></div>
-        <div class="kcard"><div class="kv" style="color:#185FA5">6</div><div class="kl">Renouvellements prévus</div></div>
+        <div class="kcard"><div class="kv" style="color:#F77F00">{{ rh.totalContrat() }}</div><div class="kl">Total contractuels</div></div>
+        <div class="kcard"><div class="kv" style="color:#009A44">{{ contractuelsActifs().length }}</div><div class="kl">CDD en cours</div></div>
       </div>
+      <div class="fs" style="margin-top:.75rem">Liste des contractuels</div>
+      <table class="tbl">
+        <thead><tr><th>Matricule</th><th>Agent</th><th>Poste</th><th>Direction</th><th>Statut</th></tr></thead>
+        <tbody>
+          @for (a of contractuelsActifs(); track a.id) {
+            <tr>
+              <td class="mono">{{ a.matricule }}</td>
+              <td class="bold">{{ a.nomComplet }}</td>
+              <td>{{ a.poste }}</td>
+              <td>{{ a.direction }}</td>
+              <td><span class="chip" [ngClass]="a.statut === 'actif' ? 'cv' : 'cp'">{{ a.statut === 'actif' ? 'Actif' : 'En congé' }}</span></td>
+            </tr>
+          } @empty {
+            <tr><td colspan="5" class="empty">Aucun contractuel enregistré</td></tr>
+          }
+        </tbody>
+      </table>
     </div>
   </div>
 }
@@ -252,14 +269,28 @@ type Tab = 'fiche' | 'liste' | 'fonct' | 'contrat' | 'stage';
 <!-- ── Stagiaires ──────────────────────────────────────────────────────── -->
 @if (activeTab() === 'stage') {
   <div class="card">
-    <div class="ch"><h3><i class="ti ti-school"></i>Stagiaires — 15 actifs</h3></div>
+    <div class="ch"><h3><i class="ti ti-school"></i>Stagiaires — {{ rh.totalStagiaires() }} actif(s)</h3></div>
     <div class="pb">
       <div class="kpi4">
-        <div class="kcard"><div class="kv" style="color:#009A44">15</div><div class="kl">Stagiaires actifs</div></div>
-        <div class="kcard"><div class="kv" style="color:#C9A84C">4</div><div class="kl">Fin de stage &lt; 1 mois</div></div>
-        <div class="kcard"><div class="kv" style="color:#185FA5">8</div><div class="kl">Avec convention signée</div></div>
-        <div class="kcard"><div class="kv" style="color:#F77F00">50 000</div><div class="kl">Gratification FCFA/mois</div></div>
+        <div class="kcard"><div class="kv" style="color:#009A44">{{ rh.totalStagiaires() }}</div><div class="kl">Stagiaires actifs</div></div>
       </div>
+      <div class="fs" style="margin-top:.75rem">Liste des stagiaires</div>
+      <table class="tbl">
+        <thead><tr><th>Matricule</th><th>Agent</th><th>Poste</th><th>Direction</th><th>Statut</th></tr></thead>
+        <tbody>
+          @for (a of stagiaires(); track a.id) {
+            <tr>
+              <td class="mono">{{ a.matricule }}</td>
+              <td class="bold">{{ a.nomComplet }}</td>
+              <td>{{ a.poste }}</td>
+              <td>{{ a.direction }}</td>
+              <td><span class="chip" [ngClass]="a.statut === 'actif' ? 'cv' : 'cp'">{{ a.statut === 'actif' ? 'Actif' : 'En congé' }}</span></td>
+            </tr>
+          } @empty {
+            <tr><td colspan="5" class="empty">Aucun stagiaire enregistré</td></tr>
+          }
+        </tbody>
+      </table>
     </div>
   </div>
 }
@@ -298,10 +329,13 @@ export class PersonnelComponent {
     this.rh.filtrerAgents(this.filtre.recherche, this.filtre.direction, this.filtre.contrat, this.filtre.statut)
   );
 
+  contractuelsActifs = computed(() => this.rh.agents().filter(a => a.typeContrat === 'contractuel'));
+  stagiaires         = computed(() => this.rh.agents().filter(a => a.typeContrat === 'stage'));
+
   creerAgent(): void {
-    const { matricule, nom, prenom, poste, direction, salaireBrut, dateEmbauche } = this.form;
-    if (!matricule || !nom || !prenom || !poste || !direction || !salaireBrut || !dateEmbauche) {
-      this.toast.show('p', 'Veuillez remplir tous les champs obligatoires'); 
+    const { matricule, nom, prenom, poste, direction, salaireBrut, dateEmbauche, dateNaissance, telephone, email, grade } = this.form;
+    if (!matricule || !nom || !prenom || !poste || !direction || !salaireBrut || !dateEmbauche || !dateNaissance || !telephone || !email || !grade) {
+      this.toast.showError('p', 'Veuillez remplir tous les champs obligatoires');
       return;
     }
     this.rh.ajouterAgent({
@@ -333,14 +367,29 @@ export class PersonnelComponent {
         this.fileDiplome = null;
         this.activeTab.set('liste');
       },
-      error: () => this.toast.show('p', 'Erreur lors de la création de l\'agent'),
+      error: (err) => this.toast.showError('p', this.errMsg(err)),
     });
+  }
+
+  private errMsg(err: any): string {
+    return err?.error?.errors ? (Object.values(err.error.errors) as string[][]).flat().join(' — ') : (err?.error?.message ?? 'Erreur lors de la création de l\'agent');
   }
 
   resetFiche(): void { this.form = this.emptyForm(); this.fileCNI = null; this.fileDiplome = null; }
 
   initiales(nom: string): string {
     return nom.split(' ').slice(0, 2).map(p => p[0]).join('').toUpperCase();
+  }
+
+  voirFiche(a: Agent): void {
+    alert(`Fiche agent\n\nMatricule : ${a.matricule}\nNom : ${a.nomComplet}\nPoste : ${a.poste}\nDirection : ${a.direction}\nContrat : ${this.labelContrat(a.typeContrat)}\nCatégorie : ${a.categorie}\nGrade : ${a.grade}\nSalaire brut : ${a.salaireBrut} FCFA\nStatut : ${a.statut}\nEmbauché le : ${a.dateEmbauche}`);
+  }
+
+  reactiverAgent(a: Agent): void {
+    this.rh.modifierAgent(a.id, { statut: 'actif' }).subscribe({
+      next: () => this.toast.show('p', `Agent remis actif — ${a.matricule}`),
+      error: () => this.toast.showError('p', 'Erreur lors de la mise à jour du statut'),
+    });
   }
 
   chipContrat(t: string): string {

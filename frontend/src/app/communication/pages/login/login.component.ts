@@ -13,9 +13,9 @@ import { AuthService } from '../../core/services/auth.service';
   <div class="login-card">
     <div class="login-flag"><span class="flag-orange"></span><span class="flag-white"></span><span class="flag-green"></span></div>
     <div class="login-header">
-      <div class="login-logo"><i class="ti ti-speakerphone"></i></div>
-      <div class="login-title">GMDI — Communication</div>
-      <div class="login-sub">Direction de la Communication et des Relations Publiques</div>
+      <div class="login-logo"><i class="ti ti-building-community"></i></div>
+      <div class="login-title">Plateforme GMDI</div>
+      <div class="login-sub">Gestion Municipale Digitale Intégrée — Portail d'accès</div>
     </div>
     <div class="login-body">
       @if (error()) { <div class="login-error"><i class="ti ti-alert-circle"></i>{{ error() }}</div> }
@@ -93,7 +93,7 @@ export class LoginComponent {
     if (!this.email || !this.password) { this.error.set('Veuillez renseigner vos identifiants.'); return; }
     this.loading.set(true); this.error.set('');
     this.auth.login({ email: this.email, password: this.password }).subscribe({
-      next: () => this.router.navigate(['/communication']),
+      next: () => this.router.navigate(['/accueil']),
       error: (err: Error) => { this.error.set(err.message); this.loading.set(false); }
     });
   }

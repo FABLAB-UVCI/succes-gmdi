@@ -75,6 +75,36 @@ export class PatrimoineService {
     return this.bienApi.getByReference(reference).pipe(map(r => this.mapBien(r.data)));
   }
 
+  enregistrerMobilier(f: { designation: string; quantite?: number; valeurUnitaire?: number; localisation: string; dateAcquisition?: string; etat?: string }): Observable<Bien> {
+    return this.mobApi.create({
+      designation: f.designation, quantite: f.quantite, valeur_unitaire: f.valeurUnitaire,
+      localisation: f.localisation, date_acquisition: f.dateAcquisition, etat: f.etat,
+    }).pipe(
+      map(r => this.mapBien(r.data)),
+      tap(b => this.biens.update(l => [b, ...l]))
+    );
+  }
+
+  enregistrerInformatique(f: { type: string; modele?: string; serie?: string; affectation: string; valeur?: number; dateAcquisition?: string }): Observable<Bien> {
+    return this.infApi.create({
+      type_materiel: f.type, modele: f.modele, numero_serie: f.serie,
+      affectation: f.affectation, valeur: f.valeur, date_acquisition: f.dateAcquisition,
+    }).pipe(
+      map(r => this.mapBien(r.data)),
+      tap(b => this.biens.update(l => [b, ...l]))
+    );
+  }
+
+  enregistrerEquipement(f: { designation: string; marque?: string; serie?: string; localisation: string; valeur?: number; dateAcquisition?: string }): Observable<Bien> {
+    return this.eqpApi.create({
+      designation: f.designation, marque: f.marque, numero_serie: f.serie,
+      localisation: f.localisation, valeur: f.valeur, date_acquisition: f.dateAcquisition,
+    }).pipe(
+      map(r => this.mapBien(r.data)),
+      tap(b => this.biens.update(l => [b, ...l]))
+    );
+  }
+
   filtrerBiens(recherche: string, categorie: string, statut: string): Bien[] {
     const q = recherche.toLowerCase();
     return this.biens().filter(b =>

@@ -3,12 +3,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../../../services/api.service';
 import { TOUTES_COMMUNES } from '../../../../communes.ci';
-<<<<<<< HEAD
 import { QUARTIERS_CI } from '../../../../quartiers.ci';
-import { qrVerification, codeVerification, formatDateFr, openPrintWindow } from '../../pdf-utils';
-=======
 import { PrintService } from '../../../../services/print.service';
->>>>>>> b5dbce35a5970a980cbad1edf363124bdb390f4a
+import { qrVerification, codeVerification, formatDateFr, openPrintWindow } from '../../pdf-utils';
 
 @Component({
   selector: 'app-certificats',
@@ -46,13 +43,16 @@ export class CertificatsComponent implements OnInit {
   onCniResidenceSelected(e: Event) { this.residenceForm.cni = (e.target as HTMLInputElement).files?.[0] ?? null; }
   onCniVieSelected(e: Event) { this.vieForm.cni = (e.target as HTMLInputElement).files?.[0] ?? null; }
 
+  submitAttempted = signal<string | null>(null);
+
   delivrer(type: string) {
+    this.submitAttempted.set(type);
     let nom = '', prenom = '', acteRef = '', typeLabel = '', dob = '', adresse = '', quartier = '', commune = '', profession = '';
     if (type === 'Célibat') { nom = this.celibatForm.nom; prenom = this.celibatForm.prenom; acteRef = this.celibatForm.acteRef; dob = this.celibatForm.dob; profession = this.celibatForm.profession; typeLabel = 'Célibat'; }
     else if (type === 'Résidence') { nom = this.residenceForm.nom; prenom = this.residenceForm.prenom; adresse = this.residenceForm.adresse; quartier = this.residenceForm.quartier; commune = this.residenceForm.commune; typeLabel = 'Résidence'; }
     else if (type === 'Vie') { nom = this.vieForm.nom; prenom = this.vieForm.prenom; dob = this.vieForm.dob; typeLabel = 'Vie'; }
 
-    if (!nom) { this.notify('Nom du bénéficiaire requis'); return; }
+    if (!nom) { this.notify('Nom du bénéficiaire requis (*)'); return; }
 
     this.api.createCertificat({ type: typeLabel, beneficiaire_nom: nom, beneficiaire_prenom: prenom, acte_reference: acteRef })
       .subscribe({
@@ -66,8 +66,9 @@ export class CertificatsComponent implements OnInit {
           this.celibatForm = { nom: '', prenom: '', dob: '', profession: '', acteRef: '', cni: null };
           this.residenceForm = { nom: '', prenom: '', adresse: '', quartier: '', commune: '', cni: null };
           this.vieForm = { nom: '', prenom: '', dob: '', cni: null };
+          this.submitAttempted.set(null);
         },
-        error: () => this.notify("Erreur lors de la délivrance")
+        error: (err) => this.notify(err?.error?.message || "Erreur lors de la délivrance")
       });
   }
 
@@ -624,10 +625,5 @@ export async function genererCertificatPDF(type: string, data: {
 </html>
 `;
 
-<<<<<<< HEAD
     openPrintWindow(html);
-=======
-    this.printService.printDocument(html, `Certificat-${data.type}`);
-  }
->>>>>>> b5dbce35a5970a980cbad1edf363124bdb390f4a
 }

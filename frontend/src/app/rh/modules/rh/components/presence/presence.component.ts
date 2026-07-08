@@ -45,7 +45,7 @@ interface JourCal { label: string; classe: string; }
           <button class="bp" (click)="pointer()"><i class="ti ti-fingerprint"></i>Pointer</button>
         </div>
       </div>
-      <app-toast [visible]="toast.get('pt')?.visible ?? false" [message]="toast.get('pt')?.message ?? ''" />
+      <app-toast [visible]="toast.get('pt')?.visible ?? false" [message]="toast.get('pt')?.message ?? ''" [type]="toast.get('pt')?.type ?? 'success'" />
       <div class="fs">Récapitulatif du mois de mai</div>
       <div class="pres-grid">
         @for (j of calendrier; track $index) {
@@ -60,7 +60,7 @@ interface JourCal { label: string; classe: string; }
 @if (activeTab() === 'conges') {
   <div class="card">
     <div class="ch"><h3><i class="ti ti-beach"></i>Gestion des congés</h3></div>
-    <app-toast [visible]="toast.get('cg')?.visible ?? false" [message]="toast.get('cg')?.message ?? ''" />
+    <app-toast [visible]="toast.get('cg')?.visible ?? false" [message]="toast.get('cg')?.message ?? ''" [type]="toast.get('cg')?.type ?? 'success'" />
     <div class="pb">
       <div class="fs">Nouvelle demande de congé</div>
       <div class="fr3">
@@ -154,7 +154,7 @@ interface JourCal { label: string; classe: string; }
 @if (activeTab() === 'absences') {
   <div class="card">
     <div class="ch"><h3><i class="ti ti-user-off"></i>Gestion des absences</h3></div>
-    <app-toast [visible]="toast.get('ab')?.visible ?? false" [message]="toast.get('ab')?.message ?? ''" />
+    <app-toast [visible]="toast.get('ab')?.visible ?? false" [message]="toast.get('ab')?.message ?? ''" [type]="toast.get('ab')?.type ?? 'success'" />
     <div class="pb">
       <div class="fs">Déclarer une absence</div>
       <div class="fr3">
@@ -194,7 +194,7 @@ interface JourCal { label: string; classe: string; }
 @if (activeTab() === 'permissions') {
   <div class="card">
     <div class="ch"><h3><i class="ti ti-calendar-event"></i>Permissions exceptionnelles</h3></div>
-    <app-toast [visible]="toast.get('pm')?.visible ?? false" [message]="toast.get('pm')?.message ?? ''" />
+    <app-toast [visible]="toast.get('pm')?.visible ?? false" [message]="toast.get('pm')?.message ?? ''" [type]="toast.get('pm')?.type ?? 'success'" />
     <div class="pb">
       <div class="fr">
         <div class="fg"><div class="fl">Matricule <span class="req">*</span></div><input class="fi" [(ngModel)]="pm.matricule" placeholder="Matricule de l'agent"></div>
@@ -253,7 +253,7 @@ export class PresenceComponent implements OnInit {
   }
 
   pointer(): void {
-    if (!this.pt.matricule) { this.toast.show('pt', 'Matricule obligatoire'); return; }
+    if (!this.pt.matricule) { this.toast.showError('pt', 'Matricule obligatoire'); return; }
     this.toast.show('pt', `Pointage enregistré — ${this.pt.matricule} — ${this.pt.statut}`);
     this.pt.matricule = '';
   }
@@ -267,7 +267,7 @@ export class PresenceComponent implements OnInit {
 
   soumettreConge(): void {
     if (!this.cg.matricule || !this.cg.type || !this.cg.duree || !this.cg.dateDebut) {
-      this.toast.show('cg', 'Champs obligatoires manquants'); return;
+      this.toast.showError('cg', 'Champs obligatoires manquants'); return;
     }
     const agent = this.rh.findAgent(this.cg.matricule);
 
@@ -285,7 +285,7 @@ export class PresenceComponent implements OnInit {
         this.toast.show('cg', `Demande soumise — ${this.cg.matricule} — ${this.cg.duree}j`);
         this.cg = { matricule: '', type: 'annuel', duree: null, dateDebut: '', motif: '', pieceJointe: null as File | null };
       },
-      error: () => this.toast.show('cg', 'Erreur lors de la soumission'),
+      error: () => this.toast.showError('cg', 'Erreur lors de la soumission'),
     });
   }
 
@@ -297,14 +297,14 @@ export class PresenceComponent implements OnInit {
       // Vérification du type de fichier
       const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf'];
       if (!allowedTypes.includes(input.files[0].type)) {
-        this.toast.show('cg', 'Format non supporté. Utilisez JPG, PNG ou PDF.');
+        this.toast.showError('cg', 'Format non supporté. Utilisez JPG, PNG ou PDF.');
         this.cg.pieceJointe = null;
         return;
       }
       
       // Vérification de la taille (max 5MB)
       if (input.files[0].size > 5 * 1024 * 1024) {
-        this.toast.show('cg', 'Fichier trop volumineux (max 5MB).');
+        this.toast.showError('cg', 'Fichier trop volumineux (max 5MB).');
         this.cg.pieceJointe = null;
         return;
       }
@@ -314,19 +314,19 @@ export class PresenceComponent implements OnInit {
   }
 
   declarer(): void {
-    if (!this.ab.matricule || !this.ab.date) { this.toast.show('ab', 'Matricule et date obligatoires'); return; }
+    if (!this.ab.matricule || !this.ab.date) { this.toast.showError('ab', 'Matricule et date obligatoires'); return; }
     const agent = this.rh.findAgent(this.ab.matricule);
     this.rh.declareAbsence({ matricule: this.ab.matricule, agent: agent?.nomComplet ?? this.ab.matricule, date: this.ab.date, motif: this.ab.motif, justifie: !!this.ab.pj }).subscribe({
       next: () => {
         this.toast.show('ab', `Absence déclarée — ${this.ab.matricule}`);
         this.ab = { matricule: '', date: '', motif: 'Absence injustifiée', pj: '' };
       },
-      error: () => this.toast.show('ab', 'Erreur lors de la déclaration'),
+      error: () => this.toast.showError('ab', 'Erreur lors de la déclaration'),
     });
   }
 
   accorderPermission(): void {
-    if (!this.pm.matricule || !this.pm.date) { this.toast.show('pm', 'Matricule et date obligatoires'); return; }
+    if (!this.pm.matricule || !this.pm.date) { this.toast.showError('pm', 'Matricule et date obligatoires'); return; }
     this.toast.show('pm', `Permission accordée — ${this.pm.matricule} — ${this.pm.motif}`);
     this.pm = { matricule: '', motif: 'Mariage', date: '', duree: null };
   }

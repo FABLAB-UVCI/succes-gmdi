@@ -35,6 +35,30 @@
           </div>
           <div class="fa"><button class="btn-p" (click)="publierBans()"><i class="ti ti-check"></i>Valider la publication</button></div>
         </div>
+        <div class="pb">
+          <div class="fsec">Bans publiés</div>
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>N° Acte</th><th>Futur Époux</th><th>Future Épouse</th><th>Date publication</th><th>Mariage prévu</th><th>Statut</th><th>Actions</th></tr></thead>
+              <tbody>
+                @for (b of bansDB(); track b.id) {
+                  <tr>
+                    <td style="font-family:monospace;font-size:11px">{{ b.numero }}</td>
+                    <td><strong>{{ b.epoux }}</strong></td>
+                    <td><strong>{{ b.epouse }}</strong></td>
+                    <td>{{ b.datePublication }}</td>
+                    <td>{{ b.dateMariagePrevue || '—' }}</td>
+                    <td><span class="chip cv">{{ b.statut }}</span></td>
+                    <td><button class="btn-s" style="padding:3px 8px;font-size:11px" (click)="supprimerBans(b)"><i class="ti ti-trash"></i>Supprimer</button></td>
+                  </tr>
+                }
+                @if (bansDB().length === 0) {
+                  <tr><td colspan="7" style="text-align:center;color:#aaa;padding:2rem">Aucune publication de bans enregistrée</td></tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     }
     @if (currentTab() === 'celebration') {

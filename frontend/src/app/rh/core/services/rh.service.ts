@@ -20,7 +20,7 @@ export interface Depart {
 
 @Injectable({ providedIn: 'root' })
 export class RhService {
-  private api = environment.apiUrl;
+  private api = `${environment.apiUrl}/rh`;
 
   // ── État réactif (chargé depuis le backend) ──────────────────────────────
   readonly agents      = signal<Agent[]>([]);
@@ -31,10 +31,19 @@ export class RhService {
   readonly departs     = signal<Depart[]>([]);
 
   // ── Computed KPIs ────────────────────────────────────────────────────────
-  readonly totalAgents     = computed(() => this.agents().length || 347);
-  readonly totalFonct      = computed(() => this.agents().filter(a => a.typeContrat === 'fonctionnaire').length || 280);
-  readonly totalContrat    = computed(() => this.agents().filter(a => a.typeContrat === 'contractuel').length || 52);
-  readonly totalStagiaires = computed(() => this.agents().filter(a => a.typeContrat === 'stage').length || 15);
+  readonly totalAgents     = computed(() => this.agents().length);
+  readonly totalFonct      = computed(() => this.agents().filter(a => a.typeContrat === 'fonctionnaire').length);
+  readonly totalContrat    = computed(() => this.agents().filter(a => a.typeContrat === 'contractuel').length);
+  readonly totalStagiaires = computed(() => this.agents().filter(a => a.typeContrat === 'stage').length);
+
+  readonly parCategorie = computed(() => {
+    const fonct = this.agents().filter(a => a.typeContrat === 'fonctionnaire');
+    return {
+      A: fonct.filter(a => a.categorie === 'A').length,
+      B: fonct.filter(a => a.categorie === 'B').length,
+      C: fonct.filter(a => a.categorie === 'C').length,
+    };
+  });
 
   readonly lignesPaie = computed<LignePaie[]>(() =>
     this.agents().slice(0, 4).map(a => {

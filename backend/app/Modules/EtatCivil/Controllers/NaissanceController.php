@@ -70,9 +70,11 @@ class NaissanceController extends Controller
             'date_jugement' => 'nullable|date',
         ]);
 
-        $data['numero'] = 'CI-CC-' . date('Y') . '-N-' . str_pad(Naissance::count() + 1, 6, '0', STR_PAD_LEFT);
-        $data['statut'] = 'Validé';
+        $data['prenom'] = $data['prenom'] ?? '';
         $data['type'] = $data['type'] ?? 'Déclaration';
+        $lettre = ['Déclaration' => 'N', 'Jugement' => 'J', 'Adoption' => 'A'][$data['type']] ?? 'N';
+        $data['numero'] = 'CI-CC-' . date('Y') . "-$lettre-" . str_pad(Naissance::where('type', $data['type'])->count() + 1, 6, '0', STR_PAD_LEFT);
+        $data['statut'] = 'Validé';
 
         $naissance = Naissance::create($data);
 

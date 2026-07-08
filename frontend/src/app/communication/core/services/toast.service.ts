@@ -4,7 +4,7 @@ export interface Toast { id: string; message: string; title?: string; visible: b
 export class ToastService {
   readonly toasts = signal<Record<string, Toast>>({});
   show(id: string, message: string): void { this._push(id, message, undefined, 'success'); }
-  showError(title: string, message: string): void { this._push('_e_'+Date.now(), message, title, 'error'); }
+  showError(id: string, message: string, title?: string): void { this._push(id, message, title, 'error'); }
   get(id: string): Toast|undefined { return this.toasts()[id]; }
   private _push(id: string, message: string, title: string|undefined, type: Toast['type']): void {
     this.toasts.update(t => ({ ...t, [id]: { id, message, title, visible: true, type } }));

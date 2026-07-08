@@ -269,7 +269,7 @@ export class ProjetsComponent implements OnInit {
   onFileCh2(e: Event): void  { this.fileCh2  = (e.target as HTMLInputElement).files?.[0]?.name ?? ''; }
 
   ajouterLotissement(): void {
-    if (!this.fLot.denomination || !this.fLot.promoteur) { this.toast.show('proj', 'Dénomination et promoteur obligatoires'); return; }
+    if (!this.fLot.denomination || !this.fLot.promoteur || !this.fLot.localisation) { this.toast.showError('proj', 'Dénomination, promoteur et localisation obligatoires'); return; }
     this.saving.set(true);
     this.urb.ajouterLotissement(this.fLot).subscribe({
       next: l => { this.toast.show('proj', `Lotissement enregistré — ${l.reference}`); this.saving.set(false); this.showAddL.set(false); this.fLot = { denomination:'', promoteur:'', localisation:'', superficie:0, nombreLots:0, dateApprob:'', statut:'etude' }; this.fileLot = ''; this.fileLot2 = ''; },
@@ -278,7 +278,7 @@ export class ProjetsComponent implements OnInit {
   }
 
   ajouterAmenagement(): void {
-    if (!this.fAm.intitule) { this.toast.show('proj', "Intitulé obligatoire"); return; }
+    if (!this.fAm.intitule || !this.fAm.localisation || !this.fAm.budget) { this.toast.showError('proj', "Intitulé, localisation et budget obligatoires"); return; }
     this.saving.set(true);
     this.urb.ajouterAmenagement({ ...this.fAm, tauxAvancement: 0 }).subscribe({
       next: () => { this.toast.show('proj', 'Aménagement enregistré'); this.saving.set(false); this.showAddA.set(false); this.fileAm = ''; this.fileAm2 = ''; },
@@ -287,7 +287,7 @@ export class ProjetsComponent implements OnInit {
   }
 
   ajouterChantier(): void {
-    if (!this.fCh.projet || !this.fCh.entrepreneur) { this.toast.show('proj', 'Projet et entrepreneur obligatoires'); return; }
+    if (!this.fCh.projet || !this.fCh.entrepreneur) { this.toast.showError('proj', 'Projet et entrepreneur obligatoires'); return; }
     this.saving.set(true);
     this.urb.ajouterChantier(this.fCh).subscribe({
       next: () => { this.toast.show('proj', 'Chantier enregistré'); this.saving.set(false); this.showAddC.set(false); this.fileCh = ''; this.fileCh2 = ''; },

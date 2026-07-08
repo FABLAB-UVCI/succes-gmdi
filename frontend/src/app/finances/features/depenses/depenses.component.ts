@@ -5,7 +5,7 @@ import { NgClass } from '@angular/common';
 import { FinancesService } from '../../core/services/finances.service';
 import { ToastService } from '../../core/services/toast.service';
 import { FcfaPipe } from '../../shared/pipes/fcfa.pipe';
-import { Chapitre } from '../../core/models/finances.models';
+import { Chapitre, Depense } from '../../core/models/finances.models';
 
 type DepTab = 'dsaisie' | 'dliste' | 'salaires';
 
@@ -25,41 +25,46 @@ type DepTab = 'dsaisie' | 'dliste' | 'salaires';
     <!-- ═══ SAISIE ═══ -->
     @if (activeTab() === 'dsaisie') {
       <div class="card">
-        <div class="ch"><h3><i class="ti ti-file-invoice"></i>Engagement d'une dépense</h3></div>
+        <div class="ch"><h3><i class="ti ti-file-invoice"></i>{{ editingId() ? 'Modifier la dépense' : "Engagement d'une dépense" }}</h3></div>
         @if (toastMsg()) {
-          <div class="alert-ok show"><i class="ti ti-check"></i>{{ toastMsg() }}</div>
+          <div class="alert-ok show" [class.error]="toastIsError()"><i class="ti" [class.ti-check]="!toastIsError()" [class.ti-alert-circle]="toastIsError()"></i>{{ toastMsg() }}</div>
         }
         <div class="pb">
           <div class="fs">Objet de la dépense</div>
           <div class="fr">
             <div class="fg">
               <div class="fl">Objet <span class="req">*</span></div>
-              <input class="fi" type="text" [(ngModel)]="form.objet" placeholder="Description de la dépense">
+              <input class="fi" [class.invalid]="submitAttempted() && !form.objet" type="text" [(ngModel)]="form.objet" placeholder="Description de la dépense">
+              @if (submitAttempted() && !form.objet) { <small class="field-error">Champ obligatoire</small> }
             </div>
             <div class="fg">
               <div class="fl">Fournisseur <span class="req">*</span></div>
-              <input class="fi" type="text" [(ngModel)]="form.fournisseur" placeholder="Nom du fournisseur">
+              <input class="fi" [class.invalid]="submitAttempted() && !form.fournisseur" type="text" [(ngModel)]="form.fournisseur" placeholder="Nom du fournisseur">
+              @if (submitAttempted() && !form.fournisseur) { <small class="field-error">Champ obligatoire</small> }
             </div>
           </div>
           <div class="fs">Imputation budgétaire</div>
           <div class="fr3">
             <div class="fg">
               <div class="fl">Chapitre <span class="req">*</span></div>
-              <select class="fsel" [(ngModel)]="form.chapitre">
+              <select class="fsel" [class.invalid]="submitAttempted() && !form.chapitre" [(ngModel)]="form.chapitre">
                 <option value="">-- Choisir --</option>
                 <option value="personnel">Personnel</option>
                 <option value="fonctionnement">Fonctionnement</option>
                 <option value="investissement">Investissement</option>
                 <option value="dette">Dette</option>
               </select>
+              @if (submitAttempted() && !form.chapitre) { <small class="field-error">Champ obligatoire</small> }
             </div>
             <div class="fg">
               <div class="fl">Article <span class="req">*</span></div>
-              <input class="fi" type="text" [(ngModel)]="form.article" placeholder="Ex: fournitures_bureau">
+              <input class="fi" [class.invalid]="submitAttempted() && !form.article" type="text" [(ngModel)]="form.article" placeholder="Ex: fournitures_bureau">
+              @if (submitAttempted() && !form.article) { <small class="field-error">Champ obligatoire</small> }
             </div>
             <div class="fg">
               <div class="fl">Montant (FCFA) <span class="req">*</span></div>
-              <input class="fi" type="number" [(ngModel)]="form.montant" placeholder="Montant">
+              <input class="fi" [class.invalid]="submitAttempted() && !form.montant" type="number" [(ngModel)]="form.montant" placeholder="Montant">
+              @if (submitAttempted() && !form.montant) { <small class="field-error">Champ obligatoire</small> }
             </div>
           </div>
           <div class="fr">
@@ -94,7 +99,10 @@ type DepTab = 'dsaisie' | 'dliste' | 'salaires';
           </div>
           <div class="fa">
             <button class="bs" (click)="resetForm()"><i class="ti ti-x"></i>Effacer</button>
-            <button class="bp" (click)="creerDepense()"><i class="ti ti-check"></i>Engager la dépense</button>
+            <button class="bp" (click)="creerDepense()">
+              @if (editingId()) { <i class="ti ti-check"></i>Enregistrer les modifications }
+              @else { <i class="ti ti-check"></i>Engager la dépense }
+            </button>
           </div>
         </div>
       </div>
@@ -142,6 +150,8 @@ type DepTab = 'dsaisie' | 'dliste' | 'salaires';
                         <i class="ti ti-check"></i>
                       </button>
                     }
+                    <button class="bti" title="Modifier" (click)="editerDepense(d)"><i class="ti ti-edit"></i></button>
+                    <button class="bti danger" title="Supprimer" (click)="supprimerDepense(d)"><i class="ti ti-trash"></i></button>
                   </td>
                 </tr>
               }
@@ -178,6 +188,9 @@ export class DepensesComponent {
 
   activeTab = signal<DepTab>('dsaisie');
   toastMsg  = signal('');
+  toastIsError = signal(false);
+  editingId = signal<string | null>(null);
+  submitAttempted = signal(false);
 
   filtreChap   = '';
   filtreStatut = '';
@@ -206,21 +219,50 @@ export class DepensesComponent {
   }
 
   creerDepense(): void {
+    this.submitAttempted.set(true);
     if (!this.form.objet || !this.form.fournisseur || !this.form.chapitre || !this.form.article || !this.form.montant) {
-      this.showToast('Veuillez remplir les champs obligatoires'); return;
+      this.showToast('Veuillez remplir les champs obligatoires (*)', true); return;
     }
-    const ref = this.svc.ajouterDepense({
+    const payload = {
       objet: this.form.objet,
       fournisseur: this.form.fournisseur,
-      chapitre: this.form.chapitre,
+      chapitre: this.form.chapitre as Chapitre,
       article: this.form.article,
       montant: this.form.montant,
       dateEngagement: this.form.dateEngagement,
       description: this.form.description,
-      statut: 'en_attente'  // Valeur par défaut: 'en_attente', 'valide', 'rejete'
-    });
-    this.showToast('Dépense engagée — Réf: ' + ref);
+      statut: 'en_attente' as const
+    };
+    if (this.editingId()) {
+      this.svc.modifierDepense(this.editingId()!, payload);
+      this.showToast('Dépense modifiée');
+    } else {
+      this.svc.ajouterDepense(payload);
+      this.showToast('Dépense engagée');
+    }
     this.resetForm();
+  }
+
+  editerDepense(d: Depense): void {
+    this.editingId.set(d.id);
+    this.form = {
+      objet: d.objet,
+      fournisseur: d.fournisseur,
+      chapitre: d.chapitre,
+      article: d.article,
+      montant: d.montant,
+      dateEngagement: d.dateEngagement,
+      description: d.description || '',
+      numeroCcompte: '',
+      factureName: '',
+      factureFile: null
+    };
+    this.activeTab.set('dsaisie');
+  }
+
+  supprimerDepense(d: Depense): void {
+    if (!confirm(`Supprimer la dépense "${d.objet}" (${d.reference}) ?`)) return;
+    this.svc.supprimerDepense(d.id);
   }
 
   payer(id: string, objet: string): void {
@@ -257,9 +299,13 @@ export class DepensesComponent {
 
   resetForm(): void {
     this.form = { objet:'', fournisseur:'', chapitre:'', article:'', montant:null, dateEngagement:'', description:'', numeroCcompte:'', factureName:'', factureFile: null };
+    this.editingId.set(null);
+    this.submitAttempted.set(false);
   }
 
-  private showToast(msg: string): void {
-    this.toastMsg.set(msg); setTimeout(() => this.toastMsg.set(''), 3500);
+  private showToast(msg: string, isError = false): void {
+    this.toastMsg.set(msg);
+    this.toastIsError.set(isError);
+    setTimeout(() => this.toastMsg.set(''), isError ? 5000 : 3500);
   }
 }

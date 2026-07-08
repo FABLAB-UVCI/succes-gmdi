@@ -21,11 +21,15 @@ Route::middleware('auth:sanctum')->group(function () {
     // Recettes
     Route::get('/recettes',              [RecetteController::class, 'index']);
     Route::post('/recettes',             [RecetteController::class, 'store']);
+    Route::put('/recettes/{id}',         [RecetteController::class, 'update']);
+    Route::delete('/recettes/{id}',      [RecetteController::class, 'destroy']);
     Route::patch('/recettes/{id}/encaisser', [RecetteController::class, 'encaisser']);
 
     // Dépenses
     Route::get('/depenses',              [DepenseController::class, 'index']);
     Route::post('/depenses',             [DepenseController::class, 'store']);
+    Route::put('/depenses/{id}',         [DepenseController::class, 'update']);
+    Route::delete('/depenses/{id}',      [DepenseController::class, 'destroy']);
     Route::patch('/depenses/{id}/payer', [DepenseController::class, 'payer']);
 
     // Budget

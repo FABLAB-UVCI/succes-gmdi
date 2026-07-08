@@ -1,8 +1,5 @@
 import { Component, signal, computed, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet } from '@angular/router';
-import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
 import { InventaireComponent }    from '../../components/inventaire/inventaire.component';
 import { ImmobilierComponent }    from '../../components/immobilier/immobilier.component';
 import {
@@ -15,7 +12,6 @@ import { PatrimoineService } from '../../../../core/services/patrimoine.service'
 import { LoadingService }    from '../../../../core/services/loading.service';
 import { AuthService }       from '../../../../core/services/auth.service';
 import { ToastService }      from '../../../../core/services/toast.service';
-import { FcfaPipe }          from '../../../../core/pipes/fcfa.pipe';
 
 export type Section = 'inventaire' | 'immobilier' | 'affectation' | 'maintenance' | 'amortissement' | 'rapports';
 
@@ -23,7 +19,7 @@ export type Section = 'inventaire' | 'immobilier' | 'affectation' | 'maintenance
   selector: 'app-patrimoine-shell',
   standalone: true,
   imports: [
-    CommonModule, FcfaPipe,
+    CommonModule,
     InventaireComponent, ImmobilierComponent, AffectationComponent,
     MaintenanceComponent, AmortissementComponent, RapportsPatrimoineComponent,
   ],
@@ -32,9 +28,15 @@ export type Section = 'inventaire' | 'immobilier' | 'affectation' | 'maintenance
 
   <!-- Topbar -->
   <div class="top">
-    <div>
-      <div class="tt">GMDI — Module Patrimoine Communal</div>
-      <div class="ts">République de Côte d'Ivoire</div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <!-- Hamburger (mobile) -->
+      <button class="hamburger" (click)="toggleSidebar()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+      <div>
+        <div class="tt">GMDI — Module Patrimoine Communal</div>
+        <div class="ts">République de Côte d'Ivoire</div>
+      </div>
     </div>
     <div style="display:flex;align-items:center;gap:1rem">
       @if (loading.isLoading()) {
@@ -44,21 +46,26 @@ export type Section = 'inventaire' | 'immobilier' | 'affectation' | 'maintenance
       }
       <div class="tu">
         <div class="av">{{ userInitials() }}</div>
-        <div>
+        <div class="tu-name">
           <div>{{ auth.currentUser()?.name ?? '—' }}</div>
           <div style="font-size:10px;color:rgba(255,255,255,.45);text-transform:capitalize">{{ auth.currentUser()?.role ?? 'agent' }}</div>
         </div>
       </div>
       <button (click)="auth.logout()" class="btn-logout">
         <i class="ti ti-logout"></i>
-        <span>Déconnexion</span>
+        <span class="logout-label">Déconnexion</span>
       </button>
     </div>
   </div>
 
   <div class="lay">
+    <!-- Overlay mobile -->
+    @if (sidebarOpen()) {
+      <div class="overlay" (click)="closeSidebar()"></div>
+    }
+
     <!-- Sidebar -->
-    <nav class="sb">
+    <nav class="sb" [class.open]="sidebarOpen()">
       <div class="ss">Patrimoine</div>
       @for (item of navItems; track item.id) {
         <div class="si" [class.on]="activeSection() === item.id" (click)="navigate(item.id)">
@@ -123,6 +130,56 @@ export type Section = 'inventaire' | 'immobilier' | 'affectation' | 'maintenance
 </div>
   `,
   styles: [`
+    /* ── Hamburger ── */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 6px;
+      transition: background .15s;
+      flex-shrink: 0;
+    }
+    .hamburger:hover { background: rgba(255,255,255,.12); }
+    .hamburger span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: #fff;
+      border-radius: 2px;
+      transition: all .25s;
+    }
+
+    /* ── Overlay ── */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.45);
+      z-index: 199;
+      backdrop-filter: blur(1px);
+    }
+
+    /* ── Topbar ── */
+    .top {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    /* ── Sidebar ── */
+    .sb {
+      transition: transform .28s cubic-bezier(.4,0,.2,1);
+      z-index: 200;
+      overflow-y: auto;
+    }
+
+    /* ── Layout ── */
+    .lay { position: relative; }
+
     /* ── Bouton déconnexion ── */
     .btn-logout {
       background: rgba(255,255,255,.1);
@@ -171,6 +228,26 @@ export type Section = 'inventaire' | 'immobilier' | 'affectation' | 'maintenance
     .phdr-kpi   { text-align: center; }
     .phdr-kv    { display: block; font-size: 20px; font-weight: 700; line-height: 1.1; }
     .phdr-kl    { display: block; font-size: 9px; color: #9ca3af; font-weight: 600; letter-spacing: .5px; margin-top: 2px; }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      .hamburger { display: flex; }
+      .sb {
+        position: fixed;
+        top: 65px;
+        left: 0;
+        height: calc(100vh - 65px);
+        transform: translateX(-100%);
+      }
+      .sb.open { transform: translateX(0); }
+      .tu-name    { display: none; }
+      .logout-label { display: none; }
+    }
+    @media (max-width: 600px) {
+      .phdr { flex-direction: column; align-items: flex-start; }
+      .phdr-kpis { width: 100%; justify-content: space-between; }
+      .mn { padding: 1rem; }
+    }
   `],
 })
 export class PatrimoineShellComponent implements OnInit {
@@ -180,6 +257,7 @@ export class PatrimoineShellComponent implements OnInit {
   readonly toast   = inject(ToastService);
 
   activeSection = signal<Section>('inventaire');
+  sidebarOpen   = signal(false);
 
   visibleToasts = computed(() => Object.values(this.toast.toasts()).filter(t => t.visible));
 
@@ -199,8 +277,12 @@ export class PatrimoineShellComponent implements OnInit {
 
   ngOnInit(): void { this.pat.loadStats(); this.pat.loadBiens(); this.pat.loadVehicules(); }
 
+  toggleSidebar(): void { this.sidebarOpen.update(v => !v); }
+  closeSidebar(): void  { this.sidebarOpen.set(false); }
+
   navigate(s: Section): void {
     this.activeSection.set(s);
+    this.closeSidebar();
     if (s === 'inventaire')    { this.pat.loadBiens(); this.pat.loadVehicules(); }
     if (s === 'immobilier')    { this.pat.loadTerrains(); }
     if (s === 'affectation')   { this.pat.loadMouvements(); }

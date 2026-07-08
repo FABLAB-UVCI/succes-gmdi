@@ -26,16 +26,17 @@ type RecetteTab = 'saisie' | 'liste' | 'enc';
     <!-- ═══ SAISIE ═══ -->
     @if (activeTab() === 'saisie') {
       <div class="card">
-        <div class="ch"><h3><i class="ti ti-plus"></i>Enregistrement d'une recette</h3></div>
+        <div class="ch"><h3><i class="ti ti-plus"></i>{{ editingId() ? "Modifier la recette" : "Enregistrement d'une recette" }}</h3></div>
         @if (toastMsg()) {
-          <div class="alert-ok show"><i class="ti ti-check"></i>{{ toastMsg() }}</div>
+          <div class="alert-ok show" [class.error]="toastIsError()"><i class="ti" [class.ti-check]="!toastIsError()" [class.ti-alert-circle]="toastIsError()"></i>{{ toastMsg() }}</div>
         }
         <div class="pb">
           <div class="fs">Contribuable</div>
           <div class="fr">
             <div class="fg">
               <div class="fl">Nom du contribuable <span class="req">*</span></div>
-              <input class="fi" type="text" [(ngModel)]="form.contribuable" placeholder="Nom complet ou raison sociale">
+              <input class="fi" [class.invalid]="submitAttempted() && !form.contribuable" type="text" [(ngModel)]="form.contribuable" placeholder="Nom complet ou raison sociale">
+              @if (submitAttempted() && !form.contribuable) { <small class="field-error">Champ obligatoire</small> }
             </div>
             <div class="fg">
               <div class="fl">Adresse</div>
@@ -46,7 +47,7 @@ type RecetteTab = 'saisie' | 'liste' | 'enc';
           <div class="fr">
             <div class="fg">
               <div class="fl">Type de taxe <span class="req">*</span></div>
-              <select class="fsel" [(ngModel)]="form.typeTaxe">
+              <select class="fsel" [class.invalid]="submitAttempted() && !form.typeTaxe" [(ngModel)]="form.typeTaxe">
                 <option value="">-- Choisir --</option>
                 <option value="taxe_fonciere">Taxe foncière</option>
                 <option value="taxe_habitation">Taxe d'habitation</option>
@@ -57,6 +58,7 @@ type RecetteTab = 'saisie' | 'liste' | 'enc';
                 <option value="taxe_publicite">Taxe de publicité</option>
                 <option value="taxe_stationnement">Taxe de stationnement</option>
               </select>
+              @if (submitAttempted() && !form.typeTaxe) { <small class="field-error">Champ obligatoire</small> }
             </div>
             <div class="fg">
               <div class="fl">Service émetteur</div>
@@ -72,11 +74,13 @@ type RecetteTab = 'saisie' | 'liste' | 'enc';
           <div class="fr3">
             <div class="fg">
               <div class="fl">Montant (FCFA) <span class="req">*</span></div>
-              <input class="fi" type="number" [(ngModel)]="form.montant" placeholder="Ex: 85000">
+              <input class="fi" [class.invalid]="submitAttempted() && !form.montant" type="number" [(ngModel)]="form.montant" placeholder="Ex: 85000">
+              @if (submitAttempted() && !form.montant) { <small class="field-error">Champ obligatoire</small> }
             </div>
             <div class="fg">
               <div class="fl">Date d'échéance <span class="req">*</span></div>
-              <input class="fi" type="date" [(ngModel)]="form.dateEcheance">
+              <input class="fi" [class.invalid]="submitAttempted() && !form.dateEcheance" type="date" [(ngModel)]="form.dateEcheance">
+              @if (submitAttempted() && !form.dateEcheance) { <small class="field-error">Champ obligatoire</small> }
             </div>
             <div class="fg">
               <div class="fl">Mode de paiement</div>
@@ -104,7 +108,10 @@ type RecetteTab = 'saisie' | 'liste' | 'enc';
           </div>
           <div class="fa">
             <button class="bs" (click)="resetForm()"><i class="ti ti-x"></i>Effacer</button>
-            <button class="bp" (click)="creerRecette()"><i class="ti ti-check"></i>Créer la recette</button>
+            <button class="bp" (click)="creerRecette()">
+              @if (editingId()) { <i class="ti ti-check"></i>Enregistrer les modifications }
+              @else { <i class="ti ti-check"></i>Créer la recette }
+            </button>
           </div>
         </div>
       </div>
@@ -158,7 +165,9 @@ type RecetteTab = 'saisie' | 'liste' | 'enc';
                         <i class="ti ti-cash"></i>
                       </button>
                     }
-                    <button class="bti" title="Reçu"><i class="ti ti-receipt"></i></button>
+                    <button class="bti" title="Modifier" (click)="editerRecette(r)"><i class="ti ti-edit"></i></button>
+                    <button class="bti danger" title="Supprimer" (click)="supprimerRecette(r)"><i class="ti ti-trash"></i></button>
+                    <button class="bti" title="Reçu (export JSON)" (click)="exporterRecu(r)"><i class="ti ti-receipt"></i></button>
                   </td>
                 </tr>
               }
@@ -246,6 +255,9 @@ export class RecettesComponent {
 
   activeTab = signal<RecetteTab>('saisie');
   toastMsg  = signal('');
+  toastIsError = signal(false);
+  editingId = signal<string | null>(null);
+  submitAttempted = signal(false);
 
   searchQ     = '';
   filtreType  = '';
@@ -281,23 +293,56 @@ export class RecettesComponent {
   }
 
   creerRecette(): void {
+    this.submitAttempted.set(true);
     if (!this.form.contribuable || !this.form.typeTaxe || !this.form.montant || !this.form.dateEcheance) {
-      this.showToast('Veuillez remplir les champs obligatoires'); return;
+      this.showToast('Veuillez remplir les champs obligatoires (*)', true); return;
     }
-    const ref = this.svc.ajouterRecette({
+    const payload = {
       contribuable: this.form.contribuable,
       typeTaxe: this.form.typeTaxe,
       montant: this.form.montant,
       dateEcheance: this.form.dateEcheance,
       modePaiement: this.form.modePaiement,
-      statut: 'en_attente',
+      statut: 'en_attente' as const,
       adresse: this.form.adresse,
       serviceEmetteur: this.form.serviceEmetteur,
       operateur: this.form.operateur,
       numeroTransaction: this.form.numeroTransaction
-    });
-    this.showToast('Recette créée — Réf: ' + ref);
+    };
+    if (this.editingId()) {
+      this.svc.modifierRecette(this.editingId()!, payload);
+      this.showToast('Recette modifiée');
+    } else {
+      this.svc.ajouterRecette(payload);
+      this.showToast('Recette créée');
+    }
     this.resetForm();
+  }
+
+  editerRecette(r: Recette): void {
+    this.editingId.set(r.id);
+    this.form = {
+      contribuable: r.contribuable,
+      adresse: r.adresse || '',
+      typeTaxe: r.typeTaxe,
+      serviceEmetteur: r.serviceEmetteur || 'finances',
+      montant: r.montant,
+      dateEcheance: r.dateEcheance,
+      modePaiement: r.modePaiement || 'especes',
+      operateur: r.operateur || '',
+      numeroTransaction: r.numeroTransaction || ''
+    };
+    this.activeTab.set('saisie');
+  }
+
+  supprimerRecette(r: Recette): void {
+    if (!confirm(`Supprimer la recette de ${r.contribuable} (${r.reference}) ?`)) return;
+    this.svc.supprimerRecette(r.id);
+  }
+
+  exporterRecu(r: Recette): void {
+    this.svc.exportJSON(r, 'recu_' + r.reference);
+    this.showToast('Reçu exporté — ' + r.reference);
   }
 
   encaisser(id: string, nom: string): void {
@@ -310,17 +355,20 @@ export class RecettesComponent {
   }
 
   validerEncaissement(): void {
-    if (!this.enc.ref || !this.enc.montant) { this.showToast('Référence et montant obligatoires'); return; }
+    if (!this.enc.ref || !this.enc.montant) { this.showToast('Référence et montant obligatoires', true); return; }
     this.showToast('Encaissement validé — Reçu généré — ' + this.enc.ref);
     this.enc.ref = ''; this.enc.montant = null;
   }
 
   resetForm(): void {
     this.form = { contribuable:'', adresse:'', typeTaxe:'', serviceEmetteur:'finances', montant:null, dateEcheance:'', modePaiement:'especes', operateur:'', numeroTransaction:'' };
+    this.editingId.set(null);
+    this.submitAttempted.set(false);
   }
 
-  private showToast(msg: string): void {
+  private showToast(msg: string, isError = false): void {
     this.toastMsg.set(msg);
-    setTimeout(() => this.toastMsg.set(''), 3500);
+    this.toastIsError.set(isError);
+    setTimeout(() => this.toastMsg.set(''), isError ? 5000 : 3500);
   }
 }

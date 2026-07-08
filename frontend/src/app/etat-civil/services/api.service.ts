@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '@env/environment';
 
-const API = environment.apiUrl;
+const API = `${environment.apiUrl}/etat-civil`;
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
@@ -42,6 +42,18 @@ export class ApiService {
   }
   deleteDeces(id: number) {
     return this.http.delete(`${API}/deces/${id}`);
+  }
+
+  // Publication des bans
+  getPublicationsBans(search = '') {
+    const params = search ? new HttpParams().set('search', search) : undefined;
+    return this.http.get<any[]>(`${API}/publications-bans`, { params });
+  }
+  createPublicationBans(data: any) {
+    return this.http.post<any>(`${API}/publications-bans`, data);
+  }
+  deletePublicationBans(id: number) {
+    return this.http.delete(`${API}/publications-bans/${id}`);
   }
 
   // Certificats

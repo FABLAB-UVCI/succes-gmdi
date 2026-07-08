@@ -31,6 +31,9 @@ export class ActualiteApiService {
   create(data: ActualiteCreateRequest): Observable<ApiResponse<ActualiteApi>> {
     return this.http.post<ApiResponse<ActualiteApi>>(this.base, data);
   }
+  update(id: number, data: ActualiteCreateRequest): Observable<ApiResponse<ActualiteApi>> {
+    return this.http.put<ApiResponse<ActualiteApi>>(`${this.base}/${id}`, data);
+  }
   updateStatut(id: number, statut: string): Observable<ApiResponse<ActualiteApi>> {
     return this.http.patch<ApiResponse<ActualiteApi>>(`${this.base}/${id}/statut`, { statut });
   }
@@ -96,6 +99,9 @@ export class DocumentApiService {
   }
   create(data: DocumentCreateRequest): Observable<ApiResponse<DocumentApi>> {
     return this.http.post<ApiResponse<DocumentApi>>(this.base, data);
+  }
+  createPhotos(formData: FormData): Observable<ApiResponse<DocumentApi[]>> {
+    return this.http.post<ApiResponse<DocumentApi[]>>(this.base, formData);
   }
 }
 

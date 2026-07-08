@@ -11,7 +11,7 @@
       <i class="ti ti-heart"></i>Mariages
     </div>
     <div class="tab" [class.act]="currentTab() === 'deces'" (click)="currentTab.set('deces')">
-      <i class="ti ti-ribbon-health"></i>Décès
+      <i class="ti ti-candle"></i>Décès
     </div>
     <div class="tab" [class.act]="currentTab() === 'certificat'" (click)="currentTab.set('certificat')">
       <i class="ti ti-certificate"></i>Certificats
@@ -144,7 +144,7 @@
     @if (currentTab() === 'deces') {
       <div>
         <div class="ph">
-          <div class="pt"><i class="ti ti-ribbon-health"></i>Recherche de décès</div>
+          <div class="pt"><i class="ti ti-candle"></i>Recherche de décès</div>
         </div>
         <div class="pb">
           <div class="form-grid-3">

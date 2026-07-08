@@ -24,7 +24,7 @@ type Tab = 'recrutement' | 'affectation' | 'promotion' | 'mutation' | 'depart';
 @if (activeTab() === 'recrutement') {
   <div class="card">
     <div class="ch"><h3><i class="ti ti-user-plus"></i>Ouverture d'un poste / concours</h3></div>
-    <app-toast [visible]="toast.get('c')?.visible ?? false" [message]="toast.get('c')?.message ?? ''" />
+    <app-toast [visible]="toast.get('c')?.visible ?? false" [message]="toast.get('c')?.message ?? ''" [type]="toast.get('c')?.type ?? 'success'" />
     <div class="pb">
       <div class="fr">
         <div class="fg"><div class="fl">Intitulé du poste <span class="req">*</span></div><input class="fi" [(ngModel)]="rc.poste" placeholder="Ex: Agent de saisie État Civil"></div>
@@ -82,7 +82,7 @@ type Tab = 'recrutement' | 'affectation' | 'promotion' | 'mutation' | 'depart';
 @if (activeTab() === 'affectation') {
   <div class="card">
     <div class="ch"><h3><i class="ti ti-arrows-transfer-up"></i>Affectation d'un agent</h3></div>
-    <app-toast [visible]="toast.get('aff')?.visible ?? false" [message]="toast.get('aff')?.message ?? ''" />
+    <app-toast [visible]="toast.get('aff')?.visible ?? false" [message]="toast.get('aff')?.message ?? ''" [type]="toast.get('aff')?.type ?? 'success'" />
     <div class="pb">
       <div class="fr">
         <div class="fg"><div class="fl">Matricule de l'agent <span class="req">*</span></div><input class="fi" [(ngModel)]="aff.matricule" placeholder="Ex: EC-001"></div>
@@ -102,7 +102,7 @@ type Tab = 'recrutement' | 'affectation' | 'promotion' | 'mutation' | 'depart';
         <div class="fg"><div class="fl">Date d'effet <span class="req">*</span></div><input class="fi" type="date" [(ngModel)]="aff.dateEffet"></div>
       </div>
       <div class="fr"><div class="fg" style="grid-column:span 2"><div class="fl">Motif de l'affectation</div><input class="fi" [(ngModel)]="aff.motif" placeholder="Ex: Renfort équipe, réorganisation..."></div></div>
-      <div class="fa"><button class="bp" (click)="validerAffectation()"><i class="ti ti-check"></i>Valider l'affectation</button></div>
+      <div class="fa"><button class="bp" [disabled]="saving()" (click)="validerAffectation()"><i class="ti ti-check"></i>Valider l'affectation</button></div>
     </div>
   </div>
 }
@@ -111,7 +111,7 @@ type Tab = 'recrutement' | 'affectation' | 'promotion' | 'mutation' | 'depart';
 @if (activeTab() === 'promotion') {
   <div class="card">
     <div class="ch"><h3><i class="ti ti-trending-up"></i>Promotion d'un agent</h3></div>
-    <app-toast [visible]="toast.get('prom')?.visible ?? false" [message]="toast.get('prom')?.message ?? ''" />
+    <app-toast [visible]="toast.get('prom')?.visible ?? false" [message]="toast.get('prom')?.message ?? ''" [type]="toast.get('prom')?.type ?? 'success'" />
     <div class="pb">
       <div class="fr">
         <div class="fg"><div class="fl">Matricule de l'agent <span class="req">*</span></div><input class="fi" [(ngModel)]="prom.matricule" placeholder="Ex: FIN-001"></div>
@@ -135,7 +135,7 @@ type Tab = 'recrutement' | 'affectation' | 'promotion' | 'mutation' | 'depart';
           </select>
         </div>
       </div>
-      <div class="fa"><button class="bp" (click)="validerPromotion()"><i class="ti ti-trending-up"></i>Valider la promotion</button></div>
+      <div class="fa"><button class="bp" [disabled]="saving()" (click)="validerPromotion()"><i class="ti ti-trending-up"></i>Valider la promotion</button></div>
     </div>
   </div>
 }
@@ -144,7 +144,7 @@ type Tab = 'recrutement' | 'affectation' | 'promotion' | 'mutation' | 'depart';
 @if (activeTab() === 'mutation') {
   <div class="card">
     <div class="ch"><h3><i class="ti ti-transfer"></i>Mutation d'un agent</h3></div>
-    <app-toast [visible]="toast.get('mut')?.visible ?? false" [message]="toast.get('mut')?.message ?? ''" />
+    <app-toast [visible]="toast.get('mut')?.visible ?? false" [message]="toast.get('mut')?.message ?? ''" [type]="toast.get('mut')?.type ?? 'success'" />
     <div class="pb">
       <div class="fr">
         <div class="fg"><div class="fl">Matricule <span class="req">*</span></div><input class="fi" [(ngModel)]="mut.matricule" placeholder="Matricule de l'agent"></div>
@@ -163,7 +163,7 @@ type Tab = 'recrutement' | 'affectation' | 'promotion' | 'mutation' | 'depart';
           </select>
         </div>
       </div>
-      <div class="fa"><button class="bp" (click)="validerMutation()"><i class="ti ti-check"></i>Valider la mutation</button></div>
+      <div class="fa"><button class="bp" [disabled]="saving()" (click)="validerMutation()"><i class="ti ti-check"></i>Valider la mutation</button></div>
     </div>
   </div>
 }
@@ -172,7 +172,7 @@ type Tab = 'recrutement' | 'affectation' | 'promotion' | 'mutation' | 'depart';
 @if (activeTab() === 'depart') {
   <div class="card">
     <div class="ch"><h3><i class="ti ti-door-exit"></i>Enregistrement de départ</h3></div>
-    <app-toast [visible]="toast.get('dep')?.visible ?? false" [message]="toast.get('dep')?.message ?? ''" />
+    <app-toast [visible]="toast.get('dep')?.visible ?? false" [message]="toast.get('dep')?.message ?? ''" [type]="toast.get('dep')?.type ?? 'success'" />
     <div class="pb">
       <div class="fr">
         <div class="fg">
@@ -297,6 +297,7 @@ export class CarriereComponent {
   constructor(readonly rh: RhService, readonly toast: ToastService) {}
 
   activeTab = signal<Tab>('recrutement');
+  saving = signal(false);
 
   tabs = [
     { id: 'recrutement' as Tab, label: 'Recrutement', icon: 'ti-user-plus' },
@@ -315,30 +316,66 @@ export class CarriereComponent {
 
   ouvrirPoste(): void {
     if (!this.rc.poste || !this.rc.direction || !this.rc.cloture) {
-      this.toast.show('c', 'Poste, direction et date de clôture obligatoires'); return;
+      this.toast.showError('c', 'Poste, direction et date de clôture obligatoires'); return;
     }
     this.rh.ouvrirPoste({ poste: this.rc.poste, direction: this.rc.direction, nbPostes: this.rc.nbPostes, type: this.rc.type as any, cloture: this.rc.cloture }).subscribe({
       next: () => {
         this.toast.show('c', `Annonce publiée — ${this.rc.poste} (${this.rc.direction})`);
         this.rc = { poste:'', direction:'', nbPostes:1, type:'concours', cloture:'', diplome:'Licence', salaire: null };
       },
-      error: () => this.toast.show('c', 'Erreur lors de la création du poste'),
+      error: () => this.toast.showError('c', 'Erreur lors de la création du poste'),
     });
   }
 
   validerAffectation(): void {
-    if (!this.aff.matricule || !this.aff.dirNouvelle) { this.toast.show('aff', 'Matricule et nouvelle direction obligatoires'); return; }
-    this.toast.show('aff', `Affectation enregistrée — ${this.aff.matricule} → ${this.aff.dirNouvelle}`);
+    if (!this.aff.matricule || !this.aff.dirNouvelle || !this.aff.poste || !this.aff.dateEffet) {
+      this.toast.showError('aff', 'Matricule, nouveau poste, nouvelle direction et date d\'effet obligatoires'); return;
+    }
+    const agent = this.rh.findAgent(this.aff.matricule);
+    if (!agent) { this.toast.showError('aff', `Agent introuvable — ${this.aff.matricule}`); return; }
+    this.saving.set(true);
+    this.rh.modifierAgent(agent.id, { direction: this.aff.dirNouvelle, poste: this.aff.poste }).subscribe({
+      next: () => {
+        this.toast.show('aff', `Affectation enregistrée — ${this.aff.matricule} → ${this.aff.dirNouvelle}`);
+        this.saving.set(false);
+        this.aff = { matricule:'', nom:'', dirActuelle:'', dirNouvelle:'', poste:'', dateEffet:'', motif:'' };
+      },
+      error: () => { this.toast.showError('aff', 'Erreur lors de l\'affectation'); this.saving.set(false); },
+    });
   }
 
   validerPromotion(): void {
-    if (!this.prom.matricule || !this.prom.gradeNouveau) { this.toast.show('prom', 'Matricule et nouveau grade obligatoires'); return; }
-    this.toast.show('prom', `Promotion enregistrée — ${this.prom.matricule} → ${this.prom.gradeNouveau}`);
+    if (!this.prom.matricule || !this.prom.gradeNouveau || !this.prom.salNouveau || !this.prom.dateEffet) {
+      this.toast.showError('prom', 'Matricule, nouveau grade, nouveau salaire et date d\'effet obligatoires'); return;
+    }
+    const agent = this.rh.findAgent(this.prom.matricule);
+    if (!agent) { this.toast.showError('prom', `Agent introuvable — ${this.prom.matricule}`); return; }
+    this.saving.set(true);
+    this.rh.modifierAgent(agent.id, { grade: this.prom.gradeNouveau, salaireBrut: Number(this.prom.salNouveau) }).subscribe({
+      next: () => {
+        this.toast.show('prom', `Promotion enregistrée — ${this.prom.matricule} → ${this.prom.gradeNouveau}`);
+        this.saving.set(false);
+        this.prom = { matricule:'', nom:'', gradeActuel:'', gradeNouveau:'', salActuel: null, salNouveau: null, dateEffet:'', type:'Avancement à l\'ancienneté' };
+      },
+      error: () => { this.toast.showError('prom', 'Erreur lors de la promotion'); this.saving.set(false); },
+    });
   }
 
   validerMutation(): void {
-    if (!this.mut.matricule || !this.mut.destination) { this.toast.show('mut', 'Matricule et structure d\'accueil obligatoires'); return; }
-    this.toast.show('mut', `Mutation enregistrée — ${this.mut.matricule} → ${this.mut.destination}`);
+    if (!this.mut.matricule || !this.mut.destination || !this.mut.date) {
+      this.toast.showError('mut', 'Matricule, structure d\'accueil et date obligatoires'); return;
+    }
+    const agent = this.rh.findAgent(this.mut.matricule);
+    if (!agent) { this.toast.showError('mut', `Agent introuvable — ${this.mut.matricule}`); return; }
+    this.saving.set(true);
+    this.rh.modifierAgent(agent.id, { direction: this.mut.destination }).subscribe({
+      next: () => {
+        this.toast.show('mut', `Mutation enregistrée — ${this.mut.matricule} → ${this.mut.destination}`);
+        this.saving.set(false);
+        this.mut = { matricule:'', nom:'', origine:'', destination:'', date:'', motif:'Rapprochement familial' };
+      },
+      error: () => { this.toast.showError('mut', 'Erreur lors de la mutation'); this.saving.set(false); },
+    });
   }
 
   chipRecr(s: string): string {
@@ -364,7 +401,7 @@ export class CarriereComponent {
       this.depart.pieceJointe = input.files[0];
       const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf'];
       if (!allowedTypes.includes(input.files[0].type)) {
-        this.toast.show('dep', 'Format non supporté. Utilisez JPG, PNG ou PDF.');
+        this.toast.showError('dep', 'Format non supporté. Utilisez JPG, PNG ou PDF.');
         this.depart.pieceJointe = null;
         return;
       }
@@ -404,7 +441,7 @@ export class CarriereComponent {
 
   validerDepart() {
     if (!this.depart.matricule || !this.depart.cause || !this.depart.date) {
-      this.toast.show('dep', 'Matricule, cause et date de départ obligatoires');
+      this.toast.showError('dep', 'Matricule, cause et date de départ obligatoires');
       return;
     }
     
@@ -421,7 +458,7 @@ export class CarriereComponent {
         this.toast.show('dep', `Départ enregistré — ${this.depart.matricule} — ${this.labelCause(this.depart.cause)}`);
         this.resetDepart();
       },
-      error: () => this.toast.show('dep', 'Erreur lors de l\'enregistrement'),
+      error: () => this.toast.showError('dep', 'Erreur lors de l\'enregistrement'),
     });
   }
 

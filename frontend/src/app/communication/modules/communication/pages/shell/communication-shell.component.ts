@@ -25,9 +25,15 @@ export type Section = 'actualites' | 'reseaux' | 'relations' | 'documents' | 'ci
 
   <!-- ── Topbar ─────────────────────────────────────────────────────────── -->
   <div class="topbar">
-    <div>
-      <div class="topbar-title">GMDI — Communication</div>
-      <div class="topbar-sub">République de Côte d'Ivoire</div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <!-- Hamburger button (mobile only) -->
+      <button class="hamburger" (click)="toggleSidebar()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+      <div>
+        <div class="topbar-title">GMDI — Communication</div>
+        <div class="topbar-sub">République de Côte d'Ivoire</div>
+      </div>
     </div>
     <div style="display:flex;align-items:center;gap:1.25rem">
       @if (loading.isLoading()) {
@@ -37,18 +43,23 @@ export type Section = 'actualites' | 'reseaux' | 'relations' | 'documents' | 'ci
       }
       <div class="topbar-user">
         <div class="av">{{initiales()}}</div>
-        <span>{{auth.currentUser()?.name ?? 'Chef Communication'}}<span style="opacity:.6"> — {{roleLabel()}}</span></span>
+        <span class="tb-name">{{auth.currentUser()?.name ?? 'Chef Communication'}}<span style="opacity:.6"> — {{roleLabel()}}</span></span>
       </div>
-      <button (click)="auth.logout()" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:12px;padding:5px 12px;border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:6px;transition:background .15s" onmouseenter="this.style.background='rgba(255,255,255,.18)'" onmouseleave="this.style.background='rgba(255,255,255,.1)'">
-        <i class="ti ti-logout" style="font-size:14px"></i>Déconnexion
+      <button (click)="auth.logout()" class="btn-logout">
+        <i class="ti ti-logout" style="font-size:14px"></i><span class="logout-label">Déconnexion</span>
       </button>
     </div>
   </div>
 
   <div class="layout">
 
+    <!-- ── Overlay mobile ─────────────────────────────────────────────── -->
+    @if (sidebarOpen()) {
+      <div class="overlay" (click)="closeSidebar()"></div>
+    }
+
     <!-- ── Sidebar ──────────────────────────────────────────────────────── -->
-    <nav class="sidebar">
+    <nav class="sidebar" [class.open]="sidebarOpen()">
       <div class="sb-sec">Communication</div>
       @for (item of navComm; track item.id) {
         <div class="sb-item" [class.act]="active()===item.id" (click)="navigate(item.id)" role="button">
@@ -148,14 +159,137 @@ export type Section = 'actualites' | 'reseaux' | 'relations' | 'documents' | 'ci
     </main>
   </div>
 </div>
-  `
+  `,
+  styles: [`
+    /* ── Hamburger ── */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 6px;
+      transition: background .15s;
+    }
+    .hamburger:hover { background: rgba(255,255,255,.12); }
+    .hamburger span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: #fff;
+      border-radius: 2px;
+      transition: all .25s;
+    }
+
+    /* ── Topbar ── */
+    .topbar {
+      background: var(--ci-bleu, #001f3f);
+      padding: 0 1.5rem;
+      height: 65px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 16px rgba(0,0,0,.18);
+      border-bottom: 3px solid var(--ci-orange, #F77F00);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .topbar-title { color:#fff;font-size:17px;font-weight:800;letter-spacing:.2px; }
+    .topbar-sub   { color:rgba(255,255,255,.65);font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;margin-top:2px; }
+    .topbar-user  { display:flex;align-items:center;gap:10px;color:#fff;font-size:13px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);padding:6px 14px;border-radius:30px; }
+    .av           { width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#F77F00,#009A44);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:bold;color:#fff;box-shadow:0 2px 6px rgba(0,0,0,.2);flex-shrink:0; }
+    .btn-logout   { background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:12px;padding:5px 12px;border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:6px;transition:background .15s; }
+    .btn-logout:hover { background:rgba(255,255,255,.18); }
+
+    /* ── Layout ── */
+    .layout   { display:flex;min-height:calc(100vh - 65px);position:relative; }
+
+    /* ── Overlay ── */
+    .overlay  { position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:199;backdrop-filter:blur(1px); }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: 260px;
+      background: linear-gradient(180deg,#001f3f 0%,#002a56 60%,#003a70 100%);
+      min-height: calc(100vh - 65px);
+      padding: 20px 0 40px;
+      border-right: 1px solid rgba(255,255,255,.06);
+      flex-shrink: 0;
+      overflow-y: auto;
+      transition: transform .28s cubic-bezier(.4,0,.2,1);
+      z-index: 200;
+    }
+    .sb-sec   { font-size:10px;color:rgba(255,255,255,.4);padding:16px 20px 6px;text-transform:uppercase;font-weight:700;letter-spacing:1.2px; }
+    .sb-item  { display:flex;align-items:center;gap:10px;padding:10px 14px;margin:2px 10px;border-radius:9px;color:rgba(255,255,255,.65);font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;border:1px solid transparent; }
+    .sb-item:hover { background:rgba(255,255,255,.08);color:rgba(255,255,255,.9);border-color:rgba(255,255,255,.1); }
+    .sb-item.act   { background:linear-gradient(90deg,#F77F00,#e06d00);color:#fff;font-weight:700;border-color:transparent;box-shadow:0 3px 10px rgba(247,127,0,.35); }
+    .sb-icon-wrap  { font-size:17px;width:22px;text-align:center;flex-shrink:0; }
+    .badge         { background:#e63946;color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px; }
+
+    /* ── Annonces ── */
+    .sb-maire-block { margin:20px 10px 10px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);display:flex;flex-direction:column;flex-shrink:0; }
+    .sb-maire-header{ display:flex;align-items:center;gap:8px;padding:10px 12px 6px;flex-shrink:0; }
+    .sb-maire-flag  { display:flex;height:22px;border-radius:3px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.3); }
+    .sb-maire-flag span { display:block;width:7px; }
+    .flag-o { background:#F77F00; }
+    .flag-w { background:#fff; }
+    .flag-v { background:#009A44; }
+    .sb-maire-title { color:rgba(255,255,255,.8);font-size:11px;font-weight:700;display:flex;align-items:center;gap:5px;letter-spacing:.3px; }
+    .sb-maire-title i { color:#F77F00; }
+    .sb-maire-scroll{ padding:4px 12px;display:flex;flex-direction:column;gap:6px;max-height:150px;overflow-y:auto; }
+    .sb-ann-item    { display:flex;align-items:flex-start;gap:8px;padding:6px 0; }
+    .ann-dot        { width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.3);margin-top:4px;flex-shrink:0; }
+    .ann-dot-urgent { background:#e63946; }
+    .ann-content    { flex:1; }
+    .ann-titre      { font-size:11px;color:rgba(255,255,255,.75);font-weight:500;line-height:1.3; }
+    .ann-date       { font-size:10px;color:rgba(255,255,255,.35);margin-top:2px; }
+    .ann-urgent .ann-titre { color:#fbbf24; }
+    .sb-maire-footer{ text-align:center;font-size:10px;color:rgba(255,255,255,.35);padding:6px 12px 10px;cursor:pointer;transition:color .15s;display:flex;align-items:center;justify-content:center;gap:4px;flex-shrink:0; }
+    .sb-maire-footer:hover { color:rgba(255,255,255,.6); }
+
+    /* ── Main ── */
+    .main { flex:1;padding:1.5rem;display:flex;flex-direction:column;gap:1.25rem;min-width:0;background:var(--bg-page,#f3f4f6); }
+
+    /* ── KPIs ── */
+    .kpi-row { display:flex;gap:.75rem;flex-wrap:wrap; }
+    .kpi     { background:#fff;border:1px solid #e5e7eb;border-left-width:4px;border-radius:10px;padding:.8rem 1rem;display:flex;align-items:center;gap:.75rem;flex:1;min-width:140px;box-shadow:0 1px 4px rgba(0,0,0,.04); }
+    .kpi-icon-box { width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0; }
+    .kpi-v   { font-size:20px;font-weight:700;color:#111827;line-height:1.1; }
+    .kpi-l   { font-size:11px;color:#6b7280;margin-top:2px; }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      .hamburger { display:flex; }
+      .sidebar {
+        position: fixed;
+        top: 65px;
+        left: 0;
+        height: calc(100vh - 65px);
+        transform: translateX(-100%);
+      }
+      .sidebar.open { transform: translateX(0); }
+      .tb-name      { display:none; }
+      .logout-label { display:none; }
+    }
+    @media (max-width: 600px) {
+      .topbar { padding:0 1rem; }
+      .main   { padding:1rem; }
+      .kpi    { min-width:calc(50% - .75rem); }
+      .topbar-user { display:none; }
+    }
+  `]
 })
 export class CommunicationShellComponent implements OnInit {
   readonly com     = inject(CommunicationService);
   readonly loading = inject(LoadingService);
   readonly auth    = inject(AuthService);
 
-  active = signal<Section>('actualites');
+  active      = signal<Section>('actualites');
+  sidebarOpen = signal(false);
 
   initiales = computed(() => {
     const name = this.auth.currentUser()?.name ?? '';
@@ -193,8 +327,12 @@ export class CommunicationShellComponent implements OnInit {
 
   ngOnInit(): void { this.com.loadStats(); this.com.loadActualites(); this.com.loadReclamations(); }
 
+  toggleSidebar(): void  { this.sidebarOpen.update(v => !v); }
+  closeSidebar(): void   { this.sidebarOpen.set(false); }
+
   navigate(s: Section): void {
     this.active.set(s);
+    this.closeSidebar();
     switch (s) {
       case 'actualites': this.com.loadActualites(); break;
       case 'reseaux':    this.com.loadComptes(); this.com.loadCalendrier(); break;

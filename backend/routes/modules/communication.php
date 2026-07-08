@@ -18,6 +18,7 @@ Route::middleware('auth:sanctum')->group(function () {
         // ── Actualités ────────────────────────────────────────────────────────
         Route::get('actualites',              [ActualiteController::class, 'index']);
         Route::post('actualites',             [ActualiteController::class, 'store']);
+        Route::put('actualites/{id}',         [ActualiteController::class, 'update']);
         Route::patch('actualites/{id}/statut',[ActualiteController::class, 'updateStatut']);
         Route::delete('actualites/{id}',      [ActualiteController::class, 'destroy']);
 

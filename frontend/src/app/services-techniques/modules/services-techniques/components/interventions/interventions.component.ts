@@ -249,7 +249,7 @@ export class InterventionsComponent implements OnInit {
 
   creerDemande(): void {
     if (!this.fDem.description || !this.fDem.localisation || !this.fDem.demandeur) {
-      this.toast.show('int', 'Description, localisation et demandeur obligatoires'); return;
+      this.toast.showError('int', 'Description, localisation et demandeur obligatoires'); return;
     }
     this.saving.set(true);
     this.st.creerDemande(this.fDem).subscribe({
@@ -259,8 +259,8 @@ export class InterventionsComponent implements OnInit {
   }
 
   creerBon(): void {
-    if (!this.fBon.description || !this.fBon.equipe || !this.fBon.dateDebut) {
-      this.toast.show('int', 'Description, équipe et date obligatoires'); return;
+    if (!this.fBon.description || !this.fBon.equipe || !this.fBon.chef || !this.fBon.dateDebut) {
+      this.toast.showError('int', 'Description, équipe, chef et date obligatoires'); return;
     }
     this.saving.set(true);
     this.st.creerBonTravail({ description: this.fBon.description, service: this.fBon.service, equipe: this.fBon.equipe, chef: this.fBon.chef, dateDebut: this.fBon.dateDebut, materiaux: this.fBon.materiaux, demandeRef: this.fBon.demandeRef }).subscribe({

@@ -103,7 +103,7 @@ class AffectationController extends Controller
     {
         return [
             'id'          => $m->id,
-            'date'        => $m->date,
+            'date'        => $m->date?->format('Y-m-d'),
             'reference'   => $m->reference,
             'bien'        => $m->bien,
             'origine'     => $m->origine,

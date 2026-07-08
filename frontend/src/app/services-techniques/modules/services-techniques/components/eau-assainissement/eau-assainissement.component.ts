@@ -208,23 +208,43 @@ export class EauAssainissementComponent implements OnInit {
   ngOnInit(): void { this.st.loadCaniveaux(); this.st.loadCollectes(); }
 
   ajouterCaniveau(): void {
-    if (!this.fCan.localisation) { this.toast.show('eau', 'Localisation obligatoire'); return; }
-    this.st.loadCaniveaux();
-    this.toast.show('eau', `Caniveau enregistré — ${this.fCan.localisation}`);
-    this.showAdd.set(false);
-    this.fCan = { localisation:'', quartier:'', longueur:0, etat:'bon' };
+    if (!this.fCan.localisation || !this.fCan.quartier || !this.fCan.longueur) {
+      this.toast.showError('eau', 'Localisation, quartier et longueur obligatoires'); return;
+    }
+    this.st.ajouterCaniveau(this.fCan).subscribe({
+      next: () => {
+        this.toast.show('eau', `Caniveau enregistré — ${this.fCan.localisation}`);
+        this.showAdd.set(false);
+        this.fCan = { localisation:'', quartier:'', longueur:0, etat:'bon' };
+      },
+      error: () => {},
+    });
   }
 
   ajouterIntervention(): void {
-    if (!this.fDrain.localisation || !this.fDrain.date) { this.toast.show('eau', 'Localisation et date obligatoires'); return; }
-    this.toast.show('eau', 'Intervention de drainage enregistrée');
-    this.showDrain.set(false);
+    if (!this.fDrain.localisation || !this.fDrain.date || !this.fDrain.equipe) {
+      this.toast.showError('eau', 'Localisation, équipe et date obligatoires'); return;
+    }
+    this.st.ajouterDrainage({ localisation: this.fDrain.localisation, type: this.fDrain.type, dateIntervention: this.fDrain.date, equipe: this.fDrain.equipe, observations: this.fDrain.obs || undefined }).subscribe({
+      next: () => {
+        this.toast.show('eau', 'Intervention de drainage enregistrée');
+        this.showDrain.set(false);
+        this.fDrain = { localisation:'', type:'curage', date:'', equipe:'', obs:'' };
+      },
+      error: () => {},
+    });
   }
 
   ajouterCollecte(): void {
-    if (!this.fDechet.zone) { this.toast.show('eau', 'Zone obligatoire'); return; }
-    this.toast.show('eau', `Collecte planifiée — ${this.fDechet.zone}`);
-    this.showDechet.set(false);
+    if (!this.fDechet.zone || !this.fDechet.prochaine) { this.toast.showError('eau', 'Zone et prochaine collecte obligatoires'); return; }
+    this.st.ajouterCollecte({ zone: this.fDechet.zone, frequence: this.fDechet.frequence, prochaineCollecte: this.fDechet.prochaine }).subscribe({
+      next: () => {
+        this.toast.show('eau', `Collecte planifiée — ${this.fDechet.zone}`);
+        this.showDechet.set(false);
+        this.fDechet = { zone:'', frequence:'Hebdomadaire', prochaine:'' };
+      },
+      error: () => {},
+    });
   }
 
   onDrainPhoto(e: Event) { const f = (e.target as HTMLInputElement).files; if (f) this.drainPhotos = Array.from(f); }

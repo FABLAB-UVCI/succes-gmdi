@@ -11,12 +11,21 @@ import { ApiService } from '../../../../services/api.service';
 })
 export class StatistiquesComponent implements OnInit {
   stats = signal<any>(null);
+  loadError = signal(false);
   mois = ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
 
   constructor(private api: ApiService) {}
 
   ngOnInit() {
-    this.api.getStatistiques().subscribe({ next: d => this.stats.set(d), error: () => {} });
+    this.chargerStatistiques();
+  }
+
+  chargerStatistiques(): void {
+    this.loadError.set(false);
+    this.api.getStatistiques().subscribe({
+      next: d => this.stats.set(d),
+      error: () => this.loadError.set(true)
+    });
   }
 
   get totaux() { return this.stats()?.totaux ?? { naissances: 0, mariages: 0, deces: 0, certificats: 0 }; }

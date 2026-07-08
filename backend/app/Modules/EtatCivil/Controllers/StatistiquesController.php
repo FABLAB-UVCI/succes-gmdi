@@ -40,14 +40,12 @@ class StatistiquesController extends Controller
     private function parMois(string $model): array
     {
         $result = array_fill(1, 12, 0);
-        $data = $model::selectRaw('MONTH(created_at) as mois, COUNT(*) as total')
-            ->whereYear('created_at', date('Y'))
-            ->groupBy('mois')
-            ->pluck('total', 'mois');
 
-        foreach ($data as $mois => $total) {
-            $result[$mois] = $total;
-        }
+        $model::whereYear('created_at', date('Y'))
+            ->pluck('created_at')
+            ->each(function ($createdAt) use (&$result) {
+                $result[(int) $createdAt->format('n')]++;
+            });
 
         return array_values($result);
     }

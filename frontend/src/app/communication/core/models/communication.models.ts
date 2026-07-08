@@ -45,6 +45,7 @@ export interface PostProgramme {
 export interface Partenaire {
   id: string;
   nom: string;
+  nomContact: string;
   type: string;
   domaine: string;
   contact: string;

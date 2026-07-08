@@ -291,12 +291,12 @@ export class CartographieComponent implements OnInit {
   }
 
   ajouterQuartier(): void {
-    if (!this.fQ.nom) { this.toast.show('sig', 'Nom obligatoire'); return; }
+    if (!this.fQ.nom) { this.toast.showError('sig', 'Nom obligatoire'); return; }
     this.urb.ajouterQuartier(this.fQ).subscribe({ next: () => { this.toast.show('sig', `Quartier enregistré — ${this.fQ.nom}`); this.showAddQ.set(false); this.fQ = { nom:'', code:'', superficie:0, population:0, chef:'' }; }, error: () => {} });
   }
 
   ajouterVoirie(): void {
-    if (!this.fV.nom) { this.toast.show('sig', 'Nom obligatoire'); return; }
+    if (!this.fV.nom || !this.fV.quartier || !this.fV.longueur) { this.toast.showError('sig', 'Nom, quartier et longueur obligatoires'); return; }
     this.urb.ajouterVoirie(this.fV).subscribe({ next: () => { this.toast.show('sig', `Voie enregistrée — ${this.fV.nom}`); this.showAddV.set(false); }, error: () => {} });
   }
 

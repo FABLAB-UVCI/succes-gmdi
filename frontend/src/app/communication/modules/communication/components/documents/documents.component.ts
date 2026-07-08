@@ -1,4 +1,4 @@
-import { Component, signal, OnInit, inject } from '@angular/core';
+import { Component, signal, OnInit, inject, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CommunicationService } from '../../../../core/services/communication.service';
@@ -23,7 +23,7 @@ type Tab = 'photos' | 'videos' | 'archives';
 <!-- ── Photos ─────────────────────────────────────────────────────────── -->
 @if (active()==='photos') {
   <div class="ph"><div class="pt"><i class="ti ti-photo"></i>Médiathèque photos</div></div>
-  @if (toast.get('ph')?.visible) { <div class="success-toast show" style="margin:.5rem 1rem"><i class="ti ti-check"></i>{{toast.get('ph')?.message}}</div> }
+  @if (toast.get('ph')?.visible) { <div class="show" [ngClass]="toast.get('ph')?.type==='error' ? 'error-toast' : 'success-toast'" style="margin:.5rem 1rem"><i class="ti" [ngClass]="toast.get('ph')?.type==='error' ? 'ti-alert-circle' : 'ti-check'"></i>{{toast.get('ph')?.message}}</div> }
   <div class="pb" style="border-bottom:.5px solid var(--color-border-tertiary)">
     <div class="fsec">Ajouter une photo</div>
     <div class="form-grid-3">
@@ -43,19 +43,38 @@ type Tab = 'photos' | 'videos' | 'archives';
         </select>
       </div>
     </div>
+    <div class="fg" style="margin-bottom:8px">
+      <div class="fl">Upload de photos <span style="color:#e63946">*</span></div>
+      <input #photoInput class="fi" type="file" accept="image/png,image/jpeg,image/webp" multiple (change)="onPhotosSelected($event)" style="padding:6px 10px;height:auto">
+      <div style="font-size:10.5px;color:var(--color-text-secondary);margin-top:2px">Formats acceptés : JPG, PNG, WEBP — 5 Mo max par fichier</div>
+      @if (selectedPhotos.length) {
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">
+          @for (f of selectedPhotos; track f.name) {
+            <span class="chip cv" style="gap:6px"><i class="ti ti-photo"></i>{{f.name}}
+              <i class="ti ti-x" style="cursor:pointer" (click)="removePhoto(f)"></i>
+            </span>
+          }
+        </div>
+      }
+    </div>
     <div class="fa"><button class="btn-p" [disabled]="saving()" (click)="ajouterPhoto()"><i class="ti ti-upload"></i>Enregistrer dans la médiathèque</button></div>
   </div>
   <div style="padding:.75rem 1rem">
     <div class="fsec" style="margin-top:0">Photos récentes</div>
     @for (d of photos(); track d.id) {
       <div class="doc-card">
-        <div class="doc-ico" style="background:#E1306C1a"><i class="ti ti-photo" style="color:#E1306C"></i></div>
+        @if (d.url) {
+          <img [src]="d.url" alt="{{d.titre}}" class="doc-thumb">
+        } @else {
+          <div class="doc-ico" style="background:#E1306C1a"><i class="ti ti-photo" style="color:#E1306C"></i></div>
+        }
         <div class="doc-body">
           <div class="doc-nom">{{d.titre}}</div>
           <div class="doc-meta">{{d.categorie}} — {{d.date}}{{d.auteur ? ' — ' + d.auteur : ''}}</div>
         </div>
-        <button class="btn-s" style="padding:4px 8px;font-size:11px;color:#185FA5;border-color:#b5d4f4"><i class="ti ti-download"></i></button>
-        <button class="btn-s" style="padding:4px 8px;font-size:11px"><i class="ti ti-share"></i></button>
+        @if (d.url) {
+          <a class="btn-s sm" [href]="d.url" target="_blank" rel="noopener"><i class="ti ti-download"></i></a>
+        }
       </div>
     }
     @empty { <div class="empty-row">Aucune photo enregistrée</div> }
@@ -65,7 +84,7 @@ type Tab = 'photos' | 'videos' | 'archives';
 <!-- ── Vidéos ─────────────────────────────────────────────────────────── -->
 @if (active()==='videos') {
   <div class="ph"><div class="pt"><i class="ti ti-video"></i>Médiathèque vidéos</div></div>
-  @if (toast.get('vid')?.visible) { <div class="success-toast show" style="margin:.5rem 1rem"><i class="ti ti-check"></i>{{toast.get('vid')?.message}}</div> }
+  @if (toast.get('vid')?.visible) { <div class="show" [ngClass]="toast.get('vid')?.type==='error' ? 'error-toast' : 'success-toast'" style="margin:.5rem 1rem"><i class="ti" [ngClass]="toast.get('vid')?.type==='error' ? 'ti-alert-circle' : 'ti-check'"></i>{{toast.get('vid')?.message}}</div> }
   <div class="pb" style="border-bottom:.5px solid var(--color-border-tertiary)">
     <div class="fsec">Ajouter une vidéo</div>
     <div class="form-grid-3">
@@ -92,7 +111,9 @@ type Tab = 'photos' | 'videos' | 'archives';
           <div class="doc-nom">{{d.titre}}</div>
           <div class="doc-meta">{{d.categorie}} — {{d.date}}</div>
         </div>
-        <button class="btn-s" style="padding:4px 8px;font-size:11px;color:#185FA5;border-color:#b5d4f4"><i class="ti ti-download"></i></button>
+        @if (d.url) {
+          <a class="btn-s sm" [href]="d.url" target="_blank" rel="noopener"><i class="ti ti-download"></i></a>
+        }
       </div>
     }
     @empty { <div class="empty-row">Aucune vidéo enregistrée</div> }
@@ -126,7 +147,9 @@ type Tab = 'photos' | 'videos' | 'archives';
             <span class="chip cm" style="font-size:9px;padding:1px 5px">{{docLabel(d.type)}}</span> — {{d.categorie}} — {{d.date}}
           </div>
         </div>
-        <button class="btn-s" style="padding:4px 8px;font-size:11px;color:#185FA5;border-color:#b5d4f4"><i class="ti ti-download"></i></button>
+        @if (d.url) {
+          <a class="btn-s sm" [href]="d.url" target="_blank" rel="noopener"><i class="ti ti-download"></i></a>
+        }
       </div>
     }
     @empty { <div class="empty-row">Aucun document archivé</div> }
@@ -137,6 +160,7 @@ type Tab = 'photos' | 'videos' | 'archives';
 <style>
 .doc-card { border:.5px solid var(--color-border-tertiary);border-radius:7px;padding:.65rem .85rem;margin-bottom:.4rem;display:flex;align-items:center;gap:.75rem }
 .doc-ico { width:32px;height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0 }
+.doc-thumb { width:32px;height:32px;border-radius:6px;object-fit:cover;flex-shrink:0 }
 .doc-nom { font-size:12px;font-weight:500;color:var(--color-text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis }
 .doc-meta { font-size:11px;color:var(--color-text-secondary) }
 .doc-body { flex:1;min-width:0 }
@@ -151,6 +175,11 @@ export class DocumentsComponent implements OnInit {
   searchArc = ''; filtreArc = '';
   fPh  = { titre:'', categorie:'Événements', date:'', photographe:'', droits:'Usage interne uniquement' };
   fVid = { titre:'', categorie:'Séance du Conseil', duree:'', url:'', date:'' };
+  selectedPhotos: File[] = [];
+  @ViewChild('photoInput') photoInput?: ElementRef<HTMLInputElement>;
+
+  private readonly ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+  private readonly MAX_SIZE = 5 * 1024 * 1024;
 
   photos  = () => this.com.documents().filter(d => d.type === 'photo');
   videos  = () => this.com.documents().filter(d => d.type === 'video');
@@ -170,21 +199,51 @@ export class DocumentsComponent implements OnInit {
 
   ngOnInit(): void { this.com.loadDocuments(); }
 
+  onPhotosSelected(e: Event): void {
+    const input = e.target as HTMLInputElement;
+    const files = Array.from(input.files ?? []);
+    for (const f of files) {
+      if (!this.ALLOWED_TYPES.includes(f.type)) { this.toast.showError('ph', `Format non supporté : ${f.name}`); continue; }
+      if (f.size > this.MAX_SIZE) { this.toast.showError('ph', `Fichier trop volumineux (max 5 Mo) : ${f.name}`); continue; }
+      this.selectedPhotos.push(f);
+    }
+    input.value = '';
+  }
+
+  removePhoto(f: File): void {
+    this.selectedPhotos = this.selectedPhotos.filter(x => x !== f);
+  }
+
   ajouterPhoto(): void {
-    if (!this.fPh.titre) { this.toast.show('ph', 'Titre obligatoire'); return; }
+    if (!this.fPh.titre) { this.toast.showError('ph', 'Titre obligatoire'); return; }
+    if (!this.selectedPhotos.length) { this.toast.showError('ph', 'Sélectionnez au moins une photo'); return; }
     this.saving.set(true);
-    this.com.ajouterDocument({ titre: this.fPh.titre, type: 'photo', categorie: this.fPh.categorie, date: this.fPh.date || new Date().toISOString().slice(0,10), auteur: this.fPh.photographe, droits: this.fPh.droits }).subscribe({
-      next: () => { this.toast.show('ph', 'Photo enregistrée — '+this.fPh.titre); this.saving.set(false); this.fPh = { titre:'', categorie:'Événements', date:'', photographe:'', droits:'Usage interne uniquement' }; },
-      error: () => this.saving.set(false)
+    const fd = new FormData();
+    fd.append('titre', this.fPh.titre);
+    fd.append('type', 'photo');
+    fd.append('categorie', this.fPh.categorie);
+    fd.append('date', this.fPh.date || new Date().toISOString().slice(0,10));
+    fd.append('auteur', this.fPh.photographe);
+    fd.append('droits', this.fPh.droits);
+    for (const f of this.selectedPhotos) fd.append('photos[]', f);
+    this.com.ajouterPhotos(fd).subscribe({
+      next: (docs) => {
+        this.toast.show('ph', `${docs.length} photo(s) enregistrée(s) — ${this.fPh.titre}`);
+        this.saving.set(false);
+        this.fPh = { titre:'', categorie:'Événements', date:'', photographe:'', droits:'Usage interne uniquement' };
+        this.selectedPhotos = [];
+        if (this.photoInput) this.photoInput.nativeElement.value = '';
+      },
+      error: (err) => { this.saving.set(false); this.toast.showError('ph', err?.error?.message || 'Une erreur est survenue.'); }
     });
   }
 
   ajouterVideo(): void {
-    if (!this.fVid.titre) { this.toast.show('vid', 'Titre obligatoire'); return; }
+    if (!this.fVid.titre) { this.toast.showError('vid', 'Titre obligatoire'); return; }
     this.saving.set(true);
     this.com.ajouterDocument({ titre: this.fVid.titre, type: 'video', categorie: this.fVid.categorie, date: this.fVid.date || new Date().toISOString().slice(0,10), url: this.fVid.url }).subscribe({
       next: () => { this.toast.show('vid', 'Vidéo enregistrée — '+this.fVid.titre); this.saving.set(false); this.fVid = { titre:'', categorie:'Séance du Conseil', duree:'', url:'', date:'' }; },
-      error: () => this.saving.set(false)
+      error: (err) => { this.saving.set(false); this.toast.showError('vid', err?.error?.message || 'Une erreur est survenue.'); }
     });
   }
 

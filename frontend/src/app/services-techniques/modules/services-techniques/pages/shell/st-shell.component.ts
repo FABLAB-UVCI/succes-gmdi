@@ -1,4 +1,4 @@
-import { Component, signal, OnInit, inject } from '@angular/core';
+import { Component, signal, computed, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { VoirieComponent }           from '../../components/voirie/voirie.component';
 import { EclairageComponent }        from '../../components/eclairage/eclairage.component';
@@ -27,6 +27,10 @@ export type Section = 'voirie' | 'eclairage' | 'eau' | 'batiments' | 'interventi
   <!-- ── Topbar ─────────────────────────────────────────────────────────── -->
   <div class="topbar">
     <div style="display:flex;align-items:center;gap:12px">
+      <!-- Hamburger (mobile) -->
+      <button class="hamburger" (click)="toggleSidebar()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
       <div class="ci-flag">
         <span class="f-or"></span><span class="f-wh"></span><span class="f-gr"></span>
       </div>
@@ -43,21 +47,27 @@ export type Section = 'voirie' | 'eclairage' | 'eau' | 'batiments' | 'interventi
       }
       <div class="topbar-user">
         <div class="av">ST</div>
-        <div>
+        <div class="tb-info">
           <div style="font-size:12px;font-weight:600;color:#1f2937">{{ auth.currentUser()?.name ?? 'Directeur Technique' }}</div>
           <div style="font-size:10px;color:var(--ci-green);font-weight:600">Services Techniques</div>
         </div>
       </div>
-      <button (click)="auth.logout()" style="background:none;border:1px solid #e5e7eb;color:#9ca3af;cursor:pointer;font-size:12px;display:flex;align-items:center;gap:4px;padding:6px 10px;border-radius:6px;transition:all .15s" title="Déconnexion">
+      <button (click)="auth.logout()" class="btn-logout" title="Déconnexion">
         <i class="ti ti-logout" style="font-size:15px"></i>
+        <span class="logout-label">Déconnexion</span>
       </button>
     </div>
   </div>
 
   <div class="layout">
 
+    <!-- ── Overlay mobile ─────────────────────────────────────────────── -->
+    @if (sidebarOpen()) {
+      <div class="overlay" (click)="closeSidebar()"></div>
+    }
+
     <!-- ── Sidebar ──────────────────────────────────────────────────────── -->
-    <nav class="sidebar">
+    <nav class="sidebar" [class.open]="sidebarOpen()">
       <div class="sb-logo">
         <div class="sb-logo-badge"><i class="ti ti-building-community"></i></div>
         <div>
@@ -134,8 +144,131 @@ export type Section = 'voirie' | 'eclairage' | 'eau' | 'batiments' | 'interventi
 
     </main>
   </div>
+
+  <!-- Erreurs globales (interceptor + validations) -->
+  <div class="error-toast-stack">
+    @for (t of visibleErrorToasts(); track t.id) {
+      <div class="error-toast">
+        <i class="ti ti-alert-circle"></i>
+        <div>
+          @if (t.title) { <div class="et-title">{{ t.title }}</div> }
+          <div class="et-msg">{{ t.message }}</div>
+        </div>
+      </div>
+    }
+  </div>
 </div>
-  `
+  `,
+  styles: [`
+    /* ── Hamburger ── */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 6px;
+      transition: background .15s;
+      flex-shrink: 0;
+    }
+    .hamburger:hover { background: rgba(0,0,0,.08); }
+    .hamburger span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: #1f2937;
+      border-radius: 2px;
+    }
+
+    /* ── Overlay ── */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.45);
+      z-index: 199;
+      backdrop-filter: blur(1px);
+    }
+
+    /* ── Bouton déconnexion ── */
+    .btn-logout {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--color-background-secondary);
+      border: 1px solid var(--color-border-secondary);
+      color: var(--color-text-secondary);
+      font-size: 12px;
+      font-weight: 500;
+      font-family: inherit;
+      padding: 7px 12px;
+      border-radius: var(--border-radius-md);
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .btn-logout:hover {
+      background: #fce8e8;
+      border-color: #e63946;
+      color: #a32d2d;
+    }
+    .btn-logout:active { transform: translateY(1px); }
+
+    /* ── Erreurs globales ── */
+    .error-toast-stack {
+      position: fixed;
+      bottom: 1.25rem;
+      right: 1.25rem;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      pointer-events: none;
+    }
+    .error-toast {
+      background: #fce8e8;
+      color: #a32d2d;
+      border: 1px solid #f3b8b8;
+      border-left: 4px solid #e63946;
+      border-radius: 6px;
+      padding: 10px 14px;
+      font-size: 12px;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      box-shadow: 0 2px 12px rgba(0,0,0,.12);
+      min-width: 260px;
+      max-width: 380px;
+      pointer-events: all;
+    }
+    .error-toast .et-title { font-weight: 700; margin-bottom: 2px; }
+    .error-toast .et-msg { opacity: .9; }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      .hamburger { display: flex; }
+      .sidebar {
+        position: fixed;
+        top: 65px;
+        left: 0;
+        height: calc(100vh - 65px);
+        transform: translateX(-100%);
+        transition: transform .28s cubic-bezier(.4,0,.2,1);
+        z-index: 200;
+        overflow-y: auto;
+      }
+      .sidebar.open { transform: translateX(0); }
+      .tb-info      { display: none; }
+      .logout-label { display: none; }
+      .layout       { position: relative; }
+    }
+    @media (max-width: 600px) {
+      .topbar { padding: 0 1rem !important; }
+      .main   { padding: 1rem !important; }
+      .kpi-row { grid-template-columns: 1fr 1fr !important; }
+    }
+  `]
 })
 export class StShellComponent implements OnInit {
   readonly st      = inject(ServicesTechniquesService);
@@ -143,7 +276,10 @@ export class StShellComponent implements OnInit {
   readonly auth    = inject(AuthService);
   readonly toast   = inject(ToastService);
 
-  active = signal<Section>('interventions');
+  active      = signal<Section>('interventions');
+  sidebarOpen = signal(false);
+
+  visibleErrorToasts = computed(() => Object.values(this.toast.toasts()).filter(t => t.visible && t.type === 'error'));
 
   navInfra = [
     { id: 'voirie' as Section,    label: 'Voirie',              icon: 'ti-road' },
@@ -157,10 +293,14 @@ export class StShellComponent implements OnInit {
     { id: 'maintenance' as Section,   label: 'Maintenance',    icon: 'ti-tool' },
   ];
 
-  ngOnInit(): void { this.st.loadStats(); this.st.loadDemandes(); }
+  ngOnInit(): void { this.st.loadStats(); }
+
+  toggleSidebar(): void { this.sidebarOpen.update(v => !v); }
+  closeSidebar(): void  { this.sidebarOpen.set(false); }
 
   navigate(s: Section): void {
     this.active.set(s);
+    this.closeSidebar();
     switch (s) {
       case 'voirie':        this.st.loadRoutes(); break;
       case 'eclairage':     this.st.loadLampadaires(); this.st.loadPannes(); break;

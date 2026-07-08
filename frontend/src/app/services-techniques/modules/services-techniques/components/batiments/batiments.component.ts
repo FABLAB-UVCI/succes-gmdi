@@ -204,23 +204,42 @@ export class BatimentsComponent implements OnInit {
   labelType(t: string): string { return TYPES.find(x => x.val === t)?.label ?? t; }
 
   ajouterBatiment(): void {
-    if (!this.fBat.nom || !this.fBat.adresse) { this.toast.show('bat', 'Nom et adresse obligatoires'); return; }
+    if (!this.fBat.nom || !this.fBat.adresse || !this.fBat.superficie) {
+      this.toast.showError('bat', 'Nom, adresse et superficie obligatoires'); return;
+    }
     this.saving.set(true);
-    this.st.batiments.update(l => [...l, { id: String(Date.now()), nom: this.fBat.nom, type: this.fBat.type as any, adresse: this.fBat.adresse, superficie: this.fBat.superficie, etat: this.fBat.etat as any, responsable: this.fBat.responsable }]);
-    this.toast.show('bat', `Bâtiment enregistré — ${this.fBat.nom}`);
-    this.saving.set(false);
-    this.fBat = { nom:'', type:'mairie', adresse:'', responsable:'', superficie:0, annee:0, etat:'bon' };
-    this.active.set('liste');
+    this.st.ajouterBatiment({
+      nom: this.fBat.nom, type: this.fBat.type, adresse: this.fBat.adresse,
+      superficie: this.fBat.superficie, anneeConstruction: this.fBat.annee || undefined,
+      etat: this.fBat.etat, responsable: this.fBat.responsable || undefined,
+    }).subscribe({
+      next: () => {
+        this.toast.show('bat', `Bâtiment enregistré — ${this.fBat.nom}`);
+        this.saving.set(false);
+        this.fBat = { nom:'', type:'mairie', adresse:'', responsable:'', superficie:0, annee:0, etat:'bon' };
+        this.active.set('liste');
+      },
+      error: () => this.saving.set(false),
+    });
   }
 
   ajouterTravaux(): void {
-    if (!this.fTrav.batiment || !this.fTrav.dateDebut) { this.toast.show('bat', 'Bâtiment et date obligatoires'); return; }
+    if (!this.fTrav.batiment || !this.fTrav.dateDebut || !this.fTrav.description) {
+      this.toast.showError('bat', 'Bâtiment, description et date obligatoires'); return;
+    }
     this.saving.set(true);
-    this.st.travaux.update(l => [...l, { id: String(Date.now()), batiment: this.fTrav.batiment, type: this.fTrav.type as any, description: this.fTrav.description, dateDebut: this.fTrav.dateDebut, coutEstime: this.fTrav.cout, prestataire: this.fTrav.prestataire, statut: 'planifie' as any }]);
-    this.toast.show('bat', `Travaux enregistrés — ${this.fTrav.batiment}`);
-    this.saving.set(false);
-    this.showAddTrav.set(false);
-    this.fTrav = { batiment:'', type:'reparation', description:'', dateDebut:'', cout:0, prestataire:'' };
+    this.st.ajouterTravaux({
+      batiment: this.fTrav.batiment, description: this.fTrav.description, type: this.fTrav.type,
+      dateDebut: this.fTrav.dateDebut, coutEstime: this.fTrav.cout || undefined, prestataire: this.fTrav.prestataire || undefined,
+    }).subscribe({
+      next: () => {
+        this.toast.show('bat', `Travaux enregistrés — ${this.fTrav.batiment}`);
+        this.saving.set(false);
+        this.showAddTrav.set(false);
+        this.fTrav = { batiment:'', type:'reparation', description:'', dateDebut:'', cout:0, prestataire:'' };
+      },
+      error: () => this.saving.set(false),
+    });
   }
 
   onBatPhoto(e: Event)  { const f = (e.target as HTMLInputElement).files; if (f) this.batPhotos  = Array.from(f); }

@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PersonnelComponent }  from '../../components/personnel/personnel.component';
 import { CarriereComponent }   from '../../components/carriere/carriere.component';
@@ -26,6 +26,10 @@ interface NavItem { id: Section; label: string; icon: string; }
   <!-- Topbar CI -->
   <div class="topbar">
     <div class="tb-brand">
+      <!-- Hamburger (mobile) -->
+      <button class="hamburger" (click)="toggleSidebar()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
       <div class="tb-flag"><span></span><span></span><span></span></div>
       <div>
         <div class="tb-title">GMDI — Ressources Humaines</div>
@@ -34,7 +38,7 @@ interface NavItem { id: Section; label: string; icon: string; }
     </div>
     <div class="tb-user">
       <div class="av">{{ initiales() }}</div>
-      <span><strong>{{ auth.currentUser()?.name ?? '' }}</strong> — {{ auth.currentUser()?.role?.toUpperCase() ?? '' }}</span>
+      <span class="tb-name"><strong>{{ auth.currentUser()?.name ?? '' }}</strong> — {{ auth.currentUser()?.role?.toUpperCase() ?? '' }}</span>
       <button class="tb-logout" (click)="auth.logout()" title="Se déconnecter">
         <i class="ti ti-logout" aria-hidden="true"></i>
       </button>
@@ -42,8 +46,13 @@ interface NavItem { id: Section; label: string; icon: string; }
   </div>
 
   <div class="layout">
+    <!-- Overlay mobile -->
+    @if (sidebarOpen()) {
+      <div class="overlay" (click)="closeSidebar()"></div>
+    }
+
     <!-- Sidebar style État Civil -->
-    <nav class="sidebar">
+    <nav class="sidebar" [class.open]="sidebarOpen()">
       <div class="sb-sec">RH</div>
       @for (item of navItems; track item.id) {
         <div class="sb-it" [class.act]="activeSection() === item.id" (click)="navigate(item.id)">
@@ -93,6 +102,7 @@ export class RhShellComponent {
   };
 
   activeSection = signal<Section>('personnel');
+  sidebarOpen   = signal(false);
 
   navItems: NavItem[] = [
     { id: 'personnel', label: 'Personnel',    icon: 'ti-users'    },
@@ -103,7 +113,11 @@ export class RhShellComponent {
     { id: 'rapports',  label: 'Rapports RH',  icon: 'ti-report'    },
   ];
 
+  toggleSidebar(): void { this.sidebarOpen.update(v => !v); }
+  closeSidebar(): void  { this.sidebarOpen.set(false); }
+
   navigate(sec: Section): void {
     this.activeSection.set(sec);
+    this.closeSidebar();
   }
 }

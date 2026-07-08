@@ -112,8 +112,8 @@ class ReparationController extends Controller
             'cout_estime'      => $r->cout_estime ?? 0,
             'cout_reel'        => $r->cout_reel,
             'statut'           => $r->statut,
-            'date_declaration' => $r->date_declaration,
-            'date_resolue'     => $r->date_resolue,
+            'date_declaration' => $r->date_declaration?->format('Y-m-d'),
+            'date_resolue'     => $r->date_resolue?->format('Y-m-d'),
             'created_at'       => $r->created_at?->toISOString(),
         ];
     }

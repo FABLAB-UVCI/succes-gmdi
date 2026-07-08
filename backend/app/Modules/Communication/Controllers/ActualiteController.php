@@ -39,6 +39,22 @@ class ActualiteController extends Controller
         return response()->json(['success'=>true,'message'=>"Publication créée — {$a->titre}",'data'=>$this->fmt($a)], 201);
     }
 
+    public function update(Request $request, $id)
+    {
+        $a = Actualite::findOrFail($id);
+        $v = $request->validate([
+            'type'      => 'required|in:communique,annonce,evenement',
+            'titre'     => 'required|string|max:250',
+            'contenu'   => 'required|string',
+            'auteur'    => 'nullable|string|max:150',
+            'statut'    => 'nullable|in:publie,brouillon',
+            'categorie' => 'nullable|string|max:100',
+            'date'      => 'nullable|date',
+        ]);
+        $a->update($v);
+        return response()->json(['success'=>true,'message'=>"Publication mise à jour — {$a->titre}",'data'=>$this->fmt($a->fresh())]);
+    }
+
     public function updateStatut(Request $request, $id)
     {
         $a = Actualite::findOrFail($id);

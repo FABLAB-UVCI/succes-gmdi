@@ -1,7 +1,7 @@
-/* ═══════════════════════════════════════════════════════════════
-   GMDI Finances — Thème Ivoirien
-   Couleurs : Orange #F77F00 · Blanc #FFFFFF · Vert #009A44
-   ═══════════════════════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   GMDI Finances â€” ThÃ¨me Ivoirien
+   Couleurs : Orange #F77F00 Â· Blanc #FFFFFF Â· Vert #009A44
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
 :root {
   --ci-orange:      #F77F00;
@@ -11,7 +11,7 @@
   --ci-green-dark:  #006B2B;
   --ci-green-pale:  #E8F8EE;
   --ci-white:       #FFFFFF;
-  --ci-bg:          #F5FAF7;        /* fond général légèrement vert */
+  --ci-bg:          #F5FAF7;        /* fond gÃ©nÃ©ral lÃ©gÃ¨rement vert */
   --ci-border:      #D9EDDF;
   --ci-text:        #1A2E20;
   --ci-text-muted:  #607A6A;
@@ -20,14 +20,13 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
-body {
+.gmdi-finances {
   font-family: 'Segoe UI', system-ui, sans-serif;
   background: var(--ci-bg);
   min-height: 100vh;
   color: var(--ci-text);
-}
 
-/* ══ TOPBAR ═══════════════════════════════════════════════════ */
+/* â•â• TOPBAR â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .topbar {
   background: var(--ci-white);
   height: 64px;
@@ -47,7 +46,7 @@ body {
   z-index: 100;
 }
 
-/* mini drapeau vertical à gauche du titre */
+/* mini drapeau vertical Ã  gauche du titre */
 .tb-flag {
   display: flex;
   flex-direction: column;
@@ -103,18 +102,23 @@ body {
   box-shadow: 0 2px 6px rgba(0,0,0,.15);
 }
 
-/* ══ LAYOUT ═══════════════════════════════════════════════════ */
-.layout { display: flex; }
+/* â•â• LAYOUT â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+.layout { display: block; position: relative; }
 
-/* ══ SIDEBAR ══════════════════════════════════════════════════ */
+/* â•â• SIDEBAR â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .sidebar {
   width: 232px;
   background: linear-gradient(180deg, var(--ci-green-dark) 0%, #003D17 100%);
-  min-height: calc(100vh - 64px);
+  position: fixed;
+  top: 64px;
+  left: 0;
+  height: calc(100vh - 64px);
   padding: 20px 0 32px;
-  flex-shrink: 0;
   border-right: 3px solid var(--ci-orange);
   box-shadow: 2px 0 12px rgba(0,0,0,.15);
+  overflow-y: auto;
+  z-index: 200;
+  transition: transform .28s cubic-bezier(.4,0,.2,1);
 }
 
 .sb-logo {
@@ -185,17 +189,22 @@ body {
 
 .sb-item.act i { color: white; }
 
-/* ══ MAIN ═════════════════════════════════════════════════════ */
+/* â•â• MAIN â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .main {
   flex: 1;
+  margin-left: 232px;
   padding: 1.75rem 2rem;
   display: flex;
   flex-direction: column;
   gap: 1.75rem;
   min-width: 0;
+  /* Le .main global (styles.css, module Communication) impose overflow:hidden ;
+     cette règle, compilée en ".gmdi-finances .main" (2 classes), est plus
+     spécifique et restaure un défilement normal pour Finances. */
+  overflow: visible;
 }
 
-/* ══ HEADER KPI ═══════════════════════════════════════════════ */
+/* â•â• HEADER KPI â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .hdr {
   display: flex;
   align-items: center;
@@ -211,7 +220,7 @@ body {
   overflow: hidden;
 }
 
-/* motif décoratif drapeau en fond */
+/* motif dÃ©coratif drapeau en fond */
 .hdr::after {
   content: '';
   position: absolute;
@@ -272,7 +281,7 @@ body {
   margin-top: 2px;
 }
 
-/* ══ TOAST ════════════════════════════════════════════════════ */
+/* â•â• TOAST â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .global-toast {
   position: fixed;
   bottom: 1.5rem; right: 1.5rem;
@@ -294,7 +303,7 @@ body {
   to   { transform: translateX(0);    opacity: 1; }
 }
 
-/* ══ TABS NAV ═════════════════════════════════════════════════ */
+/* â•â• TABS NAV â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .nav {
   display: flex;
   gap: 4px;
@@ -333,7 +342,7 @@ body {
   background: var(--ci-orange-pale);
 }
 
-/* ══ CARDS ════════════════════════════════════════════════════ */
+/* â•â• CARDS â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .card {
   background: var(--ci-white);
   border-radius: 0 0 14px 14px;
@@ -371,7 +380,7 @@ body {
 
 .pb { padding: 1.4rem; }
 
-/* ══ FORM SECTIONS ════════════════════════════════════════════ */
+/* â•â• FORM SECTIONS â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .fs {
   font-size: 11px;
   font-weight: 700;
@@ -387,7 +396,7 @@ body {
 
 .fs:first-child { margin-top: 0; }
 
-/* ══ FORM GRIDS ═══════════════════════════════════════════════ */
+/* â•â• FORM GRIDS â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .fr  { display: grid; grid-template-columns: repeat(2,1fr); gap: 1rem; margin-bottom: 1rem; }
 .fr3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; margin-bottom: 1rem; }
 
@@ -418,7 +427,7 @@ body {
 
 .req { color: #E53935; }
 
-/* ══ FORM ACTIONS ═════════════════════════════════════════════ */
+/* â•â• FORM ACTIONS â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .fa {
   display: flex;
   justify-content: flex-end;
@@ -428,7 +437,7 @@ body {
   border-top: 1px dashed var(--ci-border);
 }
 
-/* ══ BUTTONS ══════════════════════════════════════════════════ */
+/* â•â• BUTTONS â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .bp {
   background: linear-gradient(135deg, var(--ci-orange), var(--ci-orange-dark));
   border: none; color: white;
@@ -473,7 +482,25 @@ body {
   transform: translateY(-1px);
 }
 
-/* ══ KPI CARDS ════════════════════════════════════════════════ */
+.bti {
+  background: var(--ci-white);
+  border: 1.5px solid var(--ci-border);
+  color: var(--ci-text-muted);
+  width: 30px; height: 30px;
+  padding: 0; cursor: pointer;
+  border-radius: 7px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 13px;
+  transition: all .15s;
+  margin-right: 4px;
+}
+.bti:hover { background: var(--ci-orange-pale); border-color: var(--ci-orange); color: var(--ci-orange-dark); }
+.bti.ok { color: var(--ci-green-dark); border-color: var(--ci-green); }
+.bti.ok:hover { background: var(--ci-green-pale); }
+.bti.danger { color: #C62828; border-color: rgba(198,40,40,.35); }
+.bti.danger:hover { background: rgba(198,40,40,.08); border-color: #C62828; }
+
+/* â•â• KPI CARDS â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .kpi4 {
   display: grid;
   grid-template-columns: repeat(4,1fr);
@@ -508,7 +535,7 @@ body {
 }
 .kcard .kb div { height: 100%; border-radius: 2px; }
 
-/* ══ TABLE ════════════════════════════════════════════════════ */
+/* â•â• TABLE â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .tbl { width: 100%; border-collapse: collapse; }
 
 .tbl th {
@@ -540,7 +567,7 @@ body {
   font-size: 13px; padding: 11px 16px;
 }
 
-/* ══ FILTER BAR ═══════════════════════════════════════════════ */
+/* â•â• FILTER BAR â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .tf {
   display: flex;
   align-items: center;
@@ -574,7 +601,7 @@ body {
   padding: 3px 12px;
 }
 
-/* ══ CHIPS / BADGES ═══════════════════════════════════════════ */
+/* â•â• CHIPS / BADGES â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .chip {
   display: inline-flex; align-items: center;
   padding: 3px 11px; border-radius: 20px;
@@ -588,7 +615,7 @@ body {
 .cr { background: rgba(229,57,53,.1);  color: #C62828; }
 .cg { background: rgba(201,168,76,.15);color: #7B6600; }
 
-/* ══ ALERT INLINE ═════════════════════════════════════════════ */
+/* â•â• ALERT INLINE â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .alert-ok {
   background: var(--ci-green-pale);
   color: var(--ci-green-dark);
@@ -599,8 +626,27 @@ body {
   display: none; align-items: center; gap: 8px;
 }
 .alert-ok.show { display: flex; }
+.alert-ok.error {
+  background: #FDECEA;
+  color: #7a1f1f;
+  border-left-color: #C62828;
+}
 
-/* ══ MISC ═════════════════════════════════════════════════════ */
+/* â•â• VALIDATION CHAMPS OBLIGATOIRES â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+.fi.invalid, .fsel.invalid {
+  border-color: #C62828 !important;
+  background: #FDECEA !important;
+  box-shadow: 0 0 0 3px rgba(198,40,40,.1) !important;
+}
+.field-error {
+  display: block;
+  color: #C62828;
+  font-size: 11px;
+  margin-top: 3px;
+  font-weight: 500;
+}
+
+/* â•â• MISC â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .mono    { font-family: 'SF Mono','Consolas',monospace; font-size:11px!important; color: var(--ci-text-muted)!important; }
 .bold    { font-weight: 600; }
 .right   { text-align: right; }
@@ -618,7 +664,7 @@ body {
   height: 100px; margin-top: .5rem; padding: .5rem 0;
 }
 
-/* ══ UPLOAD ZONE ══════════════════════════════════════════════ */
+/* â•â• UPLOAD ZONE â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .upload-zone {
   display: flex;
   align-items: center;
@@ -644,10 +690,13 @@ body {
   }
 }
 
-/* ══ RESPONSIVE ═══════════════════════════════════════════════ */
-@media (max-width: 768px) {
-  .sidebar { width: 190px; }
-  .main { padding: 1rem; }
+/* â•â• RESPONSIVE â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+@media (max-width: 900px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+  .sidebar.open { transform: translateX(0); }
+  .main { margin-left: 0; padding: 1rem; }
   .hdr { flex-direction: column; align-items: flex-start; }
   .mkpis { width: 100%; justify-content: space-between; }
   .fr, .fr3 { grid-template-columns: 1fr; }
@@ -659,3 +708,9 @@ body {
   .tf { flex-direction: column; align-items: stretch; }
   .rc { margin-left: 0; }
 }
+
+@media (max-width: 600px) {
+  .main { padding: .75rem !important; }
+  .kpi4 { grid-template-columns: 1fr 1fr; }
+}
+} /* end .gmdi-finances */

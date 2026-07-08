@@ -2,11 +2,8 @@ import { Component, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../../../services/api.service';
-<<<<<<< HEAD
-import { qrVerification, codeVerification, formatDateFr, openPrintWindow } from '../../pdf-utils';
-=======
 import { PrintService } from '../../../../services/print.service';
->>>>>>> b5dbce35a5970a980cbad1edf363124bdb390f4a
+import { qrVerification, codeVerification, formatDateFr, openPrintWindow } from '../../pdf-utils';
 
 @Component({
   selector: 'app-deces',
@@ -40,9 +37,12 @@ export class DecesComponent implements OnInit {
   onCertificatDecesSelected(e: Event) { this.decesForm.certificatDeces = (e.target as HTMLInputElement).files?.[0] ?? null; }
   onCniDeclarantSelected(e: Event) { this.decesForm.cniDeclarant = (e.target as HTMLInputElement).files?.[0] ?? null; }
 
+  submitAttempted = signal(false);
+
   enregistrerDeces() {
+    this.submitAttempted.set(true);
     const f = this.decesForm;
-    if (!f.nom || !f.prenom || !f.date || !f.lieu) { this.notify('Nom, prénom(s), date et lieu requis (*)'); return; }
+    if (!f.nom || !f.prenom || !f.date || !f.lieu) { this.notify('Veuillez remplir les champs obligatoires (*)'); return; }
     this.api.createDeces({
       nom: f.nom, prenom: f.prenom,
       date_naissance: f.dob || null,
@@ -62,8 +62,9 @@ export class DecesComponent implements OnInit {
           causeDeces: f.cause, declarant: f.declarant, lien: f.lien
         });
         this.decesForm = { nom: '', prenom: '', dob: '', date: '', heure: '', lieu: '', commune: '', cause: '', declarant: '', lien: '', cniDefunt: null, certificatDeces: null, cniDeclarant: null };
+        this.submitAttempted.set(false);
       },
-      error: () => this.notify("Erreur lors de l'enregistrement")
+      error: (err) => this.notify(err?.error?.message || "Erreur lors de l'enregistrement")
     });
   }
 
@@ -603,10 +604,5 @@ export async function genererActeDecesPDF(data: {
 </html>
 `;
 
-<<<<<<< HEAD
     openPrintWindow(html);
-=======
-    this.printService.printDocument(html, 'Extrait-Acte-Deces');
-  }
->>>>>>> b5dbce35a5970a980cbad1edf363124bdb390f4a
 }

@@ -23,7 +23,7 @@ export class SidebarComponent {
     { type: 'section', label: 'État Civil' },
     { type: 'item', route: 'naissances',   label: 'Naissances',      icon: 'ti ti-baby-carriage' },
     { type: 'item', route: 'mariages',     label: 'Mariages',        icon: 'ti ti-heart' },
-    { type: 'item', route: 'deces',        label: 'Décès',           icon: 'ti ti-ribbon-health' },
+    { type: 'item', route: 'deces',        label: 'Décès',           icon: 'ti ti-candle' },
     { type: 'item', route: 'certificats',  label: 'Certificats',     icon: 'ti ti-certificate' },
     { type: 'item', route: 'statistiques', label: 'Statistiques',    icon: 'ti ti-chart-bar' },
     { type: 'section', label: 'Actions' },

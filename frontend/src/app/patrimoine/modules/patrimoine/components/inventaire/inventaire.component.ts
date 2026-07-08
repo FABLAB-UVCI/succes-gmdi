@@ -123,13 +123,20 @@ const STAT_CHIP:  Record<string, string> = { occupe:'ci', disponible:'cv', loue:
       </div>
       <div class="fa"><button class="bp" [disabled]="saving()" (click)="enregMobilier()"><i class="ti ti-check"></i>Enregistrer</button></div>
       <div class="sl" style="margin-top:.75rem">Registre mobilier</div>
-      <table class="tbl"><thead><tr><th>Désignation</th><th>Qté</th><th>Val. unitaire</th><th>Val. totale</th><th>Localisation</th><th>État</th></tr></thead>
+      <table class="tbl"><thead><tr><th>Désignation</th><th>Localisation</th><th>Valeur</th><th>Affectation</th><th>Statut</th></tr></thead>
       <tbody>
-        <tr><td class="bold">Bureau direction — chêne massif</td><td>4</td><td class="right">350 000</td><td class="right bold">1 400 000</td><td>HdV — Directions</td><td><span class="chip cv">Bon</span></td></tr>
-        <tr><td class="bold">Chaises de réunion</td><td>24</td><td class="right">45 000</td><td class="right bold">1 080 000</td><td>HdV — Salles de réunion</td><td><span class="chip cv">Bon</span></td></tr>
-        <tr><td class="bold">Armoires classeurs métalliques</td><td>18</td><td class="right">85 000</td><td class="right bold">1 530 000</td><td>HdV — Services divers</td><td><span class="chip cw">Usagé</span></td></tr>
-        <tr><td class="bold">Tables de travail agents</td><td>45</td><td class="right">55 000</td><td class="right bold">2 475 000</td><td>HdV — Open space</td><td><span class="chip cv">Bon</span></td></tr>
-        <tr><td class="bold">Mobilier salle du Conseil</td><td>1</td><td class="right">3 200 000</td><td class="right bold">3 200 000</td><td>HdV — Salle du Conseil</td><td><span class="chip cv">Bon</span></td></tr>
+        @for (b of biensParCategorie('mobilier'); track b.id) {
+          <tr>
+            <td class="bold">{{ b.designation }}</td>
+            <td>{{ b.localisation }}</td>
+            <td class="right bold">{{ b.valeurActuelle | fcfa }}</td>
+            <td style="font-size:11px">{{ b.affectation }}</td>
+            <td><span class="chip" [ngClass]="chipStatut(b.statut)">{{ b.statut }}</span></td>
+          </tr>
+        }
+        @empty {
+          <tr><td colspan="5" style="text-align:center;padding:1.5rem;font-style:italic;font-size:12px;color:var(--color-text-secondary)">Aucun mobilier enregistré</td></tr>
+        }
       </tbody></table>
     </div>
   </div>
@@ -165,13 +172,19 @@ const STAT_CHIP:  Record<string, string> = { occupe:'ci', disponible:'cv', loue:
       </div>
       <div class="fa"><button class="bp" [disabled]="saving()" (click)="enregInformatique()"><i class="ti ti-check"></i>Enregistrer</button></div>
       <div class="sl" style="margin-top:.75rem">Registre informatique</div>
-      <table class="tbl"><thead><tr><th>Type</th><th>Modèle</th><th>N° série</th><th>Affectation</th><th>Valeur (FCFA)</th><th>Statut</th></tr></thead>
+      <table class="tbl"><thead><tr><th>Désignation</th><th>Affectation</th><th>Valeur (FCFA)</th><th>Statut</th></tr></thead>
       <tbody>
-        <tr><td class="bold">Ordinateur bureau</td><td>HP EliteDesk 800 G5</td><td class="mono">SN-2022-08374</td><td>État Civil — poste 1</td><td class="right">450 000</td><td><span class="chip cv">Service</span></td></tr>
-        <tr><td class="bold">Serveur</td><td>Dell PowerEdge R640</td><td class="mono">SN-2021-00124</td><td>DSI — salle serveurs</td><td class="right">4 800 000</td><td><span class="chip cv">Service</span></td></tr>
-        <tr><td class="bold">Ordinateur portable</td><td>Lenovo ThinkPad E14</td><td class="mono">SN-2023-15492</td><td>DRH — RH-001</td><td class="right">580 000</td><td><span class="chip cv">Service</span></td></tr>
-        <tr><td class="bold">Imprimante laser</td><td>HP LaserJet Pro 400</td><td class="mono">SN-2019-45821</td><td>Finances</td><td class="right">280 000</td><td><span class="chip ce">Obsolète</span></td></tr>
-        <tr><td class="bold">Vidéoprojecteur</td><td>Epson EB-X51</td><td class="mono">SN-2022-78934</td><td>Salle du Conseil</td><td class="right">350 000</td><td><span class="chip cv">Service</span></td></tr>
+        @for (b of biensParCategorie('informatique'); track b.id) {
+          <tr>
+            <td class="bold">{{ b.designation }}</td>
+            <td style="font-size:11px">{{ b.affectation }}</td>
+            <td class="right">{{ b.valeurActuelle | fcfa }}</td>
+            <td><span class="chip" [ngClass]="chipStatut(b.statut)">{{ b.statut }}</span></td>
+          </tr>
+        }
+        @empty {
+          <tr><td colspan="4" style="text-align:center;padding:1.5rem;font-style:italic;font-size:12px;color:var(--color-text-secondary)">Aucun matériel informatique enregistré</td></tr>
+        }
       </tbody></table>
     </div>
   </div>
@@ -256,13 +269,19 @@ const STAT_CHIP:  Record<string, string> = { occupe:'ci', disponible:'cv', loue:
       </div>
       <div class="fa"><button class="bp" [disabled]="saving()" (click)="enregEquipement()"><i class="ti ti-check"></i>Enregistrer</button></div>
       <div class="sl" style="margin-top:.75rem">Registre équipements</div>
-      <table class="tbl"><thead><tr><th>Désignation</th><th>Marque</th><th>N° série</th><th>Localisation</th><th>Valeur (FCFA)</th><th>État</th></tr></thead>
+      <table class="tbl"><thead><tr><th>Désignation</th><th>Localisation</th><th>Valeur (FCFA)</th><th>Statut</th></tr></thead>
       <tbody>
-        <tr><td class="bold">Groupe électrogène 250 KVA</td><td>Caterpillar</td><td class="mono">CAT-2019-00892</td><td>HdV — local technique</td><td class="right">18 000 000</td><td><span class="chip cw">Maintenance</span></td></tr>
-        <tr><td class="bold">Climatiseur split 18 000 BTU</td><td>Mitsubishi</td><td class="mono">MIT-2021-05421</td><td>HdV — Salle du Conseil</td><td class="right">850 000</td><td><span class="chip cv">Opérationnel</span></td></tr>
-        <tr><td class="bold">Compacteur de voirie</td><td>Caterpillar CB-224E</td><td class="mono">CAT-2018-00341</td><td>Dépôt municipal</td><td class="right">32 000 000</td><td><span class="chip cv">Opérationnel</span></td></tr>
-        <tr><td class="bold">Centrale téléphonique</td><td>Alcatel OXO Connect</td><td class="mono">ALC-2020-00112</td><td>HdV — Accueil</td><td class="right">1 200 000</td><td><span class="chip cv">Opérationnel</span></td></tr>
-        <tr><td class="bold">Camion benne 10T</td><td>Mercedes Actros</td><td class="mono">MB-2016-00678</td><td>Dépôt municipal</td><td class="right">45 000 000</td><td><span class="chip ce">Hors service</span></td></tr>
+        @for (b of biensParCategorie('equipement'); track b.id) {
+          <tr>
+            <td class="bold">{{ b.designation }}</td>
+            <td>{{ b.localisation }}</td>
+            <td class="right">{{ b.valeurActuelle | fcfa }}</td>
+            <td><span class="chip" [ngClass]="chipStatut(b.statut)">{{ b.statut }}</span></td>
+          </tr>
+        }
+        @empty {
+          <tr><td colspan="4" style="text-align:center;padding:1.5rem;font-style:italic;font-size:12px;color:var(--color-text-secondary)">Aucun équipement enregistré</td></tr>
+        }
       </tbody></table>
     </div>
   </div>
@@ -355,7 +374,7 @@ export class InventaireComponent implements OnInit {
   enregMobilier(): void {
     if (!this.mob.designation || !this.mob.localisation) { this.toast.showError('Champs manquants', 'Désignation et localisation obligatoires'); return; }
     this.saving.set(true);
-    this.pat['mobApi'].create({ designation: this.mob.designation, quantite: this.mob.quantite ?? undefined, valeur_unitaire: this.mob.valeurUnitaire ?? undefined, localisation: this.mob.localisation, date_acquisition: this.mob.dateAcquisition || undefined, etat: this.mob.etat }).subscribe({
+    this.pat.enregistrerMobilier({ designation: this.mob.designation, quantite: this.mob.quantite ?? undefined, valeurUnitaire: this.mob.valeurUnitaire ?? undefined, localisation: this.mob.localisation, dateAcquisition: this.mob.dateAcquisition || undefined, etat: this.mob.etat }).subscribe({
       next: () => { this.toast.show('mob', `Mobilier enregistré — ${this.mob.designation}`); this.saving.set(false); this.mob = { designation: '', quantite: null, valeurUnitaire: null, localisation: '', dateAcquisition: '', etat: 'bon' }; },
       error: (err) => { this.toast.showError('Erreur', this.errMsg(err)); this.saving.set(false); },
     });
@@ -364,7 +383,7 @@ export class InventaireComponent implements OnInit {
   enregInformatique(): void {
     if (!this.inf.type || !this.inf.affectation) { this.toast.showError('Champs manquants', 'Type et affectation obligatoires'); return; }
     this.saving.set(true);
-    this.pat['infApi'].create({ type_materiel: this.inf.type, modele: this.inf.modele, numero_serie: this.inf.serie, affectation: this.inf.affectation, valeur: this.inf.valeur ?? undefined, date_acquisition: this.inf.dateAcquisition || undefined }).subscribe({
+    this.pat.enregistrerInformatique({ type: this.inf.type, modele: this.inf.modele, serie: this.inf.serie, affectation: this.inf.affectation, valeur: this.inf.valeur ?? undefined, dateAcquisition: this.inf.dateAcquisition || undefined }).subscribe({
       next: () => { this.toast.show('inf', `Matériel enregistré — ${this.inf.type} → ${this.inf.affectation}`); this.saving.set(false); this.inf = { type: '', modele: '', serie: '', affectation: '', valeur: null, dateAcquisition: '' }; },
       error: (err) => { this.toast.showError('Erreur', this.errMsg(err)); this.saving.set(false); },
     });
@@ -387,11 +406,13 @@ export class InventaireComponent implements OnInit {
   enregEquipement(): void {
     if (!this.eqp.designation || !this.eqp.localisation) { this.toast.showError('Champs manquants', 'Désignation et localisation obligatoires'); return; }
     this.saving.set(true);
-    this.pat['eqpApi'].create({ designation: this.eqp.designation, marque: this.eqp.marque, numero_serie: this.eqp.serie, localisation: this.eqp.localisation, valeur: this.eqp.valeur ?? undefined, date_acquisition: this.eqp.dateAcquisition || undefined }).subscribe({
+    this.pat.enregistrerEquipement({ designation: this.eqp.designation, marque: this.eqp.marque, serie: this.eqp.serie, localisation: this.eqp.localisation, valeur: this.eqp.valeur ?? undefined, dateAcquisition: this.eqp.dateAcquisition || undefined }).subscribe({
       next: () => { this.toast.show('eqp', `Équipement enregistré — ${this.eqp.designation}`); this.saving.set(false); this.eqp = { designation: '', marque: '', serie: '', localisation: '', valeur: null, dateAcquisition: '' }; },
       error: (err) => { this.toast.showError('Erreur', this.errMsg(err)); this.saving.set(false); },
     });
   }
+
+  biensParCategorie(cat: string) { return this.pat.biens().filter(b => b.categorie === cat); }
 
   enregistrerBien(): void {
     if (!this.nv.categorie || !this.nv.designation || !this.nv.localisation || !this.nv.valeur || !this.nv.dateAcquisition || !this.nv.affectation) {

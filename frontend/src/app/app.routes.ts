@@ -22,6 +22,7 @@ export const routes: Routes = [
   // ── Finances (plusieurs vues) ─────────────────────────────────────────────
   {
     path: 'finances', canActivate: [authGuard],
+    loadComponent: () => import('./finances/features/shell/finances-layout.component').then(m => m.FinancesLayoutComponent),
     children: [
       { path: '', redirectTo: 'budget', pathMatch: 'full' },
       { path: 'budget',       loadComponent: () => import('./finances/features/budget/budget.component').then(m => m.BudgetComponent) },

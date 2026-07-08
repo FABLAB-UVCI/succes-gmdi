@@ -334,7 +334,7 @@ export class FoncierComponent implements OnInit {
   onFileRes(e: Event): void { this.fileRes = (e.target as HTMLInputElement).files?.[0]?.name ?? ''; }
 
   ajouterParcelle(): void {
-    if (!this.fPar.proprietaire || !this.fPar.localisation) { this.toast.show('fon', 'Propriétaire et localisation obligatoires'); return; }
+    if (!this.fPar.proprietaire || !this.fPar.localisation || !this.fPar.quartier || !this.fPar.superficie) { this.toast.showError('fon', 'Propriétaire, localisation, quartier et superficie obligatoires'); return; }
     this.saving.set(true);
     this.urb.ajouterParcelle(this.fPar).subscribe({
       next: p => { this.toast.show('fon', `Parcelle enregistrée — ${p.reference}`); this.saving.set(false); this.showAddPar.set(false); this.fPar = { proprietaire:'', localisation:'', quartier:'', superficie:0, usage:'Résidentiel', titreFoncier:'', statut:'libre' }; this.filePar = ''; },
@@ -343,7 +343,7 @@ export class FoncierComponent implements OnInit {
   }
 
   ajouterLot(): void {
-    if (!this.fLot.lotissement || !this.fLot.reference) { this.toast.show('fon', 'Lotissement et référence obligatoires'); return; }
+    if (!this.fLot.lotissement || !this.fLot.reference || !this.fLot.superficie) { this.toast.showError('fon', 'Lotissement, référence et superficie obligatoires'); return; }
     this.saving.set(true);
     this.urb.ajouterLot(this.fLot).subscribe({
       next: () => { this.toast.show('fon', 'Lot enregistré'); this.saving.set(false); this.showAddLot.set(false); this.fileLot = ''; },
@@ -352,7 +352,7 @@ export class FoncierComponent implements OnInit {
   }
 
   ajouterTF(): void {
-    if (!this.fTF.numero || !this.fTF.proprietaire) { this.toast.show('fon', 'N° titre et propriétaire obligatoires'); return; }
+    if (!this.fTF.numero || !this.fTF.proprietaire || !this.fTF.superficie) { this.toast.showError('fon', 'N° titre, propriétaire et superficie obligatoires'); return; }
     this.saving.set(true);
     const payload = { ...this.fTF, coordonnees: this.fTF.lat ? { lat: this.fTF.lat, lng: this.fTF.lng } : undefined };
     this.urb.ajouterTitreFoncier(payload).subscribe({
@@ -362,7 +362,7 @@ export class FoncierComponent implements OnInit {
   }
 
   ajouterReserve(): void {
-    if (!this.fRes.denomination) { this.toast.show('fon', 'Dénomination obligatoire'); return; }
+    if (!this.fRes.denomination || !this.fRes.usage || !this.fRes.superficie || !this.fRes.localisation) { this.toast.showError('fon', 'Dénomination, usage, superficie et localisation obligatoires'); return; }
     this.saving.set(true);
     const payload = { ...this.fRes, coordonnees: this.fRes.lat ? { lat: this.fRes.lat, lng: this.fRes.lng } : undefined };
     this.urb.ajouterReserve(payload).subscribe({

@@ -6,8 +6,8 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="alert-ok" [class.show]="visible()">
-      <i class="ti ti-check"></i>
+    <div class="alert-ok" [class.show]="visible()" [class.alert-error]="type() === 'error'">
+      <i class="ti" [class.ti-check]="type() !== 'error'" [class.ti-alert-circle]="type() === 'error'"></i>
       <span>{{ message() }}</span>
     </div>
   `
@@ -15,4 +15,5 @@ import { CommonModule } from '@angular/common';
 export class ToastComponent {
   visible = input<boolean>(false);
   message = input<string>('');
+  type = input<'success' | 'error'>('success');
 }

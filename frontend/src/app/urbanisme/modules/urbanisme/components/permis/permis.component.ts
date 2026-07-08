@@ -267,7 +267,7 @@ export class PermisComponent implements OnInit {
   }
 
   enregistrerPermis(): void {
-    if (!this.fDem.demandeur || !this.fDem.localisation) { this.toast.show('per', 'Demandeur et localisation obligatoires'); return; }
+    if (!this.fDem.demandeur || !this.fDem.localisation) { this.toast.showError('per', 'Demandeur et localisation obligatoires'); return; }
     this.saving.set(true);
     const payload = {
       ...this.fDem,

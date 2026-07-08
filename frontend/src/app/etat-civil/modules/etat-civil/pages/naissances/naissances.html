@@ -26,13 +26,13 @@
         <div class="pb">
             <div class="fsec">Informations de l'enfant</div>
             <div class="form-grid">
-            <div class="fg"><div class="fl">Nom de famille <span class="req">*</span></div><input class="fi" [(ngModel)]="naissanceForm.nom" type="text" placeholder="Ex: KONAN"></div>
-            <div class="fg"><div class="fl">Prénoms <span class="req">*</span></div><input class="fi" [(ngModel)]="naissanceForm.prenom" type="text" placeholder="Ex: Yao Emmanuel"></div>
+            <div class="fg"><div class="fl">Nom de famille <span class="req">*</span></div><input class="fi" [class.invalid]="submitAttemptedNaissance() && !naissanceForm.nom" [(ngModel)]="naissanceForm.nom" type="text" placeholder="Ex: KONAN">@if (submitAttemptedNaissance() && !naissanceForm.nom) { <small class="field-error">Champ obligatoire</small> }</div>
+            <div class="fg"><div class="fl">Prénoms <span class="req">*</span></div><input class="fi" [class.invalid]="submitAttemptedNaissance() && !naissanceForm.prenom" [(ngModel)]="naissanceForm.prenom" type="text" placeholder="Ex: Yao Emmanuel">@if (submitAttemptedNaissance() && !naissanceForm.prenom) { <small class="field-error">Champ obligatoire</small> }</div>
             </div>
             <div class="form-grid-3">
-            <div class="fg"><div class="fl">Date de naissance <span class="req">*</span></div><input class="fi" [(ngModel)]="naissanceForm.date" type="date"></div>
+            <div class="fg"><div class="fl">Date de naissance <span class="req">*</span></div><input class="fi" [class.invalid]="submitAttemptedNaissance() && !naissanceForm.date" [(ngModel)]="naissanceForm.date" type="date">@if (submitAttemptedNaissance() && !naissanceForm.date) { <small class="field-error">Champ obligatoire</small> }</div>
             <div class="fg"><div class="fl">Heure de naissance</div><input class="fi" [(ngModel)]="naissanceForm.heure" type="time"></div>
-            <div class="fg"><div class="fl">Sexe <span class="req">*</span></div><select class="fs" [(ngModel)]="naissanceForm.sexe"><option value="">--</option><option>Masculin</option><option>Féminin</option></select></div>
+            <div class="fg"><div class="fl">Sexe <span class="req">*</span></div><select class="fs" [class.invalid]="submitAttemptedNaissance() && !naissanceForm.sexe" [(ngModel)]="naissanceForm.sexe"><option value="">--</option><option>Masculin</option><option>Féminin</option></select>@if (submitAttemptedNaissance() && !naissanceForm.sexe) { <small class="field-error">Champ obligatoire</small> }</div>
             </div>
 
             <div class="form-grid">
@@ -42,7 +42,7 @@
             </div>
             <div class="fg">
                 <div class="fl">Commune d'enregistrement <span class="req">*</span></div>
-                <select class="fs" [(ngModel)]="naissanceForm.commune" required>
+                <select class="fs" [class.invalid]="submitAttemptedNaissance() && !naissanceForm.commune" [(ngModel)]="naissanceForm.commune" required>
                 <option value="" disabled selected>-- Sélectionnez une commune --</option>
                 @for (commune of communesList; track commune) {
                     <option [value]="commune">{{ commune }}</option>
@@ -53,8 +53,8 @@
             
             <div class="fsec">Informations des parents</div>
             <div class="form-grid-3">
-                <div class="fg"><div class="fl">Nom du Père <span class="req">*</span></div><input class="fi" [(ngModel)]="naissanceForm.pNom" type="text" placeholder="Ex: DOUKOURÉ"></div>
-                <div class="fg"><div class="fl">Prénoms du Père <span class="req">*</span></div><input class="fi" [(ngModel)]="naissanceForm.pPrenom" type="text" placeholder="Ex: Youssouf"></div>
+                <div class="fg"><div class="fl">Nom du Père <span class="req">*</span></div><input class="fi" [class.invalid]="submitAttemptedNaissance() && !naissanceForm.pNom" [(ngModel)]="naissanceForm.pNom" type="text" placeholder="Ex: DOUKOURÉ"></div>
+                <div class="fg"><div class="fl">Prénoms du Père <span class="req">*</span></div><input class="fi" [class.invalid]="submitAttemptedNaissance() && !naissanceForm.pPrenom" [(ngModel)]="naissanceForm.pPrenom" type="text" placeholder="Ex: Youssouf"></div>
                 <div class="fg"><div class="fl">Profession Père</div><input class="fi" [(ngModel)]="naissanceForm.pProf" type="text"></div>
                 <div class="fg"><div class="fl">Nationalité Père</div><input class="fi" [(ngModel)]="naissanceForm.pNat" type="text"></div>
                 <div class="fg">
@@ -66,8 +66,8 @@
                 </div>
             </div>
             <div class="form-grid-3">
-                <div class="fg"><div class="fl">Nom de la Mère <span class="req">*</span></div><input class="fi" [(ngModel)]="naissanceForm.mNom" type="text" placeholder="Ex: KONÉ"></div>
-                <div class="fg"><div class="fl">Prénoms de la Mère <span class="req">*</span></div><input class="fi" [(ngModel)]="naissanceForm.mPrenom" type="text" placeholder="Ex: Aminata"></div>
+                <div class="fg"><div class="fl">Nom de la Mère <span class="req">*</span></div><input class="fi" [class.invalid]="submitAttemptedNaissance() && !naissanceForm.mNom" [(ngModel)]="naissanceForm.mNom" type="text" placeholder="Ex: KONÉ"></div>
+                <div class="fg"><div class="fl">Prénoms de la Mère <span class="req">*</span></div><input class="fi" [class.invalid]="submitAttemptedNaissance() && !naissanceForm.mPrenom" [(ngModel)]="naissanceForm.mPrenom" type="text" placeholder="Ex: Aminata"></div>
                 <div class="fg"><div class="fl">Profession Mère</div><input class="fi" [(ngModel)]="naissanceForm.mProf" type="text"></div>
                 <div class="fg"><div class="fl">Nationalité Mère</div><input class="fi" [(ngModel)]="naissanceForm.mNat" type="text"></div>
                 <div class="fg">
@@ -124,18 +124,20 @@
             <div class="form-grid">
                 <div class="fg">
                 <div class="fl">Nom complet du bénéficiaire <span class="req">*</span></div>
-                <input class="fi" [(ngModel)]="jugementForm.nom" type="text" placeholder="Ex: KONAN Yao">
+                <input class="fi" [class.invalid]="submitAttemptedJugement() && !jugementForm.nom" [(ngModel)]="jugementForm.nom" type="text" placeholder="Ex: KONAN Yao">
+                @if (submitAttemptedJugement() && !jugementForm.nom) { <small class="field-error">Champ obligatoire</small> }
                 </div>
                 <div class="fg">
                 <div class="fl">Lieu de naissance estimé</div>
                 <input class="fi" [(ngModel)]="jugementForm.lieu" type="text" placeholder="Ex: Cocody, Abidjan">
                 </div>
             </div>
-            
+
             <div class="form-grid-3">
                 <div class="fg">
                 <div class="fl">Date de naissance fixée <span class="req">*</span></div>
-                <input class="fi" [(ngModel)]="jugementForm.date" type="date">
+                <input class="fi" [class.invalid]="submitAttemptedJugement() && !jugementForm.date" [(ngModel)]="jugementForm.date" type="date">
+                @if (submitAttemptedJugement() && !jugementForm.date) { <small class="field-error">Champ obligatoire</small> }
                 </div>
                 <div class="fg">
                 <div class="fl">Tribunal émetteur</div>
@@ -187,7 +189,8 @@
             <div class="form-grid">
                 <div class="fg">
                 <div class="fl">Nom complet de l'enfant <span class="req">*</span></div>
-                <input class="fi" [(ngModel)]="adoptionForm.enfantNom" type="text" placeholder="Ex: KOUADIO Ange">
+                <input class="fi" [class.invalid]="submitAttemptedAdoption() && !adoptionForm.enfantNom" [(ngModel)]="adoptionForm.enfantNom" type="text" placeholder="Ex: KOUADIO Ange">
+                @if (submitAttemptedAdoption() && !adoptionForm.enfantNom) { <small class="field-error">Champ obligatoire</small> }
                 </div>
                 <div class="fg">
                 <div class="fl">Date de naissance</div>
@@ -201,7 +204,8 @@
             <div class="form-grid-3">
                 <div class="fg">
                 <div class="fl">Nom complet adoptant (Père) <span class="req">*</span></div>
-                <input class="fi" [(ngModel)]="adoptionForm.adoptantPereNom" type="text" placeholder="Ex: KOUADIO Jean">
+                <input class="fi" [class.invalid]="submitAttemptedAdoption() && !adoptionForm.adoptantPereNom" [(ngModel)]="adoptionForm.adoptantPereNom" type="text" placeholder="Ex: KOUADIO Jean">
+                @if (submitAttemptedAdoption() && !adoptionForm.adoptantPereNom) { <small class="field-error">Champ obligatoire</small> }
                 </div>
                 <div class="fg">
                 <div class="fl">Profession</div>
@@ -227,7 +231,8 @@
             <div class="form-grid-3">
                 <div class="fg">
                 <div class="fl">Nom complet adoptant (Mère) <span class="req">*</span></div>
-                <input class="fi" [(ngModel)]="adoptionForm.adoptantMereNom" type="text" placeholder="Ex: KOUADIO Marie">
+                <input class="fi" [class.invalid]="submitAttemptedAdoption() && !adoptionForm.adoptantMereNom" [(ngModel)]="adoptionForm.adoptantMereNom" type="text" placeholder="Ex: KOUADIO Marie">
+                @if (submitAttemptedAdoption() && !adoptionForm.adoptantMereNom) { <small class="field-error">Champ obligatoire</small> }
                 </div>
                 <div class="fg">
                 <div class="fl">Profession</div>
@@ -264,7 +269,8 @@
                 </div>
                 <div class="fg">
                 <div class="fl">Date du jugement d'adoption <span class="req">*</span></div>
-                <input class="fi" [(ngModel)]="adoptionForm.dateJugement" type="date">
+                <input class="fi" [class.invalid]="submitAttemptedAdoption() && !adoptionForm.dateJugement" [(ngModel)]="adoptionForm.dateJugement" type="date">
+                @if (submitAttemptedAdoption() && !adoptionForm.dateJugement) { <small class="field-error">Champ obligatoire</small> }
                 </div>
                 <div class="fg">
                 <div class="fl">Type d'adoption</div>

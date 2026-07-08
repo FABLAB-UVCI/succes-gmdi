@@ -52,3 +52,18 @@ app-root {
   display: block;
   height: 100%;
 }
+
+/* ── Validation des champs obligatoires ── */
+.fi.invalid, .fs.invalid {
+  border-color: #d32f2f !important;
+  background: #fdf2f2 !important;
+  box-shadow: 0 0 0 3px rgba(211,47,47,0.1) !important;
+}
+
+.field-error {
+  display: block;
+  color: #d32f2f;
+  font-size: 11px;
+  margin-top: 3px;
+  font-weight: 500;
+}

@@ -69,10 +69,24 @@ export class CommunicationService {
     );
   }
 
+  modifierActualite(id: string, data: ActualiteCreateRequest): Observable<Actualite> {
+    return this.actuApi.update(Number(id), data).pipe(
+      map(r => ({ id: String(r.data.id), type: r.data.type as any, titre: r.data.titre, contenu: r.data.contenu, auteur: r.data.auteur, date: r.data.date, statut: r.data.statut as any, categorie: r.data.categorie ?? undefined })),
+      tap(a => this.actualites.update(l => l.map(x => x.id === id ? a : x)))
+    );
+  }
+
   publierDirectement(id: string): void {
     this.actuApi.updateStatut(Number(id), 'publie').pipe(
       tap(() => this.actualites.update(l => l.map(a => a.id === id ? { ...a, statut: 'publie' as const } : a)))
     ).subscribe();
+  }
+
+  supprimerActualite(id: string): Observable<void> {
+    return this.actuApi.delete(Number(id)).pipe(
+      tap(() => this.actualites.update(l => l.filter(a => a.id !== id))),
+      map(() => void 0)
+    );
   }
 
   // ── Réseaux sociaux ────────────────────────────────────────────────────────
@@ -109,7 +123,7 @@ export class CommunicationService {
   loadPartenaires(): void {
     this.relApi.getPartenaires().pipe(
       tap(r => this.partenaires.set(r.data.map(x => ({
-        id: String(x.id), nom: x.nom, type: x.type, domaine: x.domaine,
+        id: String(x.id), nom: x.nom, nomContact: x.nom_contact ?? '', type: x.type, domaine: x.domaine,
         contact: x.contact, dateDebut: x.date_debut, statut: x.statut as any
       }))))
     ).subscribe();
@@ -117,7 +131,7 @@ export class CommunicationService {
 
   ajouterPartenaire(data: PartenaireCreateRequest): Observable<Partenaire> {
     return this.relApi.createPartenaire(data).pipe(
-      map(r => ({ id: String(r.data.id), nom: r.data.nom, type: r.data.type, domaine: r.data.domaine, contact: r.data.contact, dateDebut: r.data.date_debut, statut: r.data.statut as any })),
+      map(r => ({ id: String(r.data.id), nom: r.data.nom, nomContact: r.data.nom_contact ?? '', type: r.data.type, domaine: r.data.domaine, contact: r.data.contact, dateDebut: r.data.date_debut, statut: r.data.statut as any })),
       tap(p => this.partenaires.update(l => [p, ...l]))
     );
   }
@@ -139,6 +153,16 @@ export class CommunicationService {
       tap(d => {
         this.documents.update(l => [d, ...l]);
         this.kpi.update(k => ({ ...k, documentsArchives: k.documentsArchives + 1 }));
+      })
+    );
+  }
+
+  ajouterPhotos(formData: FormData): Observable<Document[]> {
+    return this.docApi.createPhotos(formData).pipe(
+      map(r => r.data.map(x => ({ id: String(x.id), titre: x.titre, type: x.type as any, categorie: x.categorie, date: x.date, auteur: x.auteur ?? undefined, url: x.url ?? undefined, droits: x.droits ?? undefined }))),
+      tap(docs => {
+        this.documents.update(l => [...docs, ...l]);
+        this.kpi.update(k => ({ ...k, documentsArchives: k.documentsArchives + docs.length }));
       })
     );
   }

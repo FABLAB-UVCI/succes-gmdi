@@ -24,7 +24,7 @@ type Tab = 'partenaires' | 'presse' | 'medias';
 <!-- ── Partenaires ────────────────────────────────────────────────────── -->
 @if (active()==='partenaires') {
   <div class="ph"><div class="pt"><i class="ti ti-handshake"></i>Gestion des partenaires</div></div>
-  @if (toast.get('part')?.visible) { <div class="success-toast show" style="margin:.5rem 1rem"><i class="ti ti-check"></i>{{toast.get('part')?.message}}</div> }
+  @if (toast.get('part')?.visible) { <div class="show" [ngClass]="toast.get('part')?.type==='error' ? 'error-toast' : 'success-toast'" style="margin:.5rem 1rem"><i class="ti" [ngClass]="toast.get('part')?.type==='error' ? 'ti-alert-circle' : 'ti-check'"></i>{{toast.get('part')?.message}}</div> }
   <div class="pb" style="border-bottom:.5px solid var(--color-border-tertiary)">
     <div class="fsec">Nouveau partenaire</div>
     <div class="form-grid-3">
@@ -35,10 +35,11 @@ type Tab = 'partenaires' | 'presse' | 'medias';
           <option>Entreprise privée</option><option>Ambassade / Consulat</option><option>Organisation internationale</option>
         </select>
       </div>
-      <div class="fg"><div class="fl">Contact principal</div><input class="fi" [(ngModel)]="fPart.contact" placeholder="Nom et téléphone"></div>
-    </div>
-    <div class="form-grid">
       <div class="fg"><div class="fl">Domaine de partenariat</div><input class="fi" [(ngModel)]="fPart.domaine" placeholder="Ex: Santé, Éducation, Infrastructure..."></div>
+    </div>
+    <div class="form-grid-3">
+      <div class="fg"><div class="fl">Nom du contact</div><input class="fi" [(ngModel)]="fPart.nomContact" placeholder="Ex: KOUAME Alain"></div>
+      <div class="fg"><div class="fl">Contact (téléphone ou email)</div><input class="fi" [(ngModel)]="fPart.contact" placeholder="Ex: 07 00 11 22 ou contact@ong.ci"></div>
       <div class="fg"><div class="fl">Date de début</div><input class="fi" type="date" [(ngModel)]="fPart.dateDebut"></div>
     </div>
     <div class="fa"><button class="btn-p" [disabled]="saving()" (click)="ajouterPartenaire()"><i class="ti ti-check"></i>Enregistrer</button></div>
@@ -47,19 +48,20 @@ type Tab = 'partenaires' | 'presse' | 'medias';
     <div class="fsec" style="margin-top:0">Partenaires actifs</div>
     <div class="tbl-wrap">
       <table>
-        <thead><tr><th>Organisation</th><th>Type</th><th>Domaine</th><th>Contact</th><th>Depuis</th><th>Statut</th></tr></thead>
+        <thead><tr><th>Organisation</th><th>Type</th><th>Domaine</th><th>Nom du contact</th><th>Contact</th><th>Depuis</th><th>Statut</th></tr></thead>
         <tbody>
           @for (p of com.partenaires(); track p.id) {
             <tr>
               <td style="font-weight:500">{{p.nom}}</td>
               <td><span class="chip cm">{{p.type}}</span></td>
               <td>{{p.domaine}}</td>
+              <td style="font-size:11px">{{p.nomContact}}</td>
               <td style="font-size:11px">{{p.contact}}</td>
               <td>{{p.dateDebut}}</td>
               <td><span class="chip cv">Actif</span></td>
             </tr>
           }
-          @empty { <tr><td colspan="6" class="empty-row">Aucun partenaire enregistré</td></tr> }
+          @empty { <tr><td colspan="7" class="empty-row">Aucun partenaire enregistré</td></tr> }
         </tbody>
       </table>
     </div>
@@ -69,7 +71,7 @@ type Tab = 'partenaires' | 'presse' | 'medias';
 <!-- ── Presse ──────────────────────────────────────────────────────────── -->
 @if (active()==='presse') {
   <div class="ph"><div class="pt"><i class="ti ti-news"></i>Relations presse</div></div>
-  @if (toast.get('press')?.visible) { <div class="success-toast show" style="margin:.5rem 1rem"><i class="ti ti-check"></i>{{toast.get('press')?.message}}</div> }
+  @if (toast.get('press')?.visible) { <div class="show" [ngClass]="toast.get('press')?.type==='error' ? 'error-toast' : 'success-toast'" style="margin:.5rem 1rem"><i class="ti" [ngClass]="toast.get('press')?.type==='error' ? 'ti-alert-circle' : 'ti-check'"></i>{{toast.get('press')?.message}}</div> }
   <div class="pb" style="border-bottom:.5px solid var(--color-border-tertiary)">
     <div class="fsec">Envoyer un dossier de presse</div>
     <div class="form-grid">
@@ -138,7 +140,7 @@ export class RelationsComponent implements OnInit {
   private relApi = inject(RelationsApiService);
   active = signal<Tab>('partenaires');
   saving = signal(false);
-  fPart = { nom:'', type:'ONG / Association', contact:'', domaine:'', dateDebut:'' };
+  fPart = { nom:'', type:'ONG / Association', nomContact:'', contact:'', domaine:'', dateDebut:'' };
   fDP   = { titre:'', medias:'', date:'', contact:'' };
 
   revuePresse = [
@@ -164,20 +166,20 @@ export class RelationsComponent implements OnInit {
   ngOnInit(): void { this.com.loadPartenaires(); }
 
   ajouterPartenaire(): void {
-    if (!this.fPart.nom) { this.toast.show('part', "Nom de l'organisation obligatoire"); return; }
+    if (!this.fPart.nom) { this.toast.showError('part', "Nom de l'organisation obligatoire"); return; }
     this.saving.set(true);
-    this.com.ajouterPartenaire({ nom: this.fPart.nom, type: this.fPart.type, domaine: this.fPart.domaine || '—', contact: this.fPart.contact || '—', date_debut: this.fPart.dateDebut || new Date().toISOString().slice(0,10) }).subscribe({
-      next: p => { this.toast.show('part', 'Partenaire enregistré — '+p.nom); this.saving.set(false); this.fPart = { nom:'', type:'ONG / Association', contact:'', domaine:'', dateDebut:'' }; },
-      error: () => this.saving.set(false)
+    this.com.ajouterPartenaire({ nom: this.fPart.nom, nom_contact: this.fPart.nomContact || '—', type: this.fPart.type, domaine: this.fPart.domaine || '—', contact: this.fPart.contact || '—', date_debut: this.fPart.dateDebut || new Date().toISOString().slice(0,10) }).subscribe({
+      next: p => { this.toast.show('part', 'Partenaire enregistré — '+p.nom); this.saving.set(false); this.fPart = { nom:'', type:'ONG / Association', nomContact:'', contact:'', domaine:'', dateDebut:'' }; },
+      error: (err) => { this.saving.set(false); this.toast.showError('part', err?.error?.message || 'Une erreur est survenue.'); }
     });
   }
 
   envoyerDP(): void {
-    if (!this.fDP.titre) { this.toast.show('press', 'Titre du dossier obligatoire'); return; }
+    if (!this.fDP.titre) { this.toast.showError('press', 'Titre du dossier obligatoire'); return; }
     this.saving.set(true);
     this.relApi.envoyerDossierPresse({ titre: this.fDP.titre, medias: this.fDP.medias, date_envoi: this.fDP.date || new Date().toISOString().slice(0,10), contact: this.fDP.contact }).subscribe({
       next: () => { this.toast.show('press', 'Dossier de presse envoyé — '+this.fDP.titre); this.saving.set(false); this.fDP = { titre:'', medias:'', date:'', contact:'' }; },
-      error: () => this.saving.set(false)
+      error: (err) => { this.saving.set(false); this.toast.showError('press', err?.error?.message || 'Une erreur est survenue.'); }
     });
   }
 

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CommunicationService } from '../../../../core/services/communication.service';
 import { ToastService } from '../../../../core/services/toast.service';
+import { Actualite } from '../../../../core/models/communication.models';
 
 type Tab = 'liste' | 'communique' | 'annonce' | 'evenement';
 const TYPE_COLORS: Record<string, string> = { communique: '#003366', annonce: '#F77F00', evenement: '#009A44' };
@@ -41,6 +42,7 @@ const TYPE_COLORS: Record<string, string> = { communique: '#003366', annonce: '#
     </select>
     <span style="font-size:11px;color:var(--color-text-secondary);margin-left:auto">{{com.actualites().length}} publication(s)</span>
   </div>
+  @if (toast.get('liste')?.visible) { <div class="show" [ngClass]="toast.get('liste')?.type==='error' ? 'error-toast' : 'success-toast'" style="margin:.5rem 1rem"><i class="ti" [ngClass]="toast.get('liste')?.type==='error' ? 'ti-alert-circle' : 'ti-check'"></i>{{toast.get('liste')?.message}}</div> }
   <div style="padding:.5rem 1rem;display:flex;flex-direction:column;gap:8px">
     @for (a of com.actualites(); track a.id) {
       <div class="art-card">
@@ -55,12 +57,15 @@ const TYPE_COLORS: Record<string, string> = { communique: '#003366', annonce: '#
           <div style="display:flex;align-items:center;gap:6px;margin-top:6px">
             <span class="chip" [ngClass]="chipStatut(a.statut)">{{a.statut}}</span>
             @if (a.statut==='brouillon') {
-              <button class="btn-s" style="padding:3px 8px;font-size:11px;color:#009A44;border-color:#9fd9b8" (click)="publierDirectement(a.id)">
+              <button class="btn-s sm success" (click)="publierDirectement(a.id)">
                 <i class="ti ti-send"></i>Publier
               </button>
             }
-            <button class="btn-s" style="padding:3px 8px;font-size:11px;color:#185FA5;border-color:#b5d4f4">
+            <button class="btn-s sm edit" (click)="editerActualite(a)">
               <i class="ti ti-edit"></i>Modifier
+            </button>
+            <button class="btn-s sm danger" (click)="supprimerActualite(a.id)">
+              <i class="ti ti-trash"></i>Supprimer
             </button>
           </div>
         </div>
@@ -72,8 +77,8 @@ const TYPE_COLORS: Record<string, string> = { communique: '#003366', annonce: '#
 
 <!-- ── Communiqué de presse ───────────────────────────────────────────── -->
 @if (active()==='communique') {
-  <div class="ph"><div class="pt"><i class="ti ti-file-text"></i>Rédiger un communiqué de presse</div></div>
-  @if (toast.get('com')?.visible) { <div class="success-toast show" style="margin:.5rem 1rem"><i class="ti ti-check"></i>{{toast.get('com')?.message}}</div> }
+  <div class="ph"><div class="pt"><i class="ti ti-file-text"></i>{{editingId() ? 'Modifier le communiqué' : 'Rédiger un communiqué de presse'}}</div></div>
+  @if (toast.get('com')?.visible) { <div class="show" [ngClass]="toast.get('com')?.type==='error' ? 'error-toast' : 'success-toast'" style="margin:.5rem 1rem"><i class="ti" [ngClass]="toast.get('com')?.type==='error' ? 'ti-alert-circle' : 'ti-check'"></i>{{toast.get('com')?.message}}</div> }
   <div class="pb">
     <div class="form-grid">
       <div class="fg"><div class="fl">Titre du communiqué <span style="color:#e63946">*</span></div>
@@ -97,6 +102,7 @@ const TYPE_COLORS: Record<string, string> = { communique: '#003366', annonce: '#
       <button class="btn-s" (click)="resetCom()"><i class="ti ti-x"></i>Effacer</button>
       <button class="btn-p" [disabled]="saving()" (click)="publierCommunique()">
         @if (saving()) { <i class="ti ti-loader-2" style="animation:spin 1s linear infinite"></i>Envoi… }
+        @else if (editingId()) { <i class="ti ti-check"></i>Enregistrer les modifications }
         @else { <i class="ti ti-send"></i>Publier le communiqué }
       </button>
     </div>
@@ -105,8 +111,8 @@ const TYPE_COLORS: Record<string, string> = { communique: '#003366', annonce: '#
 
 <!-- ── Annonce ────────────────────────────────────────────────────────── -->
 @if (active()==='annonce') {
-  <div class="ph"><div class="pt"><i class="ti ti-speakerphone"></i>Créer une annonce officielle</div></div>
-  @if (toast.get('ann')?.visible) { <div class="success-toast show" style="margin:.5rem 1rem"><i class="ti ti-check"></i>{{toast.get('ann')?.message}}</div> }
+  <div class="ph"><div class="pt"><i class="ti ti-speakerphone"></i>{{editingId() ? "Modifier l'annonce" : 'Créer une annonce officielle'}}</div></div>
+  @if (toast.get('ann')?.visible) { <div class="show" [ngClass]="toast.get('ann')?.type==='error' ? 'error-toast' : 'success-toast'" style="margin:.5rem 1rem"><i class="ti" [ngClass]="toast.get('ann')?.type==='error' ? 'ti-alert-circle' : 'ti-check'"></i>{{toast.get('ann')?.message}}</div> }
   <div class="pb">
     <div class="form-grid">
       <div class="fg"><div class="fl">Titre de l'annonce <span style="color:#e63946">*</span></div>
@@ -131,16 +137,19 @@ const TYPE_COLORS: Record<string, string> = { communique: '#003366', annonce: '#
       </div>
     </div>
     <div class="fa">
-      <button class="btn-s" (click)="fAnn.titre='';fAnn.contenu=''"><i class="ti ti-x"></i>Effacer</button>
-      <button class="btn-p" [disabled]="saving()" (click)="publierAnnonce()"><i class="ti ti-send"></i>Publier l'annonce</button>
+      <button class="btn-s" (click)="resetAnn()"><i class="ti ti-x"></i>Effacer</button>
+      <button class="btn-p" [disabled]="saving()" (click)="publierAnnonce()">
+        @if (editingId()) { <i class="ti ti-check"></i>Enregistrer les modifications }
+        @else { <i class="ti ti-send"></i>Publier l'annonce }
+      </button>
     </div>
   </div>
 }
 
 <!-- ── Événement ──────────────────────────────────────────────────────── -->
 @if (active()==='evenement') {
-  <div class="ph"><div class="pt"><i class="ti ti-calendar-event"></i>Créer un événement</div></div>
-  @if (toast.get('evt')?.visible) { <div class="success-toast show" style="margin:.5rem 1rem"><i class="ti ti-check"></i>{{toast.get('evt')?.message}}</div> }
+  <div class="ph"><div class="pt"><i class="ti ti-calendar-event"></i>{{editingId() ? "Modifier l'événement" : 'Créer un événement'}}</div></div>
+  @if (toast.get('evt')?.visible) { <div class="show" [ngClass]="toast.get('evt')?.type==='error' ? 'error-toast' : 'success-toast'" style="margin:.5rem 1rem"><i class="ti" [ngClass]="toast.get('evt')?.type==='error' ? 'ti-alert-circle' : 'ti-check'"></i>{{toast.get('evt')?.message}}</div> }
   <div class="pb">
     <div class="form-grid">
       <div class="fg"><div class="fl">Nom de l'événement <span style="color:#e63946">*</span></div>
@@ -166,8 +175,11 @@ const TYPE_COLORS: Record<string, string> = { communique: '#003366', annonce: '#
       </div>
     </div>
     <div class="fa">
-      <button class="btn-s" (click)="fEvt.titre='';fEvt.lieu='';fEvt.description=''"><i class="ti ti-x"></i>Effacer</button>
-      <button class="btn-p" [disabled]="saving()" (click)="publierEvenement()"><i class="ti ti-calendar-check"></i>Publier l'événement</button>
+      <button class="btn-s" (click)="resetEvt()"><i class="ti ti-x"></i>Effacer</button>
+      <button class="btn-p" [disabled]="saving()" (click)="publierEvenement()">
+        @if (editingId()) { <i class="ti ti-check"></i>Enregistrer les modifications }
+        @else { <i class="ti ti-calendar-check"></i>Publier l'événement }
+      </button>
     </div>
   </div>
 }
@@ -179,6 +191,7 @@ export class ActualitesComponent implements OnInit {
   readonly toast = inject(ToastService);
   active = signal<Tab>('liste');
   saving = signal(false);
+  editingId = signal<string | null>(null);
   flt = { search: '', type: '', statut: '' };
   fCom = { titre:'', sousTitre:'', contenu:'', auteur:'Service Communication', date:'', statut:'brouillon' };
   fAnn = { titre:'', categorie:'Fiscal / Taxes', contenu:'', dateDebut:'', dateFin:'', priorite:'normale' };
@@ -198,6 +211,28 @@ export class ActualitesComponent implements OnInit {
 
   publierDirectement(id: string): void { this.com.publierDirectement(id); }
 
+  supprimerActualite(id: string): void {
+    if (!confirm('Supprimer définitivement cette publication ?')) return;
+    this.com.supprimerActualite(id).subscribe({
+      next: () => this.toast.show('liste', 'Publication supprimée.'),
+      error: (err) => this.toast.showError('liste', err?.error?.message || 'Suppression impossible.')
+    });
+  }
+
+  editerActualite(a: Actualite): void {
+    this.editingId.set(a.id);
+    if (a.type === 'communique') {
+      this.fCom = { titre: a.titre, sousTitre: '', contenu: a.contenu, auteur: a.auteur, date: a.date, statut: a.statut };
+      this.active.set('communique');
+    } else if (a.type === 'annonce') {
+      this.fAnn = { titre: a.titre, categorie: a.categorie || 'Fiscal / Taxes', contenu: a.contenu, dateDebut: '', dateFin: '', priorite: 'normale' };
+      this.active.set('annonce');
+    } else {
+      this.fEvt = { titre: a.titre, lieu: '', date: a.date, hDebut: '', hFin: '', description: a.contenu, organisateur: a.auteur, publicCible: 'Tous les citoyens' };
+      this.active.set('evenement');
+    }
+  }
+
   exportActualites(): void {
     const blob = new Blob([JSON.stringify(this.com.actualites(), null, 2)], { type: 'application/json' });
     const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
@@ -205,32 +240,43 @@ export class ActualitesComponent implements OnInit {
   }
 
   publierCommunique(): void {
-    if (!this.fCom.titre || !this.fCom.contenu) { this.toast.show('com', 'Titre et contenu obligatoires'); return; }
+    if (!this.fCom.titre || !this.fCom.contenu) { this.toast.showError('com', 'Titre et contenu obligatoires'); return; }
     this.saving.set(true);
-    this.com.publierActualite({ type: 'communique', titre: this.fCom.titre, contenu: this.fCom.contenu, auteur: this.fCom.auteur, statut: this.fCom.statut, date: this.fCom.date || new Date().toISOString().slice(0,10) }).subscribe({
-      next: a => { this.toast.show('com', (a.statut==='publie'?'Publié : ':'Brouillon : ')+a.titre); this.saving.set(false); this.resetCom(); },
-      error: () => this.saving.set(false)
+    const data = { type: 'communique', titre: this.fCom.titre, contenu: this.fCom.contenu, auteur: this.fCom.auteur, statut: this.fCom.statut, date: this.fCom.date || new Date().toISOString().slice(0,10) };
+    const id = this.editingId();
+    const req = id ? this.com.modifierActualite(id, data) : this.com.publierActualite(data);
+    req.subscribe({
+      next: a => { this.toast.show('com', id ? 'Communiqué mis à jour : '+a.titre : (a.statut==='publie'?'Publié : ':'Brouillon : ')+a.titre); this.saving.set(false); this.resetCom(); if (id) this.active.set('liste'); },
+      error: (err) => { this.saving.set(false); this.toast.showError('com', err?.error?.message || 'Une erreur est survenue.'); }
     });
   }
 
   publierAnnonce(): void {
-    if (!this.fAnn.titre || !this.fAnn.contenu) { this.toast.show('ann', 'Titre et contenu obligatoires'); return; }
+    if (!this.fAnn.titre || !this.fAnn.contenu) { this.toast.showError('ann', 'Titre et contenu obligatoires'); return; }
     this.saving.set(true);
-    this.com.publierActualite({ type: 'annonce', titre: this.fAnn.titre, contenu: this.fAnn.contenu, auteur: 'Service Communication', statut: 'publie', categorie: this.fAnn.categorie }).subscribe({
-      next: a => { this.toast.show('ann', 'Annonce publiée : '+a.titre); this.saving.set(false); this.fAnn.titre=''; this.fAnn.contenu=''; },
-      error: () => this.saving.set(false)
+    const data = { type: 'annonce', titre: this.fAnn.titre, contenu: this.fAnn.contenu, auteur: 'Service Communication', statut: 'publie', categorie: this.fAnn.categorie };
+    const id = this.editingId();
+    const req = id ? this.com.modifierActualite(id, data) : this.com.publierActualite(data);
+    req.subscribe({
+      next: a => { this.toast.show('ann', id ? 'Annonce mise à jour : '+a.titre : 'Annonce publiée : '+a.titre); this.saving.set(false); this.resetAnn(); if (id) this.active.set('liste'); },
+      error: (err) => { this.saving.set(false); this.toast.showError('ann', err?.error?.message || 'Une erreur est survenue.'); }
     });
   }
 
   publierEvenement(): void {
-    if (!this.fEvt.titre || !this.fEvt.date) { this.toast.show('evt', 'Titre et date obligatoires'); return; }
+    if (!this.fEvt.titre || !this.fEvt.date) { this.toast.showError('evt', 'Titre et date obligatoires'); return; }
     this.saving.set(true);
     const contenu = `${this.fEvt.description || ''} | Lieu: ${this.fEvt.lieu || '—'} | ${this.fEvt.hDebut||''}${this.fEvt.hFin?' – '+this.fEvt.hFin:''} | Public: ${this.fEvt.publicCible}`;
-    this.com.publierActualite({ type: 'evenement', titre: this.fEvt.titre, contenu, auteur: this.fEvt.organisateur, statut: 'publie', date: this.fEvt.date }).subscribe({
-      next: a => { this.toast.show('evt', 'Événement publié : '+a.titre); this.saving.set(false); this.fEvt = { titre:'', lieu:'', date:'', hDebut:'', hFin:'', description:'', organisateur:'Mairie', publicCible:'Tous les citoyens' }; },
-      error: () => this.saving.set(false)
+    const data = { type: 'evenement', titre: this.fEvt.titre, contenu, auteur: this.fEvt.organisateur, statut: 'publie', date: this.fEvt.date };
+    const id = this.editingId();
+    const req = id ? this.com.modifierActualite(id, data) : this.com.publierActualite(data);
+    req.subscribe({
+      next: a => { this.toast.show('evt', id ? 'Événement mis à jour : '+a.titre : 'Événement publié : '+a.titre); this.saving.set(false); this.resetEvt(); if (id) this.active.set('liste'); },
+      error: (err) => { this.saving.set(false); this.toast.showError('evt', err?.error?.message || 'Une erreur est survenue.'); }
     });
   }
 
-  resetCom(): void { this.fCom = { titre:'', sousTitre:'', contenu:'', auteur:'Service Communication', date:'', statut:'brouillon' }; }
+  resetCom(): void { this.fCom = { titre:'', sousTitre:'', contenu:'', auteur:'Service Communication', date:'', statut:'brouillon' }; this.editingId.set(null); }
+  resetAnn(): void { this.fAnn = { titre:'', categorie:'Fiscal / Taxes', contenu:'', dateDebut:'', dateFin:'', priorite:'normale' }; this.editingId.set(null); }
+  resetEvt(): void { this.fEvt = { titre:'', lieu:'', date:'', hDebut:'', hFin:'', description:'', organisateur:'Mairie', publicCible:'Tous les citoyens' }; this.editingId.set(null); }
 }

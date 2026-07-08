@@ -19,7 +19,7 @@ class RelationsController extends Controller
 
     public function createPartenaire(Request $request)
     {
-        $v = $request->validate(['nom'=>'required|string|max:200','type'=>'required|string|max:100','domaine'=>'required|string|max:150','contact'=>'required|string|max:200','date_debut'=>'required|date']);
+        $v = $request->validate(['nom'=>'required|string|max:200','nom_contact'=>'nullable|string|max:150','type'=>'required|string|max:100','domaine'=>'required|string|max:150','contact'=>'required|string|max:200','date_debut'=>'required|date']);
         $p = Partenaire::create(array_merge($v, ['statut'=>'actif']));
         return response()->json(['success'=>true,'message'=>"Partenaire enregistré — {$p->nom}",'data'=>$this->fmtPart($p)], 201);
     }
@@ -42,6 +42,6 @@ class RelationsController extends Controller
 
     private function fmtPart(Partenaire $p): array
     {
-        return ['id'=>$p->id,'nom'=>$p->nom,'type'=>$p->type,'domaine'=>$p->domaine,'contact'=>$p->contact,'date_debut'=>$p->date_debut?->format('Y-m-d'),'statut'=>$p->statut,'created_at'=>$p->created_at?->toISOString()];
+        return ['id'=>$p->id,'nom'=>$p->nom,'nom_contact'=>$p->nom_contact,'type'=>$p->type,'domaine'=>$p->domaine,'contact'=>$p->contact,'date_debut'=>$p->date_debut?->format('Y-m-d'),'statut'=>$p->statut,'created_at'=>$p->created_at?->toISOString()];
     }
 }

@@ -1,0 +1,5 @@
+Set-Location 'c:\Users\daats\OneDrive\Desktop\succes-gmdi\backend'
+require 'vendor/autoload.php'
+require 'bootstrap/compat.php'
+$app = require 'bootstrap/app.php'
+echo 'boot ok'

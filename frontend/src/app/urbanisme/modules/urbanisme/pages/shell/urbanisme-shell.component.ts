@@ -1,4 +1,4 @@
-import { Component, signal, OnInit, inject, HostListener } from '@angular/core';
+import { Component, signal, computed, OnInit, inject, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FoncierComponent }          from '../../components/foncier/foncier.component';
 import { PermisComponent }           from '../../components/permis/permis.component';
@@ -8,6 +8,7 @@ import { GeolocalisationComponent }  from '../../components/geolocalisation/geol
 import { UrbanismeService }          from '../../../../core/services/urbanisme.service';
 import { LoadingService }            from '../../../../core/services/loading.service';
 import { AuthService }               from '../../../../core/services/auth.service';
+import { ToastService }              from '../../../../core/services/toast.service';
 
 export type Section = 'foncier' | 'permis' | 'cartographie' | 'projets' | 'geolocalisation';
 
@@ -130,13 +131,6 @@ export type Section = 'foncier' | 'permis' | 'cartographie' | 'projets' | 'geolo
     <!-- ── Main ─────────────────────────────────────────────────────────── -->
     <main class="main">
 
-      <!-- Fil d'Ariane -->
-      <div class="breadcrumb">
-        <span class="bc-home">Tableau de bord</span>
-        <span class="bc-sep">›</span>
-        <span class="bc-active">{{ sectionLabel() }}</span>
-      </div>
-
       <!-- ── KPIs ──────────────────────────────────────────────────────── -->
       <div class="kpi-row">
         <div class="kpi" style="--accent:#009A44">
@@ -181,6 +175,19 @@ export type Section = 'foncier' | 'permis' | 'cartographie' | 'projets' | 'geolo
       </div>
 
     </main>
+  </div>
+
+  <!-- Erreurs globales (interceptor + validations) -->
+  <div class="error-toast-stack">
+    @for (t of visibleErrorToasts(); track t.id) {
+      <div class="error-toast">
+        <i class="ti ti-alert-circle"></i>
+        <div>
+          @if (t.title) { <div class="et-title">{{ t.title }}</div> }
+          <div class="et-msg">{{ t.message }}</div>
+        </div>
+      </div>
+    }
   </div>
 </div>
 
@@ -423,17 +430,6 @@ export type Section = 'foncier' | 'permis' | 'cartographie' | 'projets' | 'geolo
   min-width: 0;
 }
 
-/* ── Breadcrumb ──────────────────────────────────────────────────────────── */
-.breadcrumb {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-}
-.bc-home { color: #6b7280; }
-.bc-sep  { color: #d1d5db; }
-.bc-active { color: #1a5c28; font-weight: 600; }
-
 /* ── KPIs ────────────────────────────────────────────────────────────────── */
 .kpi-row {
   display: grid;
@@ -473,6 +469,36 @@ export type Section = 'foncier' | 'permis' | 'cartographie' | 'projets' | 'geolo
 /* ── Animation ───────────────────────────────────────────────────────────── */
 @keyframes spin { to { transform: rotate(360deg); } }
 
+/* ── Erreurs globales ────────────────────────────────────────────────────── */
+.error-toast-stack {
+  position: fixed;
+  bottom: 1.25rem;
+  right: 1.25rem;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+.error-toast {
+  background: #fce8e8;
+  color: #a32d2d;
+  border: 1px solid #f3b8b8;
+  border-left: 4px solid #e63946;
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: 12px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  box-shadow: 0 2px 12px rgba(0,0,0,.12);
+  min-width: 260px;
+  max-width: 380px;
+  pointer-events: all;
+}
+.error-toast .et-title { font-weight: 700; margin-bottom: 2px; }
+.error-toast .et-msg { opacity: .9; }
+
 /* ── Responsive ──────────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
   .hamburger { display: flex; }
@@ -505,9 +531,12 @@ export class UrbanismeShellComponent implements OnInit {
   readonly urb     = inject(UrbanismeService);
   readonly loading = inject(LoadingService);
   readonly auth    = inject(AuthService);
+  readonly toast   = inject(ToastService);
 
   active      = signal<Section>('foncier');
   sidebarOpen = signal(false);
+
+  visibleErrorToasts = computed(() => Object.values(this.toast.toasts()).filter(t => t.visible && t.type === 'error'));
 
   navFoncier = [
     { id: 'foncier' as Section, label: 'Gestion foncière', emoji: '🏠' },
@@ -526,12 +555,7 @@ export class UrbanismeShellComponent implements OnInit {
     return name.split(' ').slice(0,2).map(n => n[0]).join('').toUpperCase() || 'U';
   }
 
-  sectionLabel(): string {
-    const all = [...this.navFoncier, ...this.navRegl, ...this.navSig];
-    return all.find(n => n.id === this.active())?.label ?? '';
-  }
-
-  ngOnInit(): void { this.urb.loadStats(); this.urb.loadParcelles(); this.urb.loadPermis(); }
+  ngOnInit(): void { this.urb.loadStats(); }
 
   toggleSidebar(): void { this.sidebarOpen.update(v => !v); }
 

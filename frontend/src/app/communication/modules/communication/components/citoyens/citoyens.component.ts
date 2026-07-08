@@ -29,7 +29,7 @@ type Tab = 'reclamations' | 'suggestions' | 'consultations';
     <div class="pt"><i class="ti ti-message-circle"></i>Réclamations citoyennes</div>
     <button class="btn-s" (click)="com.exportReclamations()"><i class="ti ti-download"></i>Exporter</button>
   </div>
-  @if (toast.get('rec')?.visible) { <div class="success-toast show" style="margin:.5rem 1rem"><i class="ti ti-check"></i>{{toast.get('rec')?.message}}</div> }
+  @if (toast.get('rec')?.visible) { <div class="show" [ngClass]="toast.get('rec')?.type==='error' ? 'error-toast' : 'success-toast'" style="margin:.5rem 1rem"><i class="ti" [ngClass]="toast.get('rec')?.type==='error' ? 'ti-alert-circle' : 'ti-check'"></i>{{toast.get('rec')?.message}}</div> }
   <div class="pb" style="border-bottom:.5px solid var(--color-border-tertiary)">
     <div class="fsec">Enregistrer une réclamation</div>
     <div class="form-grid">
@@ -68,13 +68,10 @@ type Tab = 'reclamations' | 'suggestions' | 'consultations';
         </div>
         <div style="display:flex;gap:5px;margin-top:6px">
           @if (r.statut==='en_traitement') {
-            <button class="btn-s" style="padding:3px 8px;font-size:11px;color:#009A44;border-color:#9fd9b8" (click)="valider(r.id)">
+            <button class="btn-s sm success" (click)="valider(r.id)">
               <i class="ti ti-check"></i>Marquer résolu
             </button>
           }
-          <button class="btn-s" style="padding:3px 8px;font-size:11px;color:#185FA5;border-color:#b5d4f4">
-            <i class="ti ti-message"></i>Répondre
-          </button>
         </div>
       </div>
     }
@@ -88,7 +85,7 @@ type Tab = 'reclamations' | 'suggestions' | 'consultations';
     <div class="pt"><i class="ti ti-bulb"></i>Boîte à idées citoyenne</div>
     <button class="btn-s" (click)="exportSug()"><i class="ti ti-download"></i>Exporter</button>
   </div>
-  @if (toast.get('sug')?.visible) { <div class="success-toast show" style="margin:.5rem 1rem"><i class="ti ti-check"></i>{{toast.get('sug')?.message}}</div> }
+  @if (toast.get('sug')?.visible) { <div class="show" [ngClass]="toast.get('sug')?.type==='error' ? 'error-toast' : 'success-toast'" style="margin:.5rem 1rem"><i class="ti" [ngClass]="toast.get('sug')?.type==='error' ? 'ti-alert-circle' : 'ti-check'"></i>{{toast.get('sug')?.message}}</div> }
   <div class="pb" style="border-bottom:.5px solid var(--color-border-tertiary)">
     <div class="fsec">Nouvelle suggestion</div>
     <div class="form-grid">
@@ -113,7 +110,7 @@ type Tab = 'reclamations' | 'suggestions' | 'consultations';
           <span class="chip" [ngClass]="chipSug(s.statut)">{{s.statut}}</span>
         </div>
         <div style="margin-top:6px">
-          <button class="btn-s" style="padding:3px 8px;font-size:11px;color:#185FA5;border-color:#b5d4f4" (click)="transmettre(s.id)">
+          <button class="btn-s sm edit" (click)="transmettre(s.id)">
             <i class="ti ti-send"></i>Transmettre au service
           </button>
         </div>
@@ -126,7 +123,7 @@ type Tab = 'reclamations' | 'suggestions' | 'consultations';
 <!-- ── Consultations publiques ────────────────────────────────────────── -->
 @if (active()==='consultations') {
   <div class="ph"><div class="pt"><i class="ti ti-users-group"></i>Consultations publiques</div></div>
-  @if (toast.get('cons')?.visible) { <div class="success-toast show" style="margin:.5rem 1rem"><i class="ti ti-check"></i>{{toast.get('cons')?.message}}</div> }
+  @if (toast.get('cons')?.visible) { <div class="show" [ngClass]="toast.get('cons')?.type==='error' ? 'error-toast' : 'success-toast'" style="margin:.5rem 1rem"><i class="ti" [ngClass]="toast.get('cons')?.type==='error' ? 'ti-alert-circle' : 'ti-check'"></i>{{toast.get('cons')?.message}}</div> }
   <div class="pb" style="border-bottom:.5px solid var(--color-border-tertiary)">
     <div class="fsec">Ouvrir une consultation publique</div>
     <div class="form-grid">
@@ -196,22 +193,22 @@ export class CitoyensComponent implements OnInit {
   ngOnInit(): void { this.com.loadReclamations(); this.com.loadSuggestions(); this.com.loadConsultations(); }
 
   ajouterReclamation(): void {
-    if (!this.fRec.objet || !this.fRec.demandeur) { this.toast.show('rec', 'Objet et demandeur obligatoires'); return; }
+    if (!this.fRec.objet || !this.fRec.demandeur) { this.toast.showError('rec', 'Objet et demandeur obligatoires'); return; }
     this.saving.set(true);
     this.com.ajouterReclamation(this.fRec).subscribe({
       next: r => { this.toast.show('rec', 'Réclamation enregistrée — '+r.reference); this.saving.set(false); this.fRec = { objet:'', demandeur:'', service:'Services Techniques', canal:'guichet' }; },
-      error: () => this.saving.set(false)
+      error: (err) => { this.saving.set(false); this.toast.showError('rec', err?.error?.message || 'Une erreur est survenue.'); }
     });
   }
 
   valider(id: string): void { this.com.validerReclamation(id); this.toast.show('rec', 'Réclamation marquée comme répondue'); }
 
   ajouterSuggestion(): void {
-    if (!this.fSug.objet) { this.toast.show('sug', 'Objet obligatoire'); return; }
+    if (!this.fSug.objet) { this.toast.showError('sug', 'Objet obligatoire'); return; }
     this.saving.set(true);
     this.com.ajouterSuggestion({ objet: this.fSug.objet, citoyen: this.fSug.citoyen || 'Anonyme', description: this.fSug.description }).subscribe({
       next: s => { this.toast.show('sug', 'Suggestion enregistrée — '+s.reference); this.saving.set(false); this.fSug = { objet:'', citoyen:'', description:'' }; },
-      error: () => this.saving.set(false)
+      error: (err) => { this.saving.set(false); this.toast.showError('sug', err?.error?.message || 'Une erreur est survenue.'); }
     });
   }
 
@@ -224,11 +221,11 @@ export class CitoyensComponent implements OnInit {
   }
 
   ouvrirConsultation(): void {
-    if (!this.fCons.titre || !this.fCons.dateOuv || !this.fCons.dateClt) { this.toast.show('cons', "Titre et dates obligatoires"); return; }
+    if (!this.fCons.titre || !this.fCons.dateOuv || !this.fCons.dateClt) { this.toast.showError('cons', "Titre et dates obligatoires"); return; }
     this.saving.set(true);
     this.com.ouvrirConsultation({ titre: this.fCons.titre, theme: this.fCons.theme, date_ouverture: this.fCons.dateOuv, date_cloture: this.fCons.dateClt, canaux: this.fCons.canaux }).subscribe({
       next: c => { this.toast.show('cons', 'Consultation ouverte — '+c.titre); this.saving.set(false); this.fCons = { titre:'', theme:'Urbanisme / Aménagement', dateOuv:'', dateClt:'', canaux:'En ligne + Physique' }; },
-      error: () => this.saving.set(false)
+      error: (err) => { this.saving.set(false); this.toast.showError('cons', err?.error?.message || 'Une erreur est survenue.'); }
     });
   }
 

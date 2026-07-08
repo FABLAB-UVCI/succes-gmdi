@@ -136,7 +136,7 @@ class VoirieController extends Controller
     public function indexReparations(Request $request)
     {
         $query = ReparationVoirie::query()
-            ->orderByRaw("FIELD(priorite,'urgente','haute','normale')")
+            ->orderByRaw("CASE priorite WHEN 'urgente' THEN 1 WHEN 'haute' THEN 2 WHEN 'normale' THEN 3 ELSE 4 END")
             ->orderByDesc('date_signalement');
         if ($s = $request->get('statut'))   $query->where('statut', $s);
         if ($p = $request->get('priorite')) $query->where('priorite', $p);

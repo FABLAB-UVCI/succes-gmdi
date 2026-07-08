@@ -13,8 +13,8 @@ export interface AuthUser {
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly TOKEN_KEY = 'rh_token';
-  private readonly USER_KEY  = 'rh_user';
+  private readonly TOKEN_KEY = 'gmdi_token';
+  private readonly USER_KEY  = 'gmdi_user';
 
   private _token  = signal<string | null>(localStorage.getItem(this.TOKEN_KEY));
   private _user   = signal<AuthUser | null>(this._loadUser());
@@ -26,7 +26,7 @@ export class AuthService {
 
   login(email: string, password: string) {
     return this.http.post<{ token: string; user: AuthUser }>(
-      `${environment.apiUrl}/login`,
+      `${environment.apiUrl}/auth/login`,
       { email, password }
     ).pipe(
       tap(res => {
@@ -39,7 +39,7 @@ export class AuthService {
   }
 
   logout() {
-    this.http.post(`${environment.apiUrl}/logout`, {}).subscribe({
+    this.http.post(`${environment.apiUrl}/auth/logout`, {}).subscribe({
       complete: () => this._clear(),
       error: () => this._clear(),
     });

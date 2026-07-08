@@ -146,6 +146,26 @@ export class ServicesTechniquesService {
     ).subscribe();
   }
 
+  ajouterLampadaire(f: { localisation: string; quartier: string; typeLampe: string; puissance?: number; datePosee?: string }): Observable<Lampadaire> {
+    return this.lampApi.create({
+      localisation: f.localisation, quartier: f.quartier, type_lampe: f.typeLampe,
+      puissance: f.puissance, date_posee: f.datePosee,
+    }).pipe(
+      map(r => ({ id: String(r.data.id), reference: r.data.reference, localisation: r.data.localisation, quartier: r.data.quartier, typeLampe: r.data.type_lampe, puissance: r.data.puissance, statut: r.data.statut as any })),
+      tap(l => this.lampadaires.update(list => [l, ...list]))
+    );
+  }
+
+  planifierMaintenanceEclairage(f: { zone: string; nbLampadaires: number; typeIntervention: string; datePrevue: string; technicien: string }): Observable<MaintenanceEclairage> {
+    return this.maintEclApi.create({
+      zone: f.zone, nb_lampadaires: f.nbLampadaires, type_intervention: f.typeIntervention,
+      date_prevue: f.datePrevue, technicien: f.technicien,
+    }).pipe(
+      map(r => ({ id: String(r.data.id), zone: r.data.zone, nbLampadaires: r.data.nb_lampadaires, typeIntervention: r.data.type_intervention, datePrevue: r.data.date_prevue, technicien: r.data.technicien, statut: r.data.statut as any })),
+      tap(m => this.maintEcl.update(list => [m, ...list]))
+    );
+  }
+
   signalerPanne(f: { localisation: string; description: string }): Observable<PanneEclairage> {
     return this.panneApi.create(f).pipe(
       map(r => ({ id: String(r.data.id), reference: r.data.reference, localisation: r.data.localisation, description: r.data.description, dateSignalement: r.data.date_signalement, statut: r.data.statut as any })),
@@ -190,6 +210,30 @@ export class ServicesTechniquesService {
     ).subscribe();
   }
 
+  ajouterCaniveau(f: { localisation: string; quartier: string; longueur: number; etat?: string }): Observable<Caniveau> {
+    return this.caniveauApi.create(f).pipe(
+      map(r => ({ id: String(r.data.id), localisation: r.data.localisation, quartier: r.data.quartier, longueur: r.data.longueur, etat: r.data.etat as any })),
+      tap(c => this.caniveaux.update(l => [c, ...l]))
+    );
+  }
+
+  ajouterDrainage(f: { localisation: string; type: string; dateIntervention: string; equipe: string; observations?: string }): Observable<InterventionDrainage> {
+    return this.drainageApi.create({
+      localisation: f.localisation, type: f.type, date_intervention: f.dateIntervention,
+      equipe: f.equipe, observations: f.observations,
+    }).pipe(
+      map(r => ({ id: String(r.data.id), localisation: r.data.localisation, type: r.data.type as any, dateIntervention: r.data.date_intervention, equipe: r.data.equipe, statut: r.data.statut as any })),
+      tap(d => this.drainage.update(l => [d, ...l]))
+    );
+  }
+
+  ajouterCollecte(f: { zone: string; frequence: string; prochaineCollecte: string }): Observable<CollecteDechet> {
+    return this.dechetApi.create({ zone: f.zone, frequence: f.frequence, prochaine_collecte: f.prochaineCollecte }).pipe(
+      map(r => ({ id: String(r.data.id), zone: r.data.zone, frequence: r.data.frequence, prochaineCollecte: r.data.prochaine_collecte, statut: r.data.statut as any })),
+      tap(c => this.collectes.update(l => [c, ...l]))
+    );
+  }
+
   loadCollectes(): void {
     this.dechetApi.getAll().pipe(
       tap(r => this.collectes.set(r.data.map(x => ({
@@ -229,6 +273,34 @@ export class ServicesTechniquesService {
         coutEstime: x.cout_estime, prestataire: x.prestataire ?? undefined, statut: x.statut as any
       }))))
     ).subscribe();
+  }
+
+  ajouterBatiment(f: { nom: string; type: string; adresse: string; superficie: number; anneeConstruction?: number; etat?: string; responsable?: string }): Observable<BatimentCommunal> {
+    return this.batApi.create({
+      nom: f.nom, type: f.type, adresse: f.adresse, superficie: f.superficie,
+      annee_construction: f.anneeConstruction, etat: f.etat, responsable: f.responsable,
+    }).pipe(
+      map(r => ({
+        id: String(r.data.id), nom: r.data.nom, type: r.data.type as any, adresse: r.data.adresse,
+        superficie: r.data.superficie, anneeConstrucion: r.data.annee_construction ?? undefined,
+        etat: r.data.etat as any, responsable: r.data.responsable ?? undefined,
+      })),
+      tap(b => this.batiments.update(l => [b, ...l]))
+    );
+  }
+
+  ajouterTravaux(f: { batiment: string; description: string; type: string; dateDebut: string; coutEstime?: number; prestataire?: string }): Observable<TravauxBatiment> {
+    return this.travBatApi.create({
+      batiment: f.batiment, description: f.description, type: f.type,
+      date_debut: f.dateDebut, cout_estime: f.coutEstime, prestataire: f.prestataire,
+    }).pipe(
+      map(r => ({
+        id: String(r.data.id), batiment: r.data.batiment, description: r.data.description,
+        type: r.data.type as any, dateDebut: r.data.date_debut, dateFin: r.data.date_fin ?? undefined,
+        coutEstime: r.data.cout_estime, prestataire: r.data.prestataire ?? undefined, statut: r.data.statut as any
+      })),
+      tap(t => this.travaux.update(l => [t, ...l]))
+    );
   }
 
   // ═══════════════════════════════════════════════════════════════════════════

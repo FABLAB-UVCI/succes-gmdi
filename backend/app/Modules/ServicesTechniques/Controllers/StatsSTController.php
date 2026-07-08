@@ -37,10 +37,10 @@ class StatsSTController extends Controller
         $resolues       = DemandeIntervention::whereIn('statut', ['terminee','cloturee'])->count();
         $tauxResolution = $totalDemandes > 0 ? round($resolues / $totalDemandes * 100) : 0;
 
-        // Délai moyen (jours entre dépôt et clôture)
+        // Délai moyen (jours entre dépôt et clôture) — calculé en PHP pour rester portable (SQLite/MySQL)
         $delaiMoyen = DemandeIntervention::whereNotNull('date_resolution')
-            ->selectRaw('AVG(DATEDIFF(date_resolution, date_depot)) as moy')
-            ->value('moy');
+            ->get(['date_depot', 'date_resolution'])
+            ->avg(fn ($d) => $d->date_depot->diffInDays($d->date_resolution));
 
         // ── Répartition par service ───────────────────────────────────────────
         $parService = DemandeIntervention::selectRaw('type_service as service, COUNT(*) as nb')

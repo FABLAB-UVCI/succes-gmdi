@@ -22,7 +22,7 @@ class InterventionController extends Controller
     public function indexDemandes(Request $request)
     {
         $query = DemandeIntervention::query()
-            ->orderByRaw("FIELD(priorite,'urgente','haute','normale')")
+            ->orderByRaw("CASE priorite WHEN 'urgente' THEN 1 WHEN 'haute' THEN 2 WHEN 'normale' THEN 3 ELSE 4 END")
             ->orderByDesc('date_depot');
 
         if ($s = $request->get('statut'))       $query->where('statut', $s);

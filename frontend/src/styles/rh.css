@@ -479,6 +479,7 @@ body { font-family: var(--font); background: var(--bg-page); color: var(--txt); 
 ══════════════════════════════════════════════════════════════════════════ */
 .alert-ok      { background: #e6f7ee; color: #0a6640; border-bottom: 1px solid #b3e5c9; padding: 8px 1.25rem; font-size: 12px; display: none; align-items: center; gap: 6px; }
 .alert-ok.show { display: flex; }
+.alert-ok.alert-error { background: #fdecea; color: #b3261e; border-bottom: 1px solid #f5b8b8; font-weight: 600; }
 
 /* ══════════════════════════════════════════════════════════════════════════
    UTILS
@@ -487,3 +488,24 @@ body { font-family: var(--font); background: var(--bg-page); color: var(--txt); 
 .bold  { font-weight: 600; }
 .right { text-align: right; }
 .empty { text-align: center; color: var(--txt-sec); padding: 2.5rem; font-style: italic; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  .fr3, .fr4  { grid-template-columns: 1fr 1fr; }
+  .kpi4       { grid-template-columns: 1fr 1fr; }
+  .pres-grid  { grid-template-columns: repeat(7,1fr); }
+  .tbl        { display: block; overflow-x: auto; white-space: nowrap; }
+}
+
+@media (max-width: 600px) {
+  .fr, .fr3, .fr4 { grid-template-columns: 1fr; }
+  .kpi4           { grid-template-columns: 1fr 1fr; }
+  .ch             { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .ha             { flex-wrap: wrap; }
+  .tf             { flex-direction: column; align-items: stretch; }
+  .fin            { min-width: 0; width: 100%; }
+  .rc             { margin-left: 0; }
+  .nav            { flex-wrap: wrap; }
+}

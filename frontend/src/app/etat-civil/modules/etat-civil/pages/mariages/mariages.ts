@@ -2,11 +2,8 @@ import { Component, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../../../services/api.service';
-<<<<<<< HEAD
-import { qrVerification, codeVerification, formatDateFr, openPrintWindow } from '../../pdf-utils';
-=======
 import { PrintService } from '../../../../services/print.service';
->>>>>>> b5dbce35a5970a980cbad1edf363124bdb390f4a
+import { qrVerification, codeVerification, formatDateFr, openPrintWindow } from '../../pdf-utils';
 
 @Component({
   selector: 'app-mariages',
@@ -20,6 +17,7 @@ export class MariagesComponent implements OnInit {
   toastMsg = signal('');
   showToast = signal(false);
   mariages = signal<any[]>([]);
+  bansDB = signal<any[]>([]);
 
   bansForm: { epoux: string; epouse: string; pub: string; mar: string; cniEpoux: File | null; cniEpouse: File | null } =
     { epoux: '', epouse: '', pub: '', mar: '', cniEpoux: null, cniEpouse: null };
@@ -37,6 +35,7 @@ export class MariagesComponent implements OnInit {
 
   ngOnInit() {
     this.api.getMariages().subscribe({ next: d => this.mariages.set(d), error: () => {} });
+    this.api.getPublicationsBans().subscribe({ next: d => this.bansDB.set(d), error: () => {} });
   }
 
   switchTab(tab: string) { this.currentTab.set(tab); }
@@ -51,16 +50,41 @@ export class MariagesComponent implements OnInit {
   onBansCniEpouxSelected(e: Event) { this.bansForm.cniEpoux = (e.target as HTMLInputElement).files?.[0] ?? null; }
   onBansCniEpouseSelected(e: Event) { this.bansForm.cniEpouse = (e.target as HTMLInputElement).files?.[0] ?? null; }
 
+  submitAttemptedBans = signal(false);
+  submitAttemptedMariage = signal(false);
+
   publierBans() {
-    if (!this.bansForm.epoux || !this.bansForm.epouse) { this.notify('Noms requis'); return; }
-    this.notify(`Bans publiés pour ${this.bansForm.epoux} & ${this.bansForm.epouse}`);
-    this.bansForm = { epoux: '', epouse: '', pub: '', mar: '', cniEpoux: null, cniEpouse: null };
+    this.submitAttemptedBans.set(true);
+    if (!this.bansForm.epoux || !this.bansForm.epouse) { this.notify('Veuillez remplir les champs obligatoires (*)'); return; }
+    this.api.createPublicationBans({
+      epoux_nom: this.bansForm.epoux,
+      epouse_nom: this.bansForm.epouse,
+      date_publication: this.bansForm.pub || new Date().toISOString().slice(0, 10),
+      date_mariage_prevue: this.bansForm.mar || null,
+    }).subscribe({
+      next: res => {
+        this.bansDB.update(l => [res, ...l]);
+        this.notify(`Bans publiés pour ${res.epoux} & ${res.epouse} — N° ${res.numero}`);
+        this.bansForm = { epoux: '', epouse: '', pub: '', mar: '', cniEpoux: null, cniEpouse: null };
+        this.submitAttemptedBans.set(false);
+      },
+      error: (err) => this.notify(err?.error?.message || "Erreur lors de la publication des bans")
+    });
+  }
+
+  supprimerBans(b: any): void {
+    if (!confirm(`Supprimer la publication de bans N° ${b.numero} ?`)) return;
+    this.api.deletePublicationBans(b.id).subscribe({
+      next: () => { this.bansDB.update(l => l.filter(x => x.id !== b.id)); this.notify('Publication de bans supprimée'); },
+      error: (err) => this.notify(err?.error?.message || 'Erreur lors de la suppression')
+    });
   }
 
   enregistrerMariage() {
+    this.submitAttemptedMariage.set(true);
     const f = this.mariageForm;
     if (!f.epNom || !f.epPrenom || !f.esNom || !f.esPrenom || !f.date) {
-      this.notify('Nom et prénoms de l\'époux et de l\'épouse, et date requis (*)');
+      this.notify('Veuillez remplir les champs obligatoires (*)');
       return;
     }
     this.api.createMariage({
@@ -86,8 +110,9 @@ export class MariagesComponent implements OnInit {
           esNom: '', esPrenom: '', esNat: 'Ivoirienne', esProf: '', esTemoin: '', esTemoinProf: '',
           date: '', lieu: '', regime: 'Communauté de biens', cniEpoux: null, cniEpouse: null
         };
+        this.submitAttemptedMariage.set(false);
       },
-      error: () => this.notify("Erreur lors de l'enregistrement")
+      error: (err) => this.notify(err?.error?.message || "Erreur lors de l'enregistrement")
     });
   }
 
@@ -632,10 +657,5 @@ export async function genererActeMariagePDF(data: {
 </html>
 `;
 
-<<<<<<< HEAD
     openPrintWindow(html);
-=======
-    this.printService.printDocument(html, 'Extrait-Acte-Mariage');
-  }
->>>>>>> b5dbce35a5970a980cbad1edf363124bdb390f4a
 }

@@ -63,59 +63,65 @@ export class FinancesService {
     this.chargerDashboard();
   }
 
-  chargerRecettes() {
-    this.http.get<Recette[]>(`${this.api}/recettes`).subscribe({
+  chargerRecettes(params: { search?: string; typeTaxe?: string; statut?: string } = {}) {
+    let query = new URLSearchParams();
+    Object.entries(params).forEach(([k, v]) => { if (v) query.set(k, v); });
+    const qs = query.toString();
+    this.http.get<Recette[]>(`${this.api}/recettes${qs ? '?' + qs : ''}`).subscribe({
       next: d => this.recettes.set(d),
-      error: () => this.toast.show('Erreur chargement recettes')
+      error: (err) => this.toast.showError(err?.error?.message || 'Erreur chargement recettes')
     });
   }
 
-  chargerDepenses() {
-    this.http.get<Depense[]>(`${this.api}/depenses`).subscribe({
+  chargerDepenses(params: { search?: string; chapitre?: string; statut?: string } = {}) {
+    let query = new URLSearchParams();
+    Object.entries(params).forEach(([k, v]) => { if (v) query.set(k, v); });
+    const qs = query.toString();
+    this.http.get<Depense[]>(`${this.api}/depenses${qs ? '?' + qs : ''}`).subscribe({
       next: d => this.depenses.set(d),
-      error: () => this.toast.show('Erreur chargement dépenses')
+      error: (err) => this.toast.showError(err?.error?.message || 'Erreur chargement dépenses')
     });
   }
 
   chargerLignesBudget() {
     this.http.get<LigneBudget[]>(`${this.api}/budget/lignes`).subscribe({
       next: d => this.lignesBudget.set(d),
-      error: () => this.toast.show('Erreur chargement budget')
+      error: () => this.toast.showError('Erreur chargement budget')
     });
   }
 
   chargerEcritures() {
     this.http.get<EcritureComptable[]>(`${this.api}/comptabilite/ecritures`).subscribe({
       next: d => this.ecritures.set(d),
-      error: () => this.toast.show('Erreur chargement journal')
+      error: () => this.toast.showError('Erreur chargement journal')
     });
   }
 
   chargerComptes() {
     this.http.get<CompteGL[]>(`${this.api}/comptabilite/comptes`).subscribe({
       next: d => this.comptes.set(d),
-      error: () => this.toast.show('Erreur chargement comptes')
+      error: () => this.toast.showError('Erreur chargement comptes')
     });
   }
 
   chargerRecettesParService() {
     this.http.get<RecetteParService[]>(`${this.api}/rapports/recettes-par-service`).subscribe({
       next: d => this.recettesParService.set(d),
-      error: () => this.toast.show('Erreur chargement rapports')
+      error: () => this.toast.showError('Erreur chargement rapports')
     });
   }
 
   chargerMouvementsCaisse() {
     this.http.get<MouvementCaisse[]>(`${this.api}/tresorerie/mouvements-caisse`).subscribe({
       next: d => this.mouvementsCaisse.set(d),
-      error: () => this.toast.show('Erreur chargement caisse')
+      error: () => this.toast.showError('Erreur chargement caisse')
     });
   }
 
   chargerMouvementsBanque() {
     this.http.get<MouvementBanque[]>(`${this.api}/tresorerie/mouvements-banque`).subscribe({
       next: d => this.mouvementsBanque.set(d),
-      error: () => this.toast.show('Erreur chargement banque')
+      error: () => this.toast.showError('Erreur chargement banque')
     });
   }
 
@@ -140,7 +146,27 @@ export class FinancesService {
         this.recettes.update(list => [...list, rec]);
         this.toast.show(`Recette ${rec.reference} créée`);
       },
-      error: () => this.toast.show('Erreur création recette')
+      error: (err) => this.toast.showError(err?.error?.message || 'Erreur création recette')
+    });
+  }
+
+  modifierRecette(id: string, r: Omit<Recette, 'id' | 'reference'>): void {
+    this.http.put<Recette>(`${this.api}/recettes/${id}`, r).subscribe({
+      next: rec => {
+        this.recettes.update(list => list.map(x => x.id === rec.id ? rec : x));
+        this.toast.show(`Recette ${rec.reference} modifiée`);
+      },
+      error: (err) => this.toast.showError(err?.error?.message || 'Erreur modification recette')
+    });
+  }
+
+  supprimerRecette(id: string): void {
+    this.http.delete(`${this.api}/recettes/${id}`).subscribe({
+      next: () => {
+        this.recettes.update(list => list.filter(r => r.id !== id));
+        this.toast.show('Recette supprimée');
+      },
+      error: (err) => this.toast.showError(err?.error?.message || 'Erreur suppression recette')
     });
   }
 
@@ -150,7 +176,7 @@ export class FinancesService {
         this.recettes.update(list => list.map(r => r.id === rec.id ? rec : r));
         this.toast.show(`Recette ${rec.reference} encaissée`);
       },
-      error: () => this.toast.show('Erreur encaissement')
+      error: (err) => this.toast.showError(err?.error?.message || 'Erreur encaissement')
     });
   }
 
@@ -161,7 +187,27 @@ export class FinancesService {
         this.depenses.update(list => [...list, dep]);
         this.toast.show(`Dépense ${dep.reference} enregistrée`);
       },
-      error: () => this.toast.show('Erreur création dépense')
+      error: (err) => this.toast.showError(err?.error?.message || 'Erreur création dépense')
+    });
+  }
+
+  modifierDepense(id: string, d: Omit<Depense, 'id' | 'reference'>): void {
+    this.http.put<Depense>(`${this.api}/depenses/${id}`, d).subscribe({
+      next: dep => {
+        this.depenses.update(list => list.map(x => x.id === dep.id ? dep : x));
+        this.toast.show(`Dépense ${dep.reference} modifiée`);
+      },
+      error: (err) => this.toast.showError(err?.error?.message || 'Erreur modification dépense')
+    });
+  }
+
+  supprimerDepense(id: string): void {
+    this.http.delete(`${this.api}/depenses/${id}`).subscribe({
+      next: () => {
+        this.depenses.update(list => list.filter(d => d.id !== id));
+        this.toast.show('Dépense supprimée');
+      },
+      error: (err) => this.toast.showError(err?.error?.message || 'Erreur suppression dépense')
     });
   }
 
@@ -171,7 +217,7 @@ export class FinancesService {
         this.depenses.update(list => list.map(d => d.id === dep.id ? dep : d));
         this.toast.show(`Dépense ${dep.reference} payée`);
       },
-      error: () => this.toast.show('Erreur paiement dépense')
+      error: (err) => this.toast.showError(err?.error?.message || 'Erreur paiement dépense')
     });
   }
 
@@ -182,14 +228,14 @@ export class FinancesService {
         this.lignesBudget.update(list => [...list, ligne]);
         this.toast.show('Ligne budgétaire ajoutée');
       },
-      error: () => this.toast.show('Erreur création ligne budget')
+      error: () => this.toast.showError('Erreur création ligne budget')
     });
   }
 
   soumettrRevision(motif: string, ligneId: string, montant: number): void {
     this.http.post(`${this.api}/budget/revisions`, { motif, ligne_budget_id: ligneId, montant }).subscribe({
       next: () => this.toast.show('Révision soumise avec succès'),
-      error: () => this.toast.show('Erreur soumission révision')
+      error: () => this.toast.showError('Erreur soumission révision')
     });
   }
 

@@ -38,11 +38,11 @@ export interface PostProgrammeApi {
 
 // ── Partenaires ───────────────────────────────────────────────────────────────
 export interface PartenaireApi {
-  id: number; nom: string; type: string; domaine: string;
+  id: number; nom: string; nom_contact: string | null; type: string; domaine: string;
   contact: string; date_debut: string; statut: string; created_at: string;
 }
 export interface PartenaireCreateRequest {
-  nom: string; type: string; domaine: string; contact: string; date_debut: string;
+  nom: string; nom_contact?: string; type: string; domaine: string; contact: string; date_debut: string;
 }
 
 // ── Articles presse ───────────────────────────────────────────────────────────

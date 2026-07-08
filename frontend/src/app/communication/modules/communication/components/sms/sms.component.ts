@@ -25,7 +25,7 @@ const NB_DEST: Record<string, number> = { tous: 12500, quartier: 3800, commercan
 <!-- ── Alertes ────────────────────────────────────────────────────────── -->
 @if (active()==='alerte') {
   <div class="ph"><div class="pt"><i class="ti ti-bell"></i>Envoyer une alerte urgente</div></div>
-  @if (toast.get('alt')?.visible) { <div class="success-toast show" style="margin:.5rem 1rem"><i class="ti ti-check"></i>{{toast.get('alt')?.message}}</div> }
+  @if (toast.get('alt')?.visible) { <div class="show" [ngClass]="toast.get('alt')?.type==='error' ? 'error-toast' : 'success-toast'" style="margin:.5rem 1rem"><i class="ti" [ngClass]="toast.get('alt')?.type==='error' ? 'ti-alert-circle' : 'ti-check'"></i>{{toast.get('alt')?.message}}</div> }
   <div class="pb">
     <div class="fsec">Alerte d'urgence ou information critique</div>
     <div class="fg" style="margin-bottom:6px">
@@ -68,7 +68,7 @@ const NB_DEST: Record<string, number> = { tous: 12500, quartier: 3800, commercan
 <!-- ── Campagnes ──────────────────────────────────────────────────────── -->
 @if (active()==='campagne') {
   <div class="ph"><div class="pt"><i class="ti ti-send"></i>Créer une campagne SMS</div></div>
-  @if (toast.get('camp')?.visible) { <div class="success-toast show" style="margin:.5rem 1rem"><i class="ti ti-check"></i>{{toast.get('camp')?.message}}</div> }
+  @if (toast.get('camp')?.visible) { <div class="show" [ngClass]="toast.get('camp')?.type==='error' ? 'error-toast' : 'success-toast'" style="margin:.5rem 1rem"><i class="ti" [ngClass]="toast.get('camp')?.type==='error' ? 'ti-alert-circle' : 'ti-check'"></i>{{toast.get('camp')?.message}}</div> }
   <div class="pb">
     <div class="form-grid">
       <div class="fg"><div class="fl">Nom de la campagne <span style="color:#e63946">*</span></div>
@@ -180,16 +180,16 @@ export class SmsComponent implements OnInit {
   totalSms(): number { return this.com.smsHistorique().filter(s => s.statut === 'envoye').reduce((acc, s) => acc + s.nbDestinataires, 0); }
 
   envoyerAlerte(): void {
-    if (!this.fAlt.message || !this.fAlt.cible) { this.toast.show('alt', 'Message et groupe cible obligatoires'); return; }
+    if (!this.fAlt.message || !this.fAlt.cible) { this.toast.showError('alt', 'Message et groupe cible obligatoires'); return; }
     this.saving.set(true);
     this.com.envoyerAlerte({ message: this.fAlt.message, cible: this.fAlt.cible, quartier: this.fAlt.quartier, priorite: this.fAlt.priorite }).subscribe({
       next: c => { this.toast.show('alt', `Alerte envoyée à ${new Intl.NumberFormat('fr-FR').format(c.nbDestinataires)} destinataires`); this.saving.set(false); this.fAlt = { message:'', cible:'', quartier:'', priorite:'normale' }; this.altCount = 0; },
-      error: () => this.saving.set(false)
+      error: (err) => { this.saving.set(false); this.toast.showError('alt', err?.error?.message || 'Une erreur est survenue.'); }
     });
   }
 
   lancerCampagne(): void {
-    if (!this.fCamp.nom || !this.fCamp.message || !this.fCamp.dest) { this.toast.show('camp', 'Nom, message et destinataires obligatoires'); return; }
+    if (!this.fCamp.nom || !this.fCamp.message || !this.fCamp.dest) { this.toast.showError('camp', 'Nom, message et destinataires obligatoires'); return; }
     this.saving.set(true);
     const programme = this.fCamp.quand === 'programme';
     this.com.lancerCampagne({ nom: this.fCamp.nom, type: this.fCamp.type, message: this.fCamp.message, destinataires: this.fCamp.dest, date_envoi: programme ? this.fCamp.dateHeure : new Date().toISOString().slice(0,10), programme }).subscribe({
@@ -198,7 +198,7 @@ export class SmsComponent implements OnInit {
         this.toast.show('camp', msg); this.saving.set(false);
         this.fCamp = { nom:'', type:'info', message:'', dest:'', quand:'maintenant', dateHeure:'' }; this.campCount = 0;
       },
-      error: () => this.saving.set(false)
+      error: (err) => { this.saving.set(false); this.toast.showError('camp', err?.error?.message || 'Une erreur est survenue.'); }
     });
   }
 }

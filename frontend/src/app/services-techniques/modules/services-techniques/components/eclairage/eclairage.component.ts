@@ -219,14 +219,21 @@ export class EclairageComponent implements OnInit {
   ngOnInit(): void { this.st.loadLampadaires(); this.st.loadPannes(); }
 
   ajouterLampadaire(): void {
-    if (!this.fLamp.localisation) { this.toast.show('ecl', 'Localisation obligatoire'); return; }
-    // optimiste local
-    this.toast.show('ecl', `Lampadaire enregistré — ${this.fLamp.localisation}`);
-    this.showAdd.set(false);
+    if (!this.fLamp.localisation || !this.fLamp.quartier || !this.fLamp.typeLampe) {
+      this.toast.showError('ecl', 'Localisation, quartier et type de lampe obligatoires'); return;
+    }
+    this.st.ajouterLampadaire(this.fLamp).subscribe({
+      next: () => {
+        this.toast.show('ecl', `Lampadaire enregistré — ${this.fLamp.localisation}`);
+        this.showAdd.set(false);
+        this.fLamp = { localisation:'', quartier:'', typeLampe:'LED', puissance:100, datePosee:'' };
+      },
+      error: () => {},
+    });
   }
 
   signalerPanne(): void {
-    if (!this.fPanne.localisation) { this.toast.show('ecl', 'Localisation obligatoire'); return; }
+    if (!this.fPanne.localisation) { this.toast.showError('ecl', 'Localisation obligatoire'); return; }
     this.st.signalerPanne(this.fPanne).subscribe({
       next: () => { this.toast.show('ecl', 'Panne enregistrée'); this.showSignal.set(false); this.fPanne = { localisation:'', description:'' }; },
       error: () => {}
@@ -239,9 +246,17 @@ export class EclairageComponent implements OnInit {
   }
 
   planifierMaintenance(): void {
-    if (!this.fMaint.zone || !this.fMaint.datePrevue) { this.toast.show('ecl', 'Zone et date obligatoires'); return; }
-    this.toast.show('ecl', `Maintenance planifiée — ${this.fMaint.zone}`);
-    this.showAddMaint.set(false);
+    if (!this.fMaint.zone || !this.fMaint.datePrevue || !this.fMaint.technicien) {
+      this.toast.showError('ecl', 'Zone, technicien et date obligatoires'); return;
+    }
+    this.st.planifierMaintenanceEclairage(this.fMaint).subscribe({
+      next: () => {
+        this.toast.show('ecl', `Maintenance planifiée — ${this.fMaint.zone}`);
+        this.showAddMaint.set(false);
+        this.fMaint = { zone:'', nbLampadaires:0, typeIntervention:'Remplacement lampes', datePrevue:'', technicien:'' };
+      },
+      error: () => {},
+    });
   }
 
   onLampPhoto(e: Event)  { const f = (e.target as HTMLInputElement).files; if (f) this.lampPhotos  = Array.from(f); }

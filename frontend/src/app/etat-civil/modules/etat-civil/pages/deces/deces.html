@@ -19,17 +19,17 @@
         <div class="pb">
           <div class="fsec">Informations du Défunt</div>
           <div class="form-grid">
-            <div class="fg"><div class="fl">Nom <span class="req">*</span></div><input class="fi" [(ngModel)]="decesForm.nom" type="text" placeholder="Ex: KOUADIO"></div>
-            <div class="fg"><div class="fl">Prénom(s) <span class="req">*</span></div><input class="fi" [(ngModel)]="decesForm.prenom" type="text" placeholder="Ex: Jean Marc"></div>
+            <div class="fg"><div class="fl">Nom <span class="req">*</span></div><input class="fi" [class.invalid]="submitAttempted() && !decesForm.nom" [(ngModel)]="decesForm.nom" type="text" placeholder="Ex: KOUADIO">@if (submitAttempted() && !decesForm.nom) { <small class="field-error">Champ obligatoire</small> }</div>
+            <div class="fg"><div class="fl">Prénom(s) <span class="req">*</span></div><input class="fi" [class.invalid]="submitAttempted() && !decesForm.prenom" [(ngModel)]="decesForm.prenom" type="text" placeholder="Ex: Jean Marc">@if (submitAttempted() && !decesForm.prenom) { <small class="field-error">Champ obligatoire</small> }</div>
           </div>
           <div class="form-grid">
             <div class="fg"><div class="fl">Date de Naissance (si connue)</div><input class="fi" [(ngModel)]="decesForm.dob" type="date"></div>
             <div class="fg"><div class="fl">Commune</div><input class="fi" [(ngModel)]="decesForm.commune" type="text" placeholder="Ex: Cocody"></div>
           </div>
           <div class="form-grid-3">
-            <div class="fg"><div class="fl">Date du Décès <span class="req">*</span></div><input class="fi" [(ngModel)]="decesForm.date" type="date"></div>
+            <div class="fg"><div class="fl">Date du Décès <span class="req">*</span></div><input class="fi" [class.invalid]="submitAttempted() && !decesForm.date" [(ngModel)]="decesForm.date" type="date">@if (submitAttempted() && !decesForm.date) { <small class="field-error">Champ obligatoire</small> }</div>
             <div class="fg"><div class="fl">Heure</div><input class="fi" [(ngModel)]="decesForm.heure" type="time"></div>
-            <div class="fg"><div class="fl">Lieu du Décès <span class="req">*</span></div><input class="fi" [(ngModel)]="decesForm.lieu" type="text" placeholder="Ex: CHU Treichville"></div>
+            <div class="fg"><div class="fl">Lieu du Décès <span class="req">*</span></div><input class="fi" [class.invalid]="submitAttempted() && !decesForm.lieu" [(ngModel)]="decesForm.lieu" type="text" placeholder="Ex: CHU Treichville">@if (submitAttempted() && !decesForm.lieu) { <small class="field-error">Champ obligatoire</small> }</div>
           </div>
           <div class="form-grid">
             <div class="fg"><div class="fl">Cause du décès</div><input class="fi" [(ngModel)]="decesForm.cause" type="text" placeholder="Ex: Insuffisance cardiaque"></div>
