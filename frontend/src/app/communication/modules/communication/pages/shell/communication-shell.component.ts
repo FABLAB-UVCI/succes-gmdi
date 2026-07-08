@@ -252,7 +252,7 @@ export type Section = 'actualites' | 'reseaux' | 'relations' | 'documents' | 'ci
     .sb-maire-footer:hover { color:rgba(255,255,255,.6); }
 
     /* ── Main ── */
-    .main { flex:1;padding:1.5rem;display:flex;flex-direction:column;gap:1.25rem;min-width:0;background:var(--bg-page,#f3f4f6); }
+    .main { flex:1;padding:1.5rem;display:flex;flex-direction:column;gap:1.25rem;min-width:0;background:var(--bg-page,#f3f4f6);overflow:visible; }
 
     /* ── KPIs ── */
     .kpi-row { display:flex;gap:.75rem;flex-wrap:wrap; }
