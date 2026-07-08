@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "serve -s dist/gmdi-communication/browser -l ${PORT:-4200}",
+    "dev": "ng serve",
     "build": "ng build",
     "build:prod": "ng build --configuration production"
   },
@@ -24,6 +25,7 @@
     "ng2-charts": "^10.0.0",
     "qrcode": "^1.5.4",
     "rxjs": "~7.8.0",
+    "serve": "^14.2.6",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"
   },
