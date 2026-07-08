@@ -24,7 +24,10 @@ class StatsController extends Controller
                 'documents_archives'    => Document::count() + 1248,
             ],
             'actualites_par_type' => Actualite::selectRaw('type, COUNT(*) as nb')->groupBy('type')->get()->map(fn($r)=>['type'=>$r->type,'nb'=>(int)$r->nb]),
-            'sms_par_mois'        => CampagneSms::selectRaw('DATE_FORMAT(date_envoi,"%Y-%m") as mois, COUNT(*) as nb, AVG(taux_livraison) as taux')->groupBy('mois')->orderBy('mois','desc')->take(6)->get()->map(fn($r)=>['mois'=>$r->mois,'nb'=>(int)$r->nb,'taux'=>round($r->taux)]),
+            'sms_par_mois'        => CampagneSms::select('date_envoi', 'taux_livraison')->get()
+                ->groupBy(fn($r) => $r->date_envoi->format('Y-m'))
+                ->map(fn($g, $mois) => ['mois' => $mois, 'nb' => $g->count(), 'taux' => (int) round($g->avg('taux_livraison'))])
+                ->sortByDesc('mois')->take(6)->values(),
         ]);
     }
 }
