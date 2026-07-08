@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -45,12 +46,21 @@ return new class extends Migration
         // ── equipement_publics : nouveaux types (commissariat, gendarmerie…) ──
         // MySQL/MariaDB ne supporte pas directement ALTER COLUMN sur un ENUM.
         // On modifie la colonne type pour ajouter les nouvelles valeurs.
-        Schema::table('equipement_publics', function (Blueprint $table) {
-            $table->enum('type', [
-                'ecole','sante','marche','espace_vert','sport','culte','securite',
-                'commissariat','gendarmerie','eaux_forets','autre'
-            ])->default('autre')->change();
-        });
+        // Sur PostgreSQL, ->change() sur un enum génère un ALTER COLUMN ... TYPE
+        // avec un "check" inline que Postgres refuse : on le fait en 3 étapes.
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement('ALTER TABLE equipement_publics DROP CONSTRAINT IF EXISTS equipement_publics_type_check');
+            DB::statement('ALTER TABLE equipement_publics ALTER COLUMN type TYPE varchar(255)');
+            DB::statement("ALTER TABLE equipement_publics ALTER COLUMN type SET DEFAULT 'autre'");
+            DB::statement("ALTER TABLE equipement_publics ADD CONSTRAINT equipement_publics_type_check CHECK (type IN ('ecole','sante','marche','espace_vert','sport','culte','securite','commissariat','gendarmerie','eaux_forets','autre'))");
+        } else {
+            Schema::table('equipement_publics', function (Blueprint $table) {
+                $table->enum('type', [
+                    'ecole','sante','marche','espace_vert','sport','culte','securite',
+                    'commissariat','gendarmerie','eaux_forets','autre'
+                ])->default('autre')->change();
+            });
+        }
     }
 
     public function down(): void
