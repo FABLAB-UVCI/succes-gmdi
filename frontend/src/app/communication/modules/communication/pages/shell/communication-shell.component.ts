@@ -220,6 +220,7 @@ export type Section = 'actualites' | 'reseaux' | 'relations' | 'documents' | 'ci
       border-right: 1px solid rgba(255,255,255,.06);
       flex-shrink: 0;
       overflow-y: auto;
+      overscroll-behavior: contain;
       transition: transform .28s cubic-bezier(.4,0,.2,1);
       z-index: 200;
     }
@@ -327,8 +328,9 @@ export class CommunicationShellComponent implements OnInit {
 
   ngOnInit(): void { this.com.loadStats(); this.com.loadActualites(); this.com.loadReclamations(); }
 
-  toggleSidebar(): void  { this.sidebarOpen.update(v => !v); }
-  closeSidebar(): void   { this.sidebarOpen.set(false); }
+  toggleSidebar(): void  { this.sidebarOpen.update(v => !v); this.syncBodyScrollLock(); }
+  closeSidebar(): void   { this.sidebarOpen.set(false); this.syncBodyScrollLock(); }
+  private syncBodyScrollLock(): void { document.body.style.overflow = this.sidebarOpen() ? 'hidden' : ''; }
 
   navigate(s: Section): void {
     this.active.set(s);
