@@ -7,7 +7,7 @@ import { authGuard } from './communication/core/guards/auth.guard';
  * - Chaque module est chargé en lazy sous son préfixe, protégé par authGuard.
  */
 export const routes: Routes = [
-  { path: '', redirectTo: 'accueil', pathMatch: 'full' },
+  { path: '', redirectTo: 'login', pathMatch: 'full' },
 
   { path: 'login', loadComponent: () => import('./communication/pages/login/login.component').then(m => m.LoginComponent) },
 
@@ -46,5 +46,5 @@ export const routes: Routes = [
   // ── Urbanisme / SIG ─────────────────────────────────────────────────────
   { path: 'urbanisme', canActivate: [authGuard], loadComponent: () => import('./urbanisme/modules/urbanisme/pages/shell/urbanisme-shell.component').then(m => m.UrbanismeShellComponent) },
 
-  { path: '**', redirectTo: 'accueil' },
+  { path: '**', redirectTo: 'login' },
 ];
