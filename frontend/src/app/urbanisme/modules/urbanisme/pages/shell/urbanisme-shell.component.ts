@@ -9,6 +9,7 @@ import { UrbanismeService }          from '../../../../core/services/urbanisme.s
 import { LoadingService }            from '../../../../core/services/loading.service';
 import { AuthService }               from '../../../../core/services/auth.service';
 import { ToastService }              from '../../../../core/services/toast.service';
+import { AnnoncesMaireComponent } from '../../../../../shared/components/annonces-maire/annonces-maire.component';
 
 export type Section = 'foncier' | 'permis' | 'cartographie' | 'projets' | 'geolocalisation';
 
@@ -19,6 +20,7 @@ export type Section = 'foncier' | 'permis' | 'cartographie' | 'projets' | 'geolo
     CommonModule,
     FoncierComponent, PermisComponent, CartographieComponent,
     ProjetsComponent, GeolocalisationComponent,
+    AnnoncesMaireComponent,
   ],
   template: `
 <!-- Overlay mobile pour fermer le sidebar -->
@@ -117,6 +119,8 @@ export type Section = 'foncier' | 'permis' | 'cartographie' | 'projets' | 'geolo
           </div>
         }
       </div>
+
+      <app-annonces-maire />
 
       <!-- Pied sidebar -->
       <div class="sb-footer">

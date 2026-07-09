@@ -12,6 +12,7 @@ import { PatrimoineService } from '../../../../core/services/patrimoine.service'
 import { LoadingService }    from '../../../../core/services/loading.service';
 import { AuthService }       from '../../../../core/services/auth.service';
 import { ToastService }      from '../../../../core/services/toast.service';
+import { AnnoncesMaireComponent } from '../../../../../shared/components/annonces-maire/annonces-maire.component';
 
 export type Section = 'inventaire' | 'immobilier' | 'affectation' | 'maintenance' | 'amortissement' | 'rapports';
 
@@ -22,6 +23,7 @@ export type Section = 'inventaire' | 'immobilier' | 'affectation' | 'maintenance
     CommonModule,
     InventaireComponent, ImmobilierComponent, AffectationComponent,
     MaintenanceComponent, AmortissementComponent, RapportsPatrimoineComponent,
+    AnnoncesMaireComponent,
   ],
   template: `
 <div class="r">
@@ -72,6 +74,8 @@ export type Section = 'inventaire' | 'immobilier' | 'affectation' | 'maintenance
           <i class="ti {{ item.icon }}"></i>{{ item.label }}
         </div>
       }
+
+      <app-annonces-maire />
     </nav>
 
     <!-- Main -->

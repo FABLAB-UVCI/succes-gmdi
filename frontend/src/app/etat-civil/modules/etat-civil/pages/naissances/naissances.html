@@ -32,7 +32,7 @@
             <div class="form-grid-3">
             <div class="fg"><div class="fl">Date de naissance <span class="req">*</span></div><input class="fi" [class.invalid]="submitAttemptedNaissance() && !naissanceForm.date" [(ngModel)]="naissanceForm.date" type="date">@if (submitAttemptedNaissance() && !naissanceForm.date) { <small class="field-error">Champ obligatoire</small> }</div>
             <div class="fg"><div class="fl">Heure de naissance</div><input class="fi" [(ngModel)]="naissanceForm.heure" type="time"></div>
-            <div class="fg"><div class="fl">Sexe <span class="req">*</span></div><select class="fs" [class.invalid]="submitAttemptedNaissance() && !naissanceForm.sexe" [(ngModel)]="naissanceForm.sexe"><option value="">--</option><option>Masculin</option><option>Féminin</option></select>@if (submitAttemptedNaissance() && !naissanceForm.sexe) { <small class="field-error">Champ obligatoire</small> }</div>
+            <div class="fg"><div class="fl">Sexe <span class="req">*</span></div><select class="fsel" [class.invalid]="submitAttemptedNaissance() && !naissanceForm.sexe" [(ngModel)]="naissanceForm.sexe"><option value="">--</option><option>Masculin</option><option>Féminin</option></select>@if (submitAttemptedNaissance() && !naissanceForm.sexe) { <small class="field-error">Champ obligatoire</small> }</div>
             </div>
 
             <div class="form-grid">
@@ -42,7 +42,7 @@
             </div>
             <div class="fg">
                 <div class="fl">Commune d'enregistrement <span class="req">*</span></div>
-                <select class="fs" [class.invalid]="submitAttemptedNaissance() && !naissanceForm.commune" [(ngModel)]="naissanceForm.commune" required>
+                <select class="fsel" [class.invalid]="submitAttemptedNaissance() && !naissanceForm.commune" [(ngModel)]="naissanceForm.commune" required>
                 <option value="" disabled selected>-- Sélectionnez une commune --</option>
                 @for (commune of communesList; track commune) {
                     <option [value]="commune">{{ commune }}</option>
@@ -141,7 +141,7 @@
                 </div>
                 <div class="fg">
                 <div class="fl">Tribunal émetteur</div>
-                <select class="fs" [(ngModel)]="jugementForm.trib">
+                <select class="fsel" [(ngModel)]="jugementForm.trib">
                     <option value="" disabled>-- Sélectionnez un tribunal --</option>
                     @for (tribunal of tribunauxList; track tribunal) {
                     <option [value]="tribunal">{{ tribunal }}</option>
@@ -260,7 +260,7 @@
             <div class="form-grid-3">
                 <div class="fg">
                 <div class="fl">Tribunal</div>
-                <select class="fs" [(ngModel)]="adoptionForm.tribunal">
+                <select class="fsel" [(ngModel)]="adoptionForm.tribunal">
                     <option value="" disabled selected>-- Sélectionnez un tribunal --</option>
                     @for (tribunal of tribunauxList; track tribunal) {
                     <option [value]="tribunal">{{ tribunal }}</option>
@@ -274,7 +274,7 @@
                 </div>
                 <div class="fg">
                 <div class="fl">Type d'adoption</div>
-                <select class="fs" [(ngModel)]="adoptionForm.typeAdoption">
+                <select class="fsel" [(ngModel)]="adoptionForm.typeAdoption">
                     <option value="Pleine">Adoption pleine</option>
                     <option value="Simple">Adoption simple</option>
                     <option value="Internationale">Adoption internationale</option>
@@ -307,7 +307,7 @@
         <div class="pb">
             <div class="form-grid">
               <div class="fg"><div class="fl">Type d'acte requis <span class="req">*</span></div>
-                <select class="fs" [(ngModel)]="duplicataForm.type" (ngModelChange)="resetRechercheDuplicata()">
+                <select class="fsel" [(ngModel)]="duplicataForm.type" (ngModelChange)="resetRechercheDuplicata()">
                   <option value="naissance">Extrait de Naissance</option>
                   <option value="jugement">Jugement supplétif</option>
                   <option value="adoption">Adoption</option>

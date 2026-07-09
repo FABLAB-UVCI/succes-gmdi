@@ -77,7 +77,7 @@
   letter-spacing: 0.4px;
 }
 
-.fi, .fs {
+.fi, .fsel {
   height: 40px;
   border: 1.5px solid #E0D4C0;
   border-radius: 9px;
@@ -89,7 +89,7 @@
   font-family: 'Ubuntu', sans-serif;
 }
 
-.fi:focus, .fs:focus {
+.fi:focus, .fsel:focus {
   outline: none;
   border-color: #F77F00;
   box-shadow: 0 0 0 3px rgba(247,127,0,0.1);

@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../../../services/api.service';
 import { TOUTES_COMMUNES } from '../../../../communes.ci';
-import { QUARTIERS_CI } from '../../../../quartiers.ci';
 import { PrintService } from '../../../../services/print.service';
 import { qrVerification, codeVerification, formatDateFr, openPrintWindow } from '../../pdf-utils';
 
@@ -21,7 +20,6 @@ export class CertificatsComponent implements OnInit {
   certificats = signal<any[]>([]);
 
   communesList = TOUTES_COMMUNES;
-  quartiersList = QUARTIERS_CI;
   celibatForm: { nom: string; prenom: string; dob: string; profession: string; acteRef: string; cni: File | null } = { nom: '', prenom: '', dob: '', profession: '', acteRef: '', cni: null };
   residenceForm: { nom: string; prenom: string; adresse: string; quartier: string; commune: string; cni: File | null } = { nom: '', prenom: '', adresse: '', quartier: '', commune: '', cni: null };
   vieForm: { nom: string; prenom: string; dob: string; cni: File | null } = { nom: '', prenom: '', dob: '', cni: null };

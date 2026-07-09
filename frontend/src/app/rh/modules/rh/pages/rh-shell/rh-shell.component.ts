@@ -8,6 +8,7 @@ import { FormationComponent }  from '../../components/formation/formation.compon
 import { RapportsComponent }   from '../../components/rapports/rapports.component';
 import { RhService }           from '../../../../core/services/rh.service';
 import { AuthService }         from '../../../../core/services/auth.service';
+import { AnnoncesMaireComponent } from '../../../../../shared/components/annonces-maire/annonces-maire.component';
 
 export type Section = 'personnel' | 'carriere' | 'presence' | 'paie' | 'formation' | 'rapports';
 
@@ -20,6 +21,7 @@ interface NavItem { id: Section; label: string; icon: string; }
     CommonModule,
     PersonnelComponent, CarriereComponent, PresenceComponent,
     PaieComponent, FormationComponent, RapportsComponent,
+    AnnoncesMaireComponent,
   ],
   template: `
 <div class="root">
@@ -59,6 +61,8 @@ interface NavItem { id: Section; label: string; icon: string; }
           <i class="ti {{ item.icon }}" aria-hidden="true"></i>{{ item.label }}
         </div>
       }
+
+      <app-annonces-maire />
     </nav>
 
     <!-- Main content -->

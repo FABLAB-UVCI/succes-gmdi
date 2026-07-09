@@ -88,7 +88,7 @@
             <div class="fg"><div class="fl">Date du mariage <span class="req">*</span></div><input class="fi" [(ngModel)]="mariageForm.date" type="date"></div>
             <div class="fg"><div class="fl">Lieu</div><input class="fi" [(ngModel)]="mariageForm.lieu" type="text" placeholder="Ex: Mairie de Cocody"></div>
             <div class="fg"><div class="fl">Régime matrimonial</div>
-              <select class="fs" [(ngModel)]="mariageForm.regime">
+              <select class="fsel" [(ngModel)]="mariageForm.regime">
                 <option>Communauté de biens</option><option>Séparation de biens</option><option>Polygamie</option>
               </select>
             </div>
@@ -104,6 +104,16 @@
               <div class="fl">CNI / Passeport — Épouse</div>
               <input style="font-size:11px;padding:4px 6px" class="fi" type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="onCniEpouseSelected($event)">
               @if (mariageForm.cniEpouse) { <small style="color:green">✓ {{ mariageForm.cniEpouse.name }}</small> }
+            </div>
+            <div class="fg" style="max-width:340px">
+              <div class="fl">CNI / Passeport — Témoin de l'époux</div>
+              <input style="font-size:11px;padding:4px 6px" class="fi" type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="onCniTemoinEpouxSelected($event)">
+              @if (mariageForm.cniTemoinEpoux) { <small style="color:green">✓ {{ mariageForm.cniTemoinEpoux.name }}</small> }
+            </div>
+            <div class="fg" style="max-width:340px">
+              <div class="fl">CNI / Passeport — Témoin de l'épouse</div>
+              <input style="font-size:11px;padding:4px 6px" class="fi" type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="onCniTemoinEpouseSelected($event)">
+              @if (mariageForm.cniTemoinEpouse) { <small style="color:green">✓ {{ mariageForm.cniTemoinEpouse.name }}</small> }
             </div>
           </div>
           <div class="fa"><button class="btn-p" (click)="enregistrerMariage()"><i class="ti ti-printer"></i>Enregistrer & Imprimer</button></div>

@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { AnnoncesMaireComponent } from '../../../../../shared/components/annonces-maire/annonces-maire.component';
 
 interface MenuItem {
   type: 'section' | 'item';
@@ -12,7 +13,7 @@ interface MenuItem {
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, AnnoncesMaireComponent],
   templateUrl: './sidebar.html',
   styleUrls: ['./sidebar.css']
 })

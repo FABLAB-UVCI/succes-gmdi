@@ -46,13 +46,10 @@
           <div class="form-grid-3">
             <div class="fg"><div class="fl">Adresse complète</div><input class="fi" [(ngModel)]="residenceForm.adresse" type="text" placeholder="Ex: 12 Rue des Jardins, Cocody"></div>
             <div class="fg"><div class="fl">Quartier</div>
-              <select class="fs" [(ngModel)]="residenceForm.quartier">
-                <option value="">-- Sélectionner un quartier --</option>
-                @for (q of quartiersList; track q) { <option [value]="q">{{ q }}</option> }
-              </select>
+              <input class="fi" [(ngModel)]="residenceForm.quartier" type="text" placeholder="Ex: Angré 8e Tranche">
             </div>
             <div class="fg"><div class="fl">Commune</div>
-              <select class="fs" [(ngModel)]="residenceForm.commune">
+              <select class="fsel" [(ngModel)]="residenceForm.commune">
                 <option value="">-- Sélectionner une commune --</option>
                 @for (c of communesList; track c) { <option [value]="c">{{ c }}</option> }
               </select>

@@ -10,6 +10,7 @@ import { ServicesTechniquesService } from '../../../../core/services/services-te
 import { LoadingService }            from '../../../../core/services/loading.service';
 import { AuthService }               from '../../../../core/services/auth.service';
 import { ToastService }              from '../../../../core/services/toast.service';
+import { AnnoncesMaireComponent } from '../../../../../shared/components/annonces-maire/annonces-maire.component';
 
 export type Section = 'voirie' | 'eclairage' | 'eau' | 'batiments' | 'interventions' | 'maintenance';
 
@@ -20,6 +21,7 @@ export type Section = 'voirie' | 'eclairage' | 'eau' | 'batiments' | 'interventi
     CommonModule,
     VoirieComponent, EclairageComponent, EauAssainissementComponent,
     BatimentsComponent, InterventionsComponent, MaintenanceComponent,
+    AnnoncesMaireComponent,
   ],
   template: `
 <div class="root">
@@ -90,6 +92,8 @@ export type Section = 'voirie' | 'eclairage' | 'eau' | 'batiments' | 'interventi
           }
         </div>
       }
+
+      <app-annonces-maire />
     </nav>
 
     <!-- ── Main ─────────────────────────────────────────────────────────── -->

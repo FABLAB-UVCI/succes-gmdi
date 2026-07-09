@@ -24,11 +24,13 @@ export class MariagesComponent implements OnInit {
   mariageForm: {
     epNom: string; epPrenom: string; epNat: string; epProf: string; epTemoin: string; epTemoinProf: string;
     esNom: string; esPrenom: string; esNat: string; esProf: string; esTemoin: string; esTemoinProf: string;
-    date: string; lieu: string; regime: string; cniEpoux: File | null; cniEpouse: File | null
+    date: string; lieu: string; regime: string; cniEpoux: File | null; cniEpouse: File | null;
+    cniTemoinEpoux: File | null; cniTemoinEpouse: File | null
   } = {
     epNom: '', epPrenom: '', epNat: 'Ivoirienne', epProf: '', epTemoin: '', epTemoinProf: '',
     esNom: '', esPrenom: '', esNat: 'Ivoirienne', esProf: '', esTemoin: '', esTemoinProf: '',
-    date: '', lieu: '', regime: 'Communauté de biens', cniEpoux: null, cniEpouse: null
+    date: '', lieu: '', regime: 'Communauté de biens', cniEpoux: null, cniEpouse: null,
+    cniTemoinEpoux: null, cniTemoinEpouse: null
   };
 
   constructor(private api: ApiService, private printService: PrintService) {}
@@ -47,6 +49,8 @@ export class MariagesComponent implements OnInit {
 
   onCniEpouxSelected(e: Event) { this.mariageForm.cniEpoux = (e.target as HTMLInputElement).files?.[0] ?? null; }
   onCniEpouseSelected(e: Event) { this.mariageForm.cniEpouse = (e.target as HTMLInputElement).files?.[0] ?? null; }
+  onCniTemoinEpouxSelected(e: Event) { this.mariageForm.cniTemoinEpoux = (e.target as HTMLInputElement).files?.[0] ?? null; }
+  onCniTemoinEpouseSelected(e: Event) { this.mariageForm.cniTemoinEpouse = (e.target as HTMLInputElement).files?.[0] ?? null; }
   onBansCniEpouxSelected(e: Event) { this.bansForm.cniEpoux = (e.target as HTMLInputElement).files?.[0] ?? null; }
   onBansCniEpouseSelected(e: Event) { this.bansForm.cniEpouse = (e.target as HTMLInputElement).files?.[0] ?? null; }
 
@@ -108,7 +112,8 @@ export class MariagesComponent implements OnInit {
         this.mariageForm = {
           epNom: '', epPrenom: '', epNat: 'Ivoirienne', epProf: '', epTemoin: '', epTemoinProf: '',
           esNom: '', esPrenom: '', esNat: 'Ivoirienne', esProf: '', esTemoin: '', esTemoinProf: '',
-          date: '', lieu: '', regime: 'Communauté de biens', cniEpoux: null, cniEpouse: null
+          date: '', lieu: '', regime: 'Communauté de biens', cniEpoux: null, cniEpouse: null,
+          cniTemoinEpoux: null, cniTemoinEpouse: null
         };
         this.submitAttemptedMariage.set(false);
       },

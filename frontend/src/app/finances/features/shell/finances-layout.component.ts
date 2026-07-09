@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { ToastService } from '../../core/services/toast.service';
+import { AnnoncesMaireComponent } from '../../../shared/components/annonces-maire/annonces-maire.component';
 
 @Component({
   selector: 'app-finances-layout',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, AnnoncesMaireComponent],
   template: `
     <div class="gmdi-finances">
       <!-- ── Topbar ── -->
@@ -64,6 +65,8 @@ import { ToastService } from '../../core/services/toast.service';
           <a class="sb-item" routerLink="/finances/comptabilite" routerLinkActive="act" (click)="closeSidebar()"><i class="ti ti-calculator"></i>Opérations</a>
           <a class="sb-item" routerLink="/finances/tresorerie" routerLinkActive="act" (click)="closeSidebar()"><i class="ti ti-scale"></i>Trésorerie</a>
           <a class="sb-item" routerLink="/finances/rapports" routerLinkActive="act" (click)="closeSidebar()"><i class="ti ti-report-money"></i>Rapports</a>
+
+          <app-annonces-maire />
         </nav>
 
         <!-- ── Main Content ── -->
