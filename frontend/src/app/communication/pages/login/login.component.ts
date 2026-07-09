@@ -2,6 +2,7 @@ import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { Title } from '@angular/platform-browser';
 import { AuthService } from '../../core/services/auth.service';
 
 @Component({
@@ -83,11 +84,16 @@ import { AuthService } from '../../core/services/auth.service';
 export class LoginComponent {
   private auth   = inject(AuthService);
   private router = inject(Router);
+  private title  = inject(Title);
   email    = '';
   password = '';
   loading  = signal(false);
   error    = signal('');
   showPwd  = signal(false);
+
+  constructor() {
+    this.title.setTitle('GMDI — Connexion');
+  }
 
   login(): void {
     if (!this.email || !this.password) { this.error.set('Veuillez renseigner vos identifiants.'); return; }
