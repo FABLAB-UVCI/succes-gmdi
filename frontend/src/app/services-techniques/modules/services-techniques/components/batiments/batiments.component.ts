@@ -32,7 +32,7 @@ const TYPES = [
   <div class="ph">
     <div class="pt"><i class="ti ti-building"></i>Bâtiments communaux</div>
     <div style="display:flex;gap:8px">
-      <select class="fs" style="max-width:140px" [(ngModel)]="fltType" (ngModelChange)="st.loadBatiments({type:fltType})">
+      <select class="fsel" style="max-width:140px" [(ngModel)]="fltType" (ngModelChange)="st.loadBatiments({type:fltType})">
         <option value="">Tous types</option>
         @for (ty of types; track ty.val) { <option [value]="ty.val">{{ty.label}}</option> }
       </select>
@@ -43,7 +43,7 @@ const TYPES = [
   <div style="padding:.75rem 1rem;display:grid;grid-template-columns:repeat(5,1fr);gap:8px">
     @for (ty of types; track ty.val) {
       <div class="type-card" [class.act]="fltType===ty.val" (click)="fltType=ty.val; st.loadBatiments({type:ty.val})">
-        <i class="ti {{ty.icon}}" style="font-size:20px;color:#003366;margin-bottom:4px"></i>
+        <i class="ti {{ty.icon}}" style="font-size:20px;color:#006B30;margin-bottom:4px"></i>
         <div style="font-size:11px;font-weight:500;color:var(--color-text-primary)">{{ty.label}}</div>
         <div style="font-size:18px;font-weight:500;color:#F77F00">{{countType(ty.val)}}</div>
       </div>
@@ -82,7 +82,7 @@ const TYPES = [
       <div class="form-grid">
         <div class="fg"><div class="fl">Bâtiment concerné</div><input class="fi" [(ngModel)]="fTrav.batiment" placeholder="Nom du bâtiment"></div>
         <div class="fg"><div class="fl">Type de travaux</div>
-          <select class="fs" [(ngModel)]="fTrav.type">
+          <select class="fsel" [(ngModel)]="fTrav.type">
             <option value="reparation">Réparation</option><option value="renovation">Rénovation</option><option value="construction">Construction</option><option value="entretien">Entretien</option>
           </select>
         </div>
@@ -138,7 +138,7 @@ const TYPES = [
     <div class="form-grid">
       <div class="fg"><div class="fl">Nom du bâtiment</div><input class="fi" [(ngModel)]="fBat.nom" placeholder="Ex: École Primaire Cocody 12"></div>
       <div class="fg"><div class="fl">Type</div>
-        <select class="fs" [(ngModel)]="fBat.type">
+        <select class="fsel" [(ngModel)]="fBat.type">
           @for (ty of types; track ty.val) { <option [value]="ty.val">{{ty.label}}</option> }
         </select>
       </div>
@@ -151,7 +151,7 @@ const TYPES = [
       <div class="fg"><div class="fl">Superficie (m²)</div><input class="fi" type="number" [(ngModel)]="fBat.superficie"></div>
       <div class="fg"><div class="fl">Année construction</div><input class="fi" type="number" [(ngModel)]="fBat.annee"></div>
       <div class="fg"><div class="fl">État actuel</div>
-        <select class="fs" [(ngModel)]="fBat.etat">
+        <select class="fsel" [(ngModel)]="fBat.etat">
           <option value="bon">Bon</option><option value="moyen">Moyen</option><option value="degrade">Dégradé</option>
         </select>
       </div>

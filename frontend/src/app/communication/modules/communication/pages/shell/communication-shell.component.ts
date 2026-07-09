@@ -95,8 +95,8 @@ export type Section = 'actualites' | 'reseaux' | 'relations' | 'documents' | 'ci
             <div class="kpi-l">Publications ce mois</div>
           </div>
         </div>
-        <div class="kpi" style="border-left-color:#185FA5">
-          <div class="kpi-icon-box" style="background:rgba(24,95,165,.1);font-size:26px">👥</div>
+        <div class="kpi" style="border-left-color:#C9A84C">
+          <div class="kpi-icon-box" style="background:rgba(201,168,76,.15);font-size:26px">👥</div>
           <div>
             <div class="kpi-v">{{com.kpi().abonnesTotaux > 0 ? (com.kpi().abonnesTotaux | number:'1.0-0':'fr-FR') : '—'}}</div>
             <div class="kpi-l">Abonnés réseaux</div>
@@ -163,7 +163,7 @@ export type Section = 'actualites' | 'reseaux' | 'relations' | 'documents' | 'ci
 
     /* ── Topbar ── */
     .topbar {
-      background: var(--ci-bleu, #001f3f);
+      background: linear-gradient(135deg, #1a3a1f 0%, #1a5c28 100%);
       padding: 0 1.5rem;
       height: 65px;
       display: flex;
@@ -191,7 +191,7 @@ export type Section = 'actualites' | 'reseaux' | 'relations' | 'documents' | 'ci
     /* ── Sidebar ── */
     .sidebar {
       width: 260px;
-      background: linear-gradient(180deg,#001f3f 0%,#002a56 60%,#003a70 100%);
+      background: linear-gradient(180deg, #1a3a1f 0%, #0d2414 100%);
       min-height: calc(100vh - 65px);
       padding: 20px 0 40px;
       border-right: 1px solid rgba(255,255,255,.06);

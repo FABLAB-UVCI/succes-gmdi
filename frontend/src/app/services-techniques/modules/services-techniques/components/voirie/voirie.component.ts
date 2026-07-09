@@ -36,12 +36,12 @@ type Tab = 'routes' | 'entretiens' | 'reparations';
       <div class="form-grid-3">
         <div class="fg"><div class="fl">Longueur (m)</div><input class="fi" type="number" [(ngModel)]="fRoute.longueur"></div>
         <div class="fg"><div class="fl">Type</div>
-          <select class="fs" [(ngModel)]="fRoute.type">
+          <select class="fsel" [(ngModel)]="fRoute.type">
             <option value="bitumee">Bitumée</option><option value="laterite">Latérite</option><option value="piste">Piste</option>
           </select>
         </div>
         <div class="fg"><div class="fl">État actuel</div>
-          <select class="fs" [(ngModel)]="fRoute.etat">
+          <select class="fsel" [(ngModel)]="fRoute.etat">
             <option value="bon">Bon</option><option value="moyen">Moyen</option><option value="degrade">Dégradé</option><option value="critique">Critique</option>
           </select>
         </div>
@@ -62,7 +62,7 @@ type Tab = 'routes' | 'entretiens' | 'reparations';
   }
   <div style="padding:6px 8px;border-bottom:.5px solid var(--color-border-tertiary);display:flex;gap:8px">
     <input class="fi" style="max-width:200px" [(ngModel)]="flt.search" placeholder="Rechercher...">
-    <select class="fs" style="max-width:130px" [(ngModel)]="flt.etat" (ngModelChange)="st.loadRoutes({etat:flt.etat})">
+    <select class="fsel" style="max-width:130px" [(ngModel)]="flt.etat" (ngModelChange)="st.loadRoutes({etat:flt.etat})">
       <option value="">Tous états</option><option value="bon">Bon</option><option value="moyen">Moyen</option><option value="degrade">Dégradé</option><option value="critique">Critique</option>
     </select>
   </div>
@@ -98,7 +98,7 @@ type Tab = 'routes' | 'entretiens' | 'reparations';
       <div class="form-grid">
         <div class="fg"><div class="fl">Route concernée</div><input class="fi" [(ngModel)]="fEnt.route" placeholder="Nom de la route"></div>
         <div class="fg"><div class="fl">Type d'entretien</div>
-          <select class="fs" [(ngModel)]="fEnt.typeEntretien">
+          <select class="fsel" [(ngModel)]="fEnt.typeEntretien">
             <option>Curage des caniveaux</option><option>Rebouchage nids-de-poule</option><option>Réfection de chaussée</option><option>Élagage abords</option><option>Nettoyage</option><option>Autre</option>
           </select>
         </div>
@@ -148,7 +148,7 @@ type Tab = 'routes' | 'entretiens' | 'reparations';
       <div class="form-grid">
         <div class="fg"><div class="fl">Route / Localisation</div><input class="fi" [(ngModel)]="fRep.route" placeholder="Rue, avenue, carrefour..."></div>
         <div class="fg"><div class="fl">Priorité</div>
-          <select class="fs" [(ngModel)]="fRep.priorite">
+          <select class="fsel" [(ngModel)]="fRep.priorite">
             <option value="normale">Normale</option><option value="haute">Haute</option><option value="urgente">Urgente</option>
           </select>
         </div>

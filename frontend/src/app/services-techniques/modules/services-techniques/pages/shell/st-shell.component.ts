@@ -107,8 +107,8 @@ export type Section = 'voirie' | 'eclairage' | 'eau' | 'batiments' | 'interventi
       <!-- ── KPIs ──────────────────────────────────────────────────────── -->
       <div class="kpi-row">
         <div class="kpi">
-          <div class="kpi-bar" style="background:#003366"></div>
-          <div class="kpi-ic" style="color:#003366"><i class="ti ti-refresh-alert"></i></div>
+          <div class="kpi-bar" style="background:#1a5c28"></div>
+          <div class="kpi-ic" style="color:#1a5c28"><i class="ti ti-refresh-alert"></i></div>
           <div class="kpi-v">{{st.kpi().interventionsEnCours}}</div>
           <div class="kpi-l">Interventions en cours</div>
         </div>
@@ -125,8 +125,8 @@ export type Section = 'voirie' | 'eclairage' | 'eau' | 'batiments' | 'interventi
           <div class="kpi-l">Travaux planifiés</div>
         </div>
         <div class="kpi">
-          <div class="kpi-bar" style="background:#185FA5"></div>
-          <div class="kpi-ic" style="color:#185FA5"><i class="ti ti-message-circle"></i></div>
+          <div class="kpi-bar" style="background:#C9A84C"></div>
+          <div class="kpi-ic" style="color:#C9A84C"><i class="ti ti-message-circle"></i></div>
           <div class="kpi-v">{{st.kpi().demandesCitoyennes}}</div>
           <div class="kpi-l">Demandes citoyennes</div>
         </div>

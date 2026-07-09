@@ -22,7 +22,7 @@ type Tab = 'preventive' | 'corrective';
 
 <!-- ── KPIs maintenance ───────────────────────────────────────────────── -->
 <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:.75rem 1rem;border-bottom:.5px solid var(--color-border-tertiary)">
-  <div class="mini-kpi"><span class="mk-v" style="color:#185FA5">{{totalPrev()}}</span><span class="mk-l">Planifiées</span></div>
+  <div class="mini-kpi"><span class="mk-v" style="color:#8c4a00">{{totalPrev()}}</span><span class="mk-l">Planifiées</span></div>
   <div class="mini-kpi"><span class="mk-v" style="color:#e63946">{{enRetard()}}</span><span class="mk-l">En retard</span></div>
   <div class="mini-kpi"><span class="mk-v" style="color:#F77F00">{{totalCorr()}}</span><span class="mk-l">Pannes signalées</span></div>
   <div class="mini-kpi"><span class="mk-v" style="color:#009A44">{{resolues()}}</span><span class="mk-l">Résolues</span></div>
@@ -39,21 +39,21 @@ type Tab = 'preventive' | 'corrective';
       <div class="form-grid">
         <div class="fg"><div class="fl">Équipement / Installation</div><input class="fi" [(ngModel)]="fPrev.equipement" placeholder="Ex: Groupe électrogène HdV"></div>
         <div class="fg"><div class="fl">Service</div>
-          <select class="fs" [(ngModel)]="fPrev.service">
+          <select class="fsel" [(ngModel)]="fPrev.service">
             <option>Voirie</option><option>Éclairage public</option><option>Eau / Assainissement</option><option>Bâtiments</option><option>Général</option>
           </select>
         </div>
       </div>
       <div class="form-grid">
         <div class="fg"><div class="fl">Type de maintenance</div>
-          <select class="fs" [(ngModel)]="fPrev.type">
+          <select class="fsel" [(ngModel)]="fPrev.type">
             <option>Révision générale</option><option>Nettoyage / Dépoussiérage</option>
             <option>Lubrification</option><option>Vérification électrique</option>
             <option>Remplacement pièces</option><option>Contrôle étanchéité</option><option>Autre</option>
           </select>
         </div>
         <div class="fg"><div class="fl">Périodicité</div>
-          <select class="fs" [(ngModel)]="fPrev.periodicite">
+          <select class="fsel" [(ngModel)]="fPrev.periodicite">
             <option>Mensuelle</option><option>Trimestrielle</option><option>Semestrielle</option><option>Annuelle</option>
           </select>
         </div>
@@ -70,12 +70,12 @@ type Tab = 'preventive' | 'corrective';
     </div>
   }
   <div style="padding:6px 8px;border-bottom:.5px solid var(--color-border-tertiary);display:flex;gap:8px">
-    <select class="fs" style="max-width:150px" [(ngModel)]="fltPrev" (ngModelChange)="st.loadPlanningMaintenance()">
+    <select class="fsel" style="max-width:150px" [(ngModel)]="fltPrev" (ngModelChange)="st.loadPlanningMaintenance()">
       <option value="">Tous statuts</option>
       <option value="programme">Programmée</option><option value="en_cours">En cours</option>
       <option value="effectue">Effectuée</option><option value="en_retard">En retard</option>
     </select>
-    <select class="fs" style="max-width:150px" [(ngModel)]="fltSvc">
+    <select class="fsel" style="max-width:150px" [(ngModel)]="fltSvc">
       <option value="">Tous services</option>
       <option>Voirie</option><option>Éclairage public</option><option>Eau / Assainissement</option><option>Bâtiments</option>
     </select>
@@ -120,7 +120,7 @@ type Tab = 'preventive' | 'corrective';
       <div class="form-grid">
         <div class="fg"><div class="fl">Équipement / Installation</div><input class="fi" [(ngModel)]="fCorr.equipement" placeholder="Ex: Pompe forage quartier N"></div>
         <div class="fg"><div class="fl">Service</div>
-          <select class="fs" [(ngModel)]="fCorr.service">
+          <select class="fsel" [(ngModel)]="fCorr.service">
             <option>Voirie</option><option>Éclairage public</option><option>Eau / Assainissement</option><option>Bâtiments</option>
           </select>
         </div>
@@ -130,7 +130,7 @@ type Tab = 'preventive' | 'corrective';
           <textarea class="fi" style="height:60px;resize:none;padding-top:6px" [(ngModel)]="fCorr.panne" placeholder="Symptômes observés..."></textarea>
         </div>
         <div class="fg"><div class="fl">Priorité</div>
-          <select class="fs" [(ngModel)]="fCorr.priorite">
+          <select class="fsel" [(ngModel)]="fCorr.priorite">
             <option value="normale">Normale</option><option value="haute">Haute</option><option value="urgente">Urgente</option>
           </select>
         </div>

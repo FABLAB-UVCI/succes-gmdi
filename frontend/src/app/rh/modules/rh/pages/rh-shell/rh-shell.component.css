@@ -24,7 +24,7 @@
 
 /* ── Topbar ───────────────────────────────────────────────────────────── */
 .topbar {
-  background: var(--ci-bleu);
+  background: linear-gradient(135deg, #1a3a1f 0%, #1a5c28 100%);
   padding: 0 1.5rem;
   height: 65px;
   display: flex;
@@ -131,7 +131,7 @@
 /* ── Sidebar ─────────────────────────────────────────────────────────── */
 .sidebar {
   width: 240px;
-  background: linear-gradient(180deg, #001f3f 0%, #002a56 60%, #003a70 100%);
+  background: linear-gradient(180deg, #1a3a1f 0%, #0d2414 100%);
   min-height: calc(100vh - 65px);
   padding: 20px 0 40px;
   border-right: 1px solid rgba(255,255,255,.06);
@@ -212,10 +212,10 @@
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 1rem;
-  background: var(--ci-bleu);
+  background: linear-gradient(135deg, #1a3a1f 0%, #1a5c28 100%);
   padding: 1rem 1.5rem;
   border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0,51,102,.25);
+  box-shadow: 0 4px 16px rgba(26,92,40,.25);
   border-left: 5px solid var(--ci-orange);
   position: relative;
   overflow: hidden;

@@ -25,7 +25,7 @@ Chart.register(...registerables);
         <div class="ks">/ 180 M budget annuel</div>
         <div class="kb"><div style="width:42%;background:#009A44;height:100%;border-radius:2px"></div></div>
       </div>
-      <div class="kcard"><div class="kv" style="color:#185FA5">43 285</div><div class="kl">Salaire moyen (FCFA)</div><div class="ks">Tous agents confondus</div></div>
+      <div class="kcard"><div class="kv" style="color:#8c4a00">43 285</div><div class="kl">Salaire moyen (FCFA)</div><div class="ks">Tous agents confondus</div></div>
       <div class="kcard"><div class="kv" style="color:#F77F00">3</div><div class="kl">Congés en attente</div><div class="ks">À valider</div></div>
     </div>
 
@@ -35,7 +35,7 @@ Chart.register(...registerables);
       <table class="tbl">
         <thead><tr><th>Par type de contrat</th><th>Effectif</th><th>%</th></tr></thead>
         <tbody>
-          <tr><td class="bold">Fonctionnaires</td><td>280</td><td><div class="mbw"><div class="mbf" style="width:81%;background:#185FA5"></div></div> 81%</td></tr>
+          <tr><td class="bold">Fonctionnaires</td><td>280</td><td><div class="mbw"><div class="mbf" style="width:81%;background:#8c4a00"></div></div> 81%</td></tr>
           <tr><td class="bold">Contractuels</td><td>52</td><td><div class="mbw"><div class="mbf" style="width:15%;background:#F77F00"></div></div> 15%</td></tr>
           <tr><td class="bold">Stagiaires</td><td>15</td><td><div class="mbw"><div class="mbf" style="width:4%;background:#009A44"></div></div> 4%</td></tr>
         </tbody>
@@ -59,7 +59,7 @@ Chart.register(...registerables);
     <div style="background: #f8fafc; border-radius: 12px; padding: 1rem; margin-bottom: 1rem;">
       <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
         <div style="flex: 1;">
-          <div style="font-weight: 600; color: #003366; margin-bottom: 0.5rem;">👩 Taux de féminisation</div>
+          <div style="font-weight: 600; color: #006B30; margin-bottom: 0.5rem;">👩 Taux de féminisation</div>
           <div style="font-size: 2rem; font-weight: 700; color: #C9A84C;">38%</div>
           <div style="font-size: 0.75rem; color: #009A44; margin-top: 0.25rem;">⬆ +3% vs 2024</div>
         </div>
@@ -75,15 +75,15 @@ Chart.register(...registerables);
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
       <div style="background: #f8fafc; border-radius: 12px; padding: 1rem; text-align: center;">
         <div style="font-size: 0.7rem; color: #6c757d;">🎂 ÂGE MOYEN</div>
-        <div style="font-size: 2.5rem; font-weight: 700; color: #185FA5;">42</div>
+        <div style="font-size: 2.5rem; font-weight: 700; color: #8c4a00;">42</div>
         <div style="font-size: 0.7rem; color: #6c757d;">ans</div>
-        <div class="kb" style="margin-top: 0.5rem;"><div style="width: 70%; background: #185FA5; height: 100%; border-radius: 2px;"></div></div>
+        <div class="kb" style="margin-top: 0.5rem;"><div style="width: 70%; background: #8c4a00; height: 100%; border-radius: 2px;"></div></div>
       </div>
       <div style="background: #f8fafc; border-radius: 12px; padding: 1rem; text-align: center;">
         <div style="font-size: 0.7rem; color: #6c757d;">📅 ANCIENNETÉ MOYENNE</div>
-        <div style="font-size: 2.5rem; font-weight: 700; color: #185FA5;">14</div>
+        <div style="font-size: 2.5rem; font-weight: 700; color: #8c4a00;">14</div>
         <div style="font-size: 0.7rem; color: #6c757d;">ans</div>
-        <div class="kb" style="margin-top: 0.5rem;"><div style="width: 58%; background: #185FA5; height: 100%; border-radius: 2px;"></div></div>
+        <div class="kb" style="margin-top: 0.5rem;"><div style="width: 58%; background: #8c4a00; height: 100%; border-radius: 2px;"></div></div>
       </div>
     </div>
 
@@ -91,7 +91,7 @@ Chart.register(...registerables);
     <div style="background: #f8fafc; border-radius: 12px; padding: 1rem; margin-bottom: 1rem;">
       <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
         <div style="flex: 1;">
-          <div style="font-weight: 600; color: #003366; margin-bottom: 0.5rem;">📊 Taux d'absentéisme - Mai 2025</div>
+          <div style="font-weight: 600; color: #006B30; margin-bottom: 0.5rem;">📊 Taux d'absentéisme - Mai 2025</div>
           <div style="font-size: 2rem; font-weight: 700; color: #E24B4A;">4,2%</div>
           <div style="font-size: 0.75rem; color: #E24B4A; margin-top: 0.25rem;">⚠ +0.8% vs avril</div>
         </div>
@@ -106,7 +106,7 @@ Chart.register(...registerables);
     <!-- Graphique 4: Agents en formation et Promotions (Barres horizontales) -->
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
       <div style="background: #f8fafc; border-radius: 12px; padding: 1rem;">
-        <div style="font-weight: 600; color: #003366; margin-bottom: 0.5rem;">🎓 Agents en formation</div>
+        <div style="font-weight: 600; color: #006B30; margin-bottom: 0.5rem;">🎓 Agents en formation</div>
         <div style="display: flex; align-items: baseline; gap: 0.5rem;">
           <span style="font-size: 2rem; font-weight: 700; color: #009A44;">18</span>
           <span style="font-size: 0.75rem; color: #009A44;">⬆ +6 vs mai 2024</span>
@@ -114,7 +114,7 @@ Chart.register(...registerables);
         <div class="kb" style="margin-top: 0.5rem;"><div style="width: 18%; background: #009A44; height: 100%; border-radius: 2px;"></div></div>
       </div>
       <div style="background: #f8fafc; border-radius: 12px; padding: 1rem;">
-        <div style="font-weight: 600; color: #003366; margin-bottom: 0.5rem;">🏆 Promotions accordées 2025</div>
+        <div style="font-weight: 600; color: #006B30; margin-bottom: 0.5rem;">🏆 Promotions accordées 2025</div>
         <div style="display: flex; align-items: baseline; gap: 0.5rem;">
           <span style="font-size: 2rem; font-weight: 700; color: #009A44;">12</span>
           <span style="font-size: 0.75rem; color: #009A44;">⬆ +4 vs 2024</span>
@@ -146,7 +146,7 @@ Chart.register(...registerables);
     .tbl td { font-size: 12px; padding: 7px 10px; border-bottom: 0.5px solid #e5e7eb; }
     .bold { font-weight: 500; }
     .bs { background: white; border: 0.5px solid #d1d5db; color: #111827; font-size: 12px; padding: 6px 12px; border-radius: 6px; cursor: pointer; }
-    .bd { background: #003366; border: none; color: white; font-size: 12px; padding: 6px 12px; border-radius: 6px; cursor: pointer; }
+    .bd { background: #006B30; border: none; color: white; font-size: 12px; padding: 6px 12px; border-radius: 6px; cursor: pointer; }
   `]
 })
 export class RapportsComponent {

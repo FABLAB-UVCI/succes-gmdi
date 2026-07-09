@@ -30,17 +30,17 @@ type Tab = 'demandes' | 'bons' | 'equipes';
 
   <!-- Filtres ─────────────────────────────────────────────────────────── -->
   <div style="padding:6px 8px;border-bottom:.5px solid var(--color-border-tertiary);display:flex;gap:8px">
-    <select class="fs" style="max-width:130px" [(ngModel)]="flt.statut" (ngModelChange)="st.loadDemandes({statut:flt.statut})">
+    <select class="fsel" style="max-width:130px" [(ngModel)]="flt.statut" (ngModelChange)="st.loadDemandes({statut:flt.statut})">
       <option value="">Tous statuts</option>
       <option value="ouverte">Ouverte</option><option value="assignee">Assignée</option>
       <option value="en_cours">En cours</option><option value="terminee">Terminée</option><option value="cloturee">Clôturée</option>
     </select>
-    <select class="fs" style="max-width:130px" [(ngModel)]="flt.service" (ngModelChange)="st.loadDemandes({type_service:flt.service})">
+    <select class="fsel" style="max-width:130px" [(ngModel)]="flt.service" (ngModelChange)="st.loadDemandes({type_service:flt.service})">
       <option value="">Tous services</option>
       <option value="voirie">Voirie</option><option value="eclairage">Éclairage</option>
       <option value="eau">Eau/Assain.</option><option value="batiment">Bâtiments</option>
     </select>
-    <select class="fs" style="max-width:120px" [(ngModel)]="flt.priorite" (ngModelChange)="st.loadDemandes({priorite:flt.priorite})">
+    <select class="fsel" style="max-width:120px" [(ngModel)]="flt.priorite" (ngModelChange)="st.loadDemandes({priorite:flt.priorite})">
       <option value="">Toutes priorités</option>
       <option value="urgente">Urgente</option><option value="haute">Haute</option><option value="normale">Normale</option>
     </select>
@@ -51,13 +51,13 @@ type Tab = 'demandes' | 'bons' | 'equipes';
       <div class="fsec">Nouvelle demande citoyenne</div>
       <div class="form-grid">
         <div class="fg"><div class="fl">Service concerné</div>
-          <select class="fs" [(ngModel)]="fDem.typeService">
+          <select class="fsel" [(ngModel)]="fDem.typeService">
             <option value="voirie">Voirie</option><option value="eclairage">Éclairage public</option>
             <option value="eau">Eau / Assainissement</option><option value="batiment">Bâtiment communal</option>
           </select>
         </div>
         <div class="fg"><div class="fl">Priorité</div>
-          <select class="fs" [(ngModel)]="fDem.priorite">
+          <select class="fsel" [(ngModel)]="fDem.priorite">
             <option value="normale">Normale</option><option value="haute">Haute</option><option value="urgente">Urgente</option>
           </select>
         </div>
@@ -138,7 +138,7 @@ type Tab = 'demandes' | 'bons' | 'equipes';
       <div class="form-grid">
         <div class="fg"><div class="fl">Description des travaux</div><input class="fi" [(ngModel)]="fBon.description" placeholder="Nature des travaux"></div>
         <div class="fg"><div class="fl">Service</div>
-          <select class="fs" [(ngModel)]="fBon.service">
+          <select class="fsel" [(ngModel)]="fBon.service">
             <option>Voirie</option><option>Éclairage public</option><option>Eau / Assainissement</option><option>Bâtiments</option>
           </select>
         </div>

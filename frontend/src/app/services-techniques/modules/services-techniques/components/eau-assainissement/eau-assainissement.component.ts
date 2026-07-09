@@ -35,7 +35,7 @@ type Tab = 'caniveaux' | 'drainage' | 'dechets';
       <div class="form-grid">
         <div class="fg"><div class="fl">Longueur (m)</div><input class="fi" type="number" [(ngModel)]="fCan.longueur"></div>
         <div class="fg"><div class="fl">État</div>
-          <select class="fs" [(ngModel)]="fCan.etat">
+          <select class="fsel" [(ngModel)]="fCan.etat">
             <option value="bon">Bon</option><option value="colmate">Colmaté</option><option value="degrade">Dégradé</option>
           </select>
         </div>
@@ -47,7 +47,7 @@ type Tab = 'caniveaux' | 'drainage' | 'dechets';
     </div>
   }
   <div style="padding:6px 8px;border-bottom:.5px solid var(--color-border-tertiary)">
-    <select class="fs" style="max-width:150px" [(ngModel)]="fltEtat" (ngModelChange)="st.loadCaniveaux({etat:fltEtat})">
+    <select class="fsel" style="max-width:150px" [(ngModel)]="fltEtat" (ngModelChange)="st.loadCaniveaux({etat:fltEtat})">
       <option value="">Tous états</option><option value="bon">Bon</option><option value="colmate">Colmaté</option><option value="degrade">Dégradé</option>
     </select>
   </div>
@@ -86,7 +86,7 @@ type Tab = 'caniveaux' | 'drainage' | 'dechets';
       <div class="form-grid">
         <div class="fg"><div class="fl">Localisation</div><input class="fi" [(ngModel)]="fDrain.localisation" placeholder="Zone concernée"></div>
         <div class="fg"><div class="fl">Type d'intervention</div>
-          <select class="fs" [(ngModel)]="fDrain.type">
+          <select class="fsel" [(ngModel)]="fDrain.type">
             <option value="curage">Curage</option><option value="debouchage">Débouchage</option><option value="reparation">Réparation</option><option value="construction">Construction</option>
           </select>
         </div>
@@ -143,7 +143,7 @@ type Tab = 'caniveaux' | 'drainage' | 'dechets';
       <div class="form-grid-3">
         <div class="fg"><div class="fl">Zone de collecte</div><input class="fi" [(ngModel)]="fDechet.zone" placeholder="Ex: Quartier Anono"></div>
         <div class="fg"><div class="fl">Fréquence</div>
-          <select class="fs" [(ngModel)]="fDechet.frequence">
+          <select class="fsel" [(ngModel)]="fDechet.frequence">
             <option>Quotidienne</option><option>Hebdomadaire</option><option>Bihebdomadaire</option>
           </select>
         </div>

@@ -33,7 +33,7 @@ type Tab = 'lampadaires' | 'pannes' | 'maintenance';
   <div class="ph">
     <div class="pt"><i class="ti ti-bulb"></i>Inventaire lampadaires</div>
     <div style="display:flex;gap:8px">
-      <select class="fs" style="max-width:130px" [(ngModel)]="flt" (ngModelChange)="st.loadLampadaires({statut:flt})">
+      <select class="fsel" style="max-width:130px" [(ngModel)]="flt" (ngModelChange)="st.loadLampadaires({statut:flt})">
         <option value="">Tous</option><option value="fonctionnel">Fonctionnel</option><option value="en_panne">En panne</option><option value="en_maintenance">En maintenance</option>
       </select>
       <button class="btn-s" (click)="showAdd.set(!showAdd())"><i class="ti ti-plus"></i>Ajouter</button>
@@ -47,7 +47,7 @@ type Tab = 'lampadaires' | 'pannes' | 'maintenance';
       </div>
       <div class="form-grid-3">
         <div class="fg"><div class="fl">Type de lampe</div>
-          <select class="fs" [(ngModel)]="fLamp.typeLampe">
+          <select class="fsel" [(ngModel)]="fLamp.typeLampe">
             <option>Sodium</option><option>LED</option><option>Fluo compact</option><option>Halogène</option>
           </select>
         </div>
@@ -155,7 +155,7 @@ type Tab = 'lampadaires' | 'pannes' | 'maintenance';
       </div>
       <div class="form-grid-3">
         <div class="fg"><div class="fl">Type d'intervention</div>
-          <select class="fs" [(ngModel)]="fMaint.typeIntervention">
+          <select class="fsel" [(ngModel)]="fMaint.typeIntervention">
             <option>Remplacement lampes</option><option>Vérification câblage</option><option>Nettoyage réflecteurs</option><option>Révision générale</option>
           </select>
         </div>

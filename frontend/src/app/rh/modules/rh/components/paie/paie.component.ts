@@ -29,7 +29,7 @@ type Tab = 'salaires' | 'primes' | 'bulletins';
       <div class="kpi4" style="margin-bottom:1rem">
         <div class="kcard"><div class="kv" style="color:#C9A84C">15 000 000</div><div class="kl">Masse salariale mai (FCFA)</div></div>
         <div class="kcard"><div class="kv" style="color:#009A44">347</div><div class="kl">Agents à payer</div></div>
-        <div class="kcard"><div class="kv" style="color:#185FA5">43 285</div><div class="kl">Salaire moyen (FCFA)</div></div>
+        <div class="kcard"><div class="kv" style="color:#8c4a00">43 285</div><div class="kl">Salaire moyen (FCFA)</div></div>
         <div class="kcard"><div class="kv" style="color:#F77F00">2 250 000</div><div class="kl">Total retenues CNPS</div></div>
       </div>
       <div style="display:flex;gap:8px;margin-bottom:1rem">

@@ -126,9 +126,9 @@ const NB_DEST: Record<string, number> = { tous: 12500, quartier: 3800, commercan
   </div>
   <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:.75rem 1rem;border-bottom:.5px solid var(--color-border-tertiary)">
     <div class="mini-kpi"><span class="mk-v" style="color:#F77F00">{{com.smsHistorique().length}}</span><span class="mk-l">Campagnes ce mois</span></div>
-    <div class="mini-kpi"><span class="mk-v" style="color:#003366">{{totalSms() | number}}</span><span class="mk-l">SMS envoyés</span></div>
+    <div class="mini-kpi"><span class="mk-v" style="color:#006B30">{{totalSms() | number}}</span><span class="mk-l">SMS envoyés</span></div>
     <div class="mini-kpi"><span class="mk-v" style="color:#009A44">{{com.kpi().tauxLivraisonSms}}%</span><span class="mk-l">Taux de livraison</span></div>
-    <div class="mini-kpi"><span class="mk-v" style="color:#185FA5">1 850</span><span class="mk-l">FCFA coût moyen camp.</span></div>
+    <div class="mini-kpi"><span class="mk-v" style="color:#C9A84C">1 850</span><span class="mk-l">FCFA coût moyen camp.</span></div>
   </div>
   <div style="padding:.75rem 1rem;display:flex;flex-direction:column;gap:8px">
     @for (s of com.smsHistorique(); track s.id) {

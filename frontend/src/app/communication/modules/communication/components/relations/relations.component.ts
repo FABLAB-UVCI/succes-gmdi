@@ -112,7 +112,7 @@ type Tab = 'partenaires' | 'presse' | 'medias';
     <div class="mini-kpi"><span class="mk-v" style="color:#F77F00">28</span><span class="mk-l">Médias référencés</span></div>
     <div class="mini-kpi"><span class="mk-v" style="color:#009A44">12</span><span class="mk-l">Articles positifs ce mois</span></div>
     <div class="mini-kpi"><span class="mk-v" style="color:#F77F00">4</span><span class="mk-l">Articles mitigés</span></div>
-    <div class="mini-kpi"><span class="mk-v" style="color:#185FA5">6</span><span class="mk-l">Demandes d'interview</span></div>
+    <div class="mini-kpi"><span class="mk-v" style="color:#C9A84C">6</span><span class="mk-l">Demandes d'interview</span></div>
   </div>
   <div class="tbl-wrap">
     <table>

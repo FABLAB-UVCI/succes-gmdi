@@ -144,7 +144,7 @@ interface CritereEval {
       <div style="background: #f8fafc; border-radius: 12px; padding: 1rem; margin-bottom: 1rem;">
         
         <!-- En-tête de la grille -->
-        <div style="display: grid; grid-template-columns: 2fr 3fr 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr; gap: 0.5rem; margin-bottom: 0.75rem; font-size: 0.7rem; font-weight: 600; color: #003366; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem;">
+        <div style="display: grid; grid-template-columns: 2fr 3fr 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr; gap: 0.5rem; margin-bottom: 0.75rem; font-size: 0.7rem; font-weight: 600; color: #006B30; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem;">
           <div>Critère</div>
           <div>Description</div>
           <div style="text-align: center;">À éviter<br>(0)</div>
@@ -260,15 +260,15 @@ interface CritereEval {
         <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1rem;">
           <div style="text-align: center;">
             <div style="font-size: 0.7rem; color: #6c757d;">Note totale</div>
-            <div style="font-size: 1.8rem; font-weight: 700; color: #003366;">{{ noteTotale }}/40</div>
+            <div style="font-size: 1.8rem; font-weight: 700; color: #006B30;">{{ noteTotale }}/40</div>
           </div>
           <div style="text-align: center;">
             <div style="font-size: 0.7rem; color: #6c757d;">Note moyenne</div>
-            <div style="font-size: 1.8rem; font-weight: 700; color: #003366;">{{ noteMoyenne }}/4</div>
+            <div style="font-size: 1.8rem; font-weight: 700; color: #006B30;">{{ noteMoyenne }}/4</div>
           </div>
           <div style="text-align: center;">
             <div style="font-size: 0.7rem; color: #6c757d;">Pourcentage</div>
-            <div style="font-size: 1.8rem; font-weight: 700; color: #003366;">{{ pourcentage }}%</div>
+            <div style="font-size: 1.8rem; font-weight: 700; color: #006B30;">{{ pourcentage }}%</div>
           </div>
           <div style="text-align: center;">
             <div style="font-size: 0.7rem; color: #6c757d;">Mention</div>
@@ -424,7 +424,7 @@ export class FormationComponent {
     const pourc = this.pourcentage;
     if (pourc >= 90) return '#C9A84C';
     if (pourc >= 75) return '#009A44';
-    if (pourc >= 60) return '#185FA5';
+    if (pourc >= 60) return '#8c4a00';
     if (pourc >= 50) return '#F77F00';
     if (pourc >= 40) return '#E24B4A';
     return '#6c757d';

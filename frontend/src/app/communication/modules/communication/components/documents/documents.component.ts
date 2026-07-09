@@ -106,7 +106,7 @@ type Tab = 'photos' | 'videos' | 'archives';
     <div class="fsec" style="margin-top:0">Vidéos récentes</div>
     @for (d of videos(); track d.id) {
       <div class="doc-card">
-        <div class="doc-ico" style="background:#185FA51a"><i class="ti ti-video" style="color:#185FA5"></i></div>
+        <div class="doc-ico" style="background:#C9A84C1a"><i class="ti ti-video" style="color:#C9A84C"></i></div>
         <div class="doc-body">
           <div class="doc-nom">{{d.titre}}</div>
           <div class="doc-meta">{{d.categorie}} — {{d.date}}</div>
@@ -128,7 +128,7 @@ type Tab = 'photos' | 'videos' | 'archives';
   <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:.75rem 1rem;border-bottom:.5px solid var(--color-border-tertiary)">
     <div class="mini-kpi"><span class="mk-v" style="color:#F77F00">1 248</span><span class="mk-l">Documents archivés</span></div>
     <div class="mini-kpi"><span class="mk-v" style="color:#E1306C">{{photos().length}}</span><span class="mk-l">Photos</span></div>
-    <div class="mini-kpi"><span class="mk-v" style="color:#185FA5">{{videos().length}}</span><span class="mk-l">Vidéos</span></div>
+    <div class="mini-kpi"><span class="mk-v" style="color:#C9A84C">{{videos().length}}</span><span class="mk-l">Vidéos</span></div>
     <div class="mini-kpi"><span class="mk-v" style="color:#009A44">838</span><span class="mk-l">Documents PDF / Office</span></div>
   </div>
   <div style="padding:6px 8px;border-bottom:.5px solid var(--color-border-tertiary);display:flex;gap:8px">
@@ -247,7 +247,7 @@ export class DocumentsComponent implements OnInit {
     });
   }
 
-  docColor(t: string): string { return { photo:'#E1306C', video:'#185FA5', pdf:'#003366', arrete:'#C9A84C', deliberation:'#C9A84C' }[t] ?? '#888'; }
+  docColor(t: string): string { return { photo:'#E1306C', video:'#C9A84C', pdf:'#006B30', arrete:'#C9A84C', deliberation:'#C9A84C' }[t] ?? '#888'; }
   docIcon(t: string): string  { return { photo:'ti-photo', video:'ti-video', pdf:'ti-file-text', arrete:'ti-file-certificate', deliberation:'ti-file-certificate' }[t] ?? 'ti-file'; }
   docLabel(t: string): string { return { photo:'Photo', video:'Vidéo', pdf:'Document PDF', arrete:'Arrêté', deliberation:'Délibération' }[t] ?? t; }
 }

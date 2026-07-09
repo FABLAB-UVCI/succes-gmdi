@@ -78,7 +78,7 @@ interface NavItem { id: Section; label: string; icon: string; }
         </div>
         <div class="mkpis">
           <div class="mk"><span class="mk-v" style="color:#C9A84C">{{ rh.totalAgents() }}</span><span class="mk-l">Agents actifs</span></div>
-          <div class="mk"><span class="mk-v" style="color:#185FA5">{{ rh.totalFonct() }}</span><span class="mk-l">Fonctionnaires</span></div>
+          <div class="mk"><span class="mk-v" style="color:#8c4a00">{{ rh.totalFonct() }}</span><span class="mk-l">Fonctionnaires</span></div>
           <div class="mk"><span class="mk-v" style="color:#F77F00">{{ rh.totalContrat() }}</span><span class="mk-l">Contractuels</span></div>
           <div class="mk"><span class="mk-v" style="color:#009A44">{{ rh.totalStagiaires() }}</span><span class="mk-l">Stagiaires</span></div>
         </div>

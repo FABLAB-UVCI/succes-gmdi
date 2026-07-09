@@ -6,7 +6,7 @@ import { ToastService } from '../../../../core/services/toast.service';
 import { Actualite } from '../../../../core/models/communication.models';
 
 type Tab = 'liste' | 'communique' | 'annonce' | 'evenement';
-const TYPE_COLORS: Record<string, string> = { communique: '#003366', annonce: '#F77F00', evenement: '#009A44' };
+const TYPE_COLORS: Record<string, string> = { communique: '#006B30', annonce: '#F77F00', evenement: '#009A44' };
 
 @Component({
   selector: 'app-actualites',

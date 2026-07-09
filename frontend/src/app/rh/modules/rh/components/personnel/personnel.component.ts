@@ -227,7 +227,7 @@ type Tab = 'fiche' | 'liste' | 'fonct' | 'contrat' | 'stage';
     <div class="ch"><h3><i class="ti ti-building"></i>Fonctionnaires — {{ rh.totalFonct() }} agent(s)</h3></div>
     <div class="pb">
       <div class="kpi4">
-        <div class="kcard"><div class="kv" style="color:#185FA5">{{ rh.totalFonct() }}</div><div class="kl">Total fonctionnaires</div></div>
+        <div class="kcard"><div class="kv" style="color:#8c4a00">{{ rh.totalFonct() }}</div><div class="kl">Total fonctionnaires</div></div>
         <div class="kcard"><div class="kv" style="color:#009A44">{{ rh.parCategorie().A }}</div><div class="kl">Catégorie A</div><div class="ks">Cadres supérieurs</div></div>
         <div class="kcard"><div class="kv" style="color:#C9A84C">{{ rh.parCategorie().B }}</div><div class="kl">Catégorie B</div><div class="ks">Cadres moyens</div></div>
         <div class="kcard"><div class="kv" style="color:#F77F00">{{ rh.parCategorie().C }}</div><div class="kl">Catégorie C</div><div class="ks">Agents d'exécution</div></div>
