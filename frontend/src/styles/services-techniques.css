@@ -39,10 +39,14 @@ body { font-family: var(--font-sans); background: var(--color-background-tertiar
 
 /* ── Shell ───────────────────────────────────────────────────────────────── */
 .root   { font-family: var(--font-sans); min-height: 100vh; padding-top: 4px; }
-.layout { display: flex; height: calc(100vh - 4px - var(--topbar-h)); }
+.st-shell .layout { display: flex; height: calc(100vh - 4px - var(--topbar-h)); }
 
 /* ── Topbar ──────────────────────────────────────────────────────────────── */
-.topbar {
+/* .st-shell double le sélecteur pour battre les regles génériques homonymes
+   d'autres feuilles de style globales (ex: urbanisme.css) chargées après
+   ce fichier dans angular.json — sans cette précaution, la dernière feuille
+   de style chargée l'emporte en cas d'égalité de spécificité. */
+.st-shell .topbar {
   background: #fff;
   border-bottom: 2px solid var(--color-border-tertiary);
   padding: 0 1.25rem;
@@ -55,13 +59,13 @@ body { font-family: var(--font-sans); background: var(--color-background-tertiar
   z-index: 50;
   box-shadow: 0 2px 8px rgba(0,0,0,.07);
 }
-.topbar-title {
+.st-shell .topbar-title {
   color: var(--ci-navy);
   font-size: 14px;
   font-weight: 700;
   letter-spacing: -.01em;
 }
-.topbar-sub {
+.st-shell .topbar-sub {
   color: var(--ci-green);
   font-size: 10px;
   font-weight: 700;
@@ -69,14 +73,14 @@ body { font-family: var(--font-sans); background: var(--color-background-tertiar
   text-transform: uppercase;
   margin-top: 2px;
 }
-.topbar-user {
+.st-shell .topbar-user {
   color: var(--color-text-secondary);
   font-size: 12px;
   display: flex;
   align-items: center;
   gap: 8px;
 }
-.av {
+.st-shell .av {
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -106,7 +110,7 @@ body { font-family: var(--font-sans); background: var(--color-background-tertiar
 .ci-flag .f-gr { background: #009A44; }
 
 /* ── Sidebar ─────────────────────────────────────────────────────────────── */
-.sidebar {
+.st-shell .sidebar {
   width: var(--sidebar-w);
   background: var(--sidebar-bg);
   height: 100%;
@@ -117,7 +121,7 @@ body { font-family: var(--font-sans); background: var(--color-background-tertiar
   flex-direction: column;
   border-right: none;
 }
-.sb-logo {
+.st-shell .sb-logo {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -125,7 +129,7 @@ body { font-family: var(--font-sans); background: var(--color-background-tertiar
   border-bottom: 1px solid rgba(255,255,255,.08);
   margin-bottom: 6px;
 }
-.sb-logo-badge {
+.st-shell .sb-logo-badge {
   width: 32px;
   height: 32px;
   border-radius: 8px;
@@ -137,9 +141,9 @@ body { font-family: var(--font-sans); background: var(--color-background-tertiar
   color: #fff;
   flex-shrink: 0;
 }
-.sb-logo-text { font-size: 11px; font-weight: 700; color: rgba(255,255,255,.9); letter-spacing: .02em; }
-.sb-logo-sub  { font-size: 9px; color: rgba(255,255,255,.45); letter-spacing: .05em; margin-top: 1px; }
-.sb-sec {
+.st-shell .sb-logo-text { font-size: 11px; font-weight: 700; color: rgba(255,255,255,.9); letter-spacing: .02em; }
+.st-shell .sb-logo-sub  { font-size: 9px; color: rgba(255,255,255,.45); letter-spacing: .05em; margin-top: 1px; }
+.st-shell .sb-sec {
   font-size: 9.5px;
   color: rgba(255,255,255,.38);
   padding: 12px 14px 3px;
@@ -150,8 +154,8 @@ body { font-family: var(--font-sans); background: var(--color-background-tertiar
   align-items: center;
   gap: 6px;
 }
-.sb-sec i { font-size: 11px; color: rgba(255,255,255,.35); }
-.sb-item {
+.st-shell .sb-sec i { font-size: 11px; color: rgba(255,255,255,.35); }
+.st-shell .sb-item {
   display: flex;
   align-items: center;
   gap: 9px;
@@ -164,21 +168,21 @@ body { font-family: var(--font-sans); background: var(--color-background-tertiar
   margin: 1px 8px;
   border-radius: 7px;
 }
-.sb-item:hover {
+.st-shell .sb-item:hover {
   background: rgba(255,255,255,.09);
   color: rgba(255,255,255,.95);
 }
-.sb-item.act {
+.st-shell .sb-item.act {
   background: var(--ci-orange);
   color: #fff;
   font-weight: 600;
   box-shadow: 0 3px 10px rgba(247,127,0,.35);
 }
-.sb-item.act i { color: #fff; }
-.sb-item i { font-size: 15px; }
+.st-shell .sb-item.act i { color: #fff; }
+.st-shell .sb-item i { font-size: 15px; }
 
 /* ── Main ────────────────────────────────────────────────────────────────── */
-.main {
+.st-shell .main {
   flex: 1;
   padding: 1rem 1.25rem;
   display: flex;

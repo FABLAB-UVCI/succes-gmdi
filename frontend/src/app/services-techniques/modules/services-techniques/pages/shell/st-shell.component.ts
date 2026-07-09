@@ -24,7 +24,7 @@ export type Section = 'voirie' | 'eclairage' | 'eau' | 'batiments' | 'interventi
     AnnoncesMaireComponent,
   ],
   template: `
-<div class="root">
+<div class="root st-shell">
 
   <!-- ── Topbar ─────────────────────────────────────────────────────────── -->
   <div class="topbar">
