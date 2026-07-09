@@ -22,4 +22,4 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction --no-script
 EXPOSE 8000
 
 # Au démarrage : cache config, migrations (avec attente de la DB), puis serveur sur $PORT
-CMD ["sh", "-c", "php artisan config:cache && until php artisan migrate --force; do echo 'Base de donnees indisponible, nouvelle tentative dans 3s...'; sleep 3; done && php artisan serve --host=0.0.0.0 --port=${PORT:-8000}"]
+CMD ["sh", "-c", "php artisan config:cache && until php artisan migrate --force; do echo 'Base de donnees indisponible, nouvelle tentative dans 3s...'; sleep 3; done && php artisan db:seed --force && php artisan serve --host=0.0.0.0 --port=${PORT:-8000}"]
