@@ -513,4 +513,4 @@ tbody tr:nth-child(even):hover td { background: rgba(247,127,0,.05); }
 /* ── Responsive ────────────────────────────────────────────────────────────── */
 @media (max-width: 1200px) { .kpi-row { grid-template-columns: repeat(3,1fr); } }
 @media (max-width: 900px)  { .kpi-row { grid-template-columns: repeat(2,1fr); } .form-grid, .form-grid-3 { grid-template-columns: 1fr; } }
-@media (max-width: 700px)  { .sidebar { display: none; } .kpi-row { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 700px)  { .kpi-row { grid-template-columns: 1fr 1fr; } }

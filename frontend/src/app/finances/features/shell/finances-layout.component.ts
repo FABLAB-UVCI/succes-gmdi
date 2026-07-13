@@ -47,7 +47,7 @@ import { AnnoncesMaireComponent } from '../../../shared/components/annonces-mair
         }
 
         <!-- ── Sidebar ── -->
-        <nav class="sidebar" [class.open]="sidebarOpen()">
+        <nav class="sidebar" [class.open]="sidebarOpen()" [style.transform]="sidebarOpen() ? 'translateX(0)' : null">
           <div class="sb-logo">
             <div class="sb-logo-icon">💰</div>
             <div class="sb-logo-text">
