@@ -36,7 +36,7 @@ interface CritereEval {
     <div class="ch"><h3><i class="ti ti-list-check"></i>Plan de formation 2025</h3></div>
     <app-toast [visible]="toast.get('f')?.visible ?? false" [message]="toast.get('f')?.message ?? ''" [type]="toast.get('f')?.type ?? 'success'" />
     <div class="pb">
-      <div class="fs">Nouvelle formation</div>
+      <div class="fsec">Nouvelle formation</div>
       
       <div class="fr">
         <div class="fg">
@@ -82,7 +82,7 @@ interface CritereEval {
         <button class="bp" (click)="planifier()"><i class="ti ti-check"></i>Planifier la formation</button>
       </div>
 
-      <div class="fs" style="margin-top:.75rem">Formations planifiées</div>
+      <div class="fsec" style="margin-top:.75rem">Formations planifiées</div>
       <table class="tbl">
         <thead>
           <tr>
@@ -123,7 +123,7 @@ interface CritereEval {
     <div class="pb">
       
       <!-- Informations de l'agent -->
-      <div class="fs">👤 Informations de l'agent</div>
+      <div class="fsec">👤 Informations de l'agent</div>
       <div class="fr3">
         <div class="fg">
           <div class="fl">Matricule de l'agent <span class="req">*</span></div>
@@ -140,7 +140,7 @@ interface CritereEval {
       </div>
 
       <!-- Grille des critères d'évaluation -->
-      <div class="fs">📋 Critères d'évaluation</div>
+      <div class="fsec">📋 Critères d'évaluation</div>
       <div style="background: #f8fafc; border-radius: 12px; padding: 1rem; margin-bottom: 1rem;">
         
         <!-- En-tête de la grille -->
@@ -255,7 +255,7 @@ interface CritereEval {
       </div>
 
       <!-- Résumé et mention calculée automatiquement -->
-      <div class="fs">📊 Résultat de l'évaluation</div>
+      <div class="fsec">📊 Résultat de l'évaluation</div>
       <div style="background: linear-gradient(135deg, #f0f2f5, #ffffff); border-radius: 12px; padding: 1rem; margin-bottom: 1rem;">
         <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1rem;">
           <div style="text-align: center;">
@@ -299,7 +299,7 @@ interface CritereEval {
       </div>
 
       <!-- Historique des évaluations -->
-      <div class="fs" style="margin-top: 1rem;">📜 Historique des évaluations</div>
+      <div class="fsec" style="margin-top: 1rem;">📜 Historique des évaluations</div>
       <table class="tbl">
         <thead>
           <tr>

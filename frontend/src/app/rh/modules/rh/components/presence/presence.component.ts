@@ -46,7 +46,7 @@ interface JourCal { label: string; classe: string; }
         </div>
       </div>
       <app-toast [visible]="toast.get('pt')?.visible ?? false" [message]="toast.get('pt')?.message ?? ''" [type]="toast.get('pt')?.type ?? 'success'" />
-      <div class="fs">Récapitulatif du mois de mai</div>
+      <div class="fsec">Récapitulatif du mois de mai</div>
       <div class="pres-grid">
         @for (j of calendrier; track $index) {
           <div class="pres-day" [ngClass]="j.classe">{{ j.label }}</div>
@@ -62,7 +62,7 @@ interface JourCal { label: string; classe: string; }
     <div class="ch"><h3><i class="ti ti-beach"></i>Gestion des congés</h3></div>
     <app-toast [visible]="toast.get('cg')?.visible ?? false" [message]="toast.get('cg')?.message ?? ''" [type]="toast.get('cg')?.type ?? 'success'" />
     <div class="pb">
-      <div class="fs">Nouvelle demande de congé</div>
+      <div class="fsec">Nouvelle demande de congé</div>
       <div class="fr3">
         <div class="fg"><div class="fl">Matricule de l'agent <span class="req">*</span></div><input class="fi" [(ngModel)]="cg.matricule" placeholder="Ex: RH-002"></div>
         <div class="fg"><div class="fl">Type de congé <span class="req">*</span></div>
@@ -110,7 +110,7 @@ interface JourCal { label: string; classe: string; }
         <button class="bp" (click)="soumettreConge()"><i class="ti ti-check"></i>Soumettre la demande</button>
       </div>
       
-      <div class="fs" style="margin-top:.75rem">Demandes en attente</div>
+      <div class="fsec" style="margin-top:.75rem">Demandes en attente</div>
       <table class="tbl">
         <thead>
           <tr>
@@ -156,7 +156,7 @@ interface JourCal { label: string; classe: string; }
     <div class="ch"><h3><i class="ti ti-user-off"></i>Gestion des absences</h3></div>
     <app-toast [visible]="toast.get('ab')?.visible ?? false" [message]="toast.get('ab')?.message ?? ''" [type]="toast.get('ab')?.type ?? 'success'" />
     <div class="pb">
-      <div class="fs">Déclarer une absence</div>
+      <div class="fsec">Déclarer une absence</div>
       <div class="fr3">
         <div class="fg"><div class="fl">Matricule <span class="req">*</span></div><input class="fi" [(ngModel)]="ab.matricule" placeholder="Matricule de l'agent"></div>
         <div class="fg"><div class="fl">Date d'absence <span class="req">*</span></div><input class="fi" type="date" [(ngModel)]="ab.date"></div>
@@ -171,7 +171,7 @@ interface JourCal { label: string; classe: string; }
       </div>
       <div class="fr"><div class="fg" style="grid-column:span 2"><div class="fl">Pièce justificative</div><input class="fi" [(ngModel)]="ab.pj" placeholder="Référence certificat médical ou autre document"></div></div>
       <div class="fa"><button class="bp" (click)="declarer()"><i class="ti ti-check"></i>Déclarer l'absence</button></div>
-      <div class="fs" style="margin-top:.75rem">Absences du mois</div>
+      <div class="fsec" style="margin-top:.75rem">Absences du mois</div>
       <table class="tbl">
         <thead><tr><th>Matricule</th><th>Agent</th><th>Date</th><th>Motif</th><th>Justifié</th></tr></thead>
         <tbody>

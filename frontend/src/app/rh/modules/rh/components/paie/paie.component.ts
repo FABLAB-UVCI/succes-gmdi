@@ -38,7 +38,7 @@ type Tab = 'salaires' | 'primes' | 'bulletins';
         <button class="bd"><i class="ti ti-printer"></i>Imprimer tous les bulletins</button>
       </div>
       <app-toast [visible]="toast.get('pa')?.visible ?? false" [message]="toast.get('pa')?.message ?? ''" [type]="toast.get('pa')?.type ?? 'success'" />
-      <div class="fs">Extrait du journal de paie</div>
+      <div class="fsec">Extrait du journal de paie</div>
       <table class="tbl">
         <thead><tr>
           <th>Matricule</th><th>Agent</th><th>Poste</th>
@@ -70,7 +70,7 @@ type Tab = 'salaires' | 'primes' | 'bulletins';
     <div class="ch"><h3><i class="ti ti-star"></i>Primes et indemnités</h3></div>
     <app-toast [visible]="toast.get('pr')?.visible ?? false" [message]="toast.get('pr')?.message ?? ''" [type]="toast.get('pr')?.type ?? 'success'" />
     <div class="pb">
-      <div class="fs">Attribuer une prime</div>
+      <div class="fsec">Attribuer une prime</div>
       <div class="fr3">
         <div class="fg"><div class="fl">Matricule <span class="req">*</span></div><input class="fi" [(ngModel)]="prime.matricule" placeholder="Matricule"></div>
         <div class="fg"><div class="fl">Type de prime <span class="req">*</span></div>
@@ -97,7 +97,7 @@ type Tab = 'salaires' | 'primes' | 'bulletins';
       </div>
       <div class="fa"><button class="bp" (click)="attribuerPrime()"><i class="ti ti-check"></i>Attribuer la prime</button></div>
 
-      <div class="fs" style="margin-top:.75rem">Types d'indemnités en vigueur</div>
+      <div class="fsec" style="margin-top:.75rem">Types d'indemnités en vigueur</div>
       <table class="tbl">
         <thead><tr><th>Type</th><th>Bénéficiaires</th><th>Montant unitaire (FCFA)</th><th>Total mensuel (FCFA)</th></tr></thead>
         <tbody>

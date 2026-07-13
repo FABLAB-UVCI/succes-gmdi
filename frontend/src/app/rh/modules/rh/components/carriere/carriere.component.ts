@@ -57,7 +57,7 @@ type Tab = 'recrutement' | 'affectation' | 'promotion' | 'mutation' | 'depart';
       <div class="fa">
         <button class="bp" (click)="ouvrirPoste()"><i class="ti ti-speakerphone"></i>Publier l'annonce</button>
       </div>
-      <div class="fs" style="margin-top:.75rem">Recrutements en cours</div>
+      <div class="fsec" style="margin-top:.75rem">Recrutements en cours</div>
       <table class="tbl">
         <thead><tr><th>Poste</th><th>Direction</th><th>Postes</th><th>Type</th><th>Clôture</th><th>Candidatures</th><th>Statut</th></tr></thead>
         <tbody>
@@ -253,7 +253,7 @@ type Tab = 'recrutement' | 'affectation' | 'promotion' | 'mutation' | 'depart';
       </div>
 
       <!-- Historique des départs -->
-      <div class="fs" style="margin-top: 1rem;">Historique des départs récents</div>
+      <div class="fsec" style="margin-top: 1rem;">Historique des départs récents</div>
       <table class="tbl">
         <thead>
           <tr>

@@ -30,7 +30,7 @@ Chart.register(...registerables);
     </div>
 
     <!-- Répartition par type de contrat (existante) -->
-    <div class="fs">Répartition des effectifs</div>
+    <div class="fsec">Répartition des effectifs</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
       <table class="tbl">
         <thead><tr><th>Par type de contrat</th><th>Effectif</th><th>%</th></tr></thead>
@@ -53,7 +53,7 @@ Chart.register(...registerables);
     </div>
 
     <!-- 📊 NOUVEAU : Graphiques à la place du tableau "Statistiques du personnel" -->
-    <div class="fs">📊 Statistiques du personnel - Visualisation graphique</div>
+    <div class="fsec">📊 Statistiques du personnel - Visualisation graphique</div>
     
     <!-- Graphique 1: Taux de féminisation (Jauge) -->
     <div style="background: #f8fafc; border-radius: 12px; padding: 1rem; margin-bottom: 1rem;">
@@ -140,7 +140,7 @@ Chart.register(...registerables);
     .kb { height: 4px; background: #e5e7eb; border-radius: 2px; overflow: hidden; margin-top: 7px; }
     .mbf { height: 100%; border-radius: 2px; }
     .mbw { height: 4px; background: #e5e7eb; border-radius: 2px; overflow: hidden; width: 70px; display: inline-block; vertical-align: middle; margin-left: 8px; }
-    .fs { font-size: 11px; font-weight: 500; color: #C9A84C; margin: 15px 0 10px; text-transform: uppercase; letter-spacing: .5px; border-bottom: 0.5px solid #f0e4b8; padding-bottom: 3px; }
+    .fsec { font-size: 11px; font-weight: 500; color: #C9A84C; margin: 15px 0 10px; text-transform: uppercase; letter-spacing: .5px; border-bottom: 0.5px solid #f0e4b8; padding-bottom: 3px; }
     .tbl { width: 100%; border-collapse: collapse; }
     .tbl th { font-size: 11px; font-weight: 500; color: #6b7280; padding: 7px 10px; border-bottom: 0.5px solid #e5e7eb; background: #f7f8fa; text-align: left; }
     .tbl td { font-size: 12px; padding: 7px 10px; border-bottom: 0.5px solid #e5e7eb; }

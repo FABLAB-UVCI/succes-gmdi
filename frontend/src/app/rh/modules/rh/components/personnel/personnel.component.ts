@@ -29,7 +29,7 @@ type Tab = 'fiche' | 'liste' | 'fonct' | 'contrat' | 'stage';
     <div class="ch"><h3><i class="ti ti-user-plus"></i>Nouvelle fiche agent</h3></div>
     <app-toast [visible]="toast.get('p')?.visible ?? false" [message]="toast.get('p')?.message ?? ''" [type]="toast.get('p')?.type ?? 'success'" />
     <div class="pb">
-      <div class="fs">Identité</div>
+      <div class="fsec">Identité</div>
       <div class="fr3">
         <div class="fg"><div class="fl">Matricule <span class="req">*</span></div><input class="fi" [(ngModel)]="form.matricule" placeholder="Ex: EC-024"></div>
         <div class="fg"><div class="fl">Nom <span class="req">*</span></div><input class="fi" [(ngModel)]="form.nom" placeholder="Nom de famille"></div>
@@ -53,7 +53,7 @@ type Tab = 'fiche' | 'liste' | 'fonct' | 'contrat' | 'stage';
         <div class="fg"><div class="fl">Email professionnel <span class="req">*</span></div><input class="fi" type="email" [(ngModel)]="form.email" placeholder="agent@mairie.ci"></div>
       </div>
 
-      <div class="fs">Poste et contrat</div>
+      <div class="fsec">Poste et contrat</div>
       <div class="fr3">
         <div class="fg"><div class="fl">Type de contrat <span class="req">*</span></div>
           <select class="fsel" [(ngModel)]="form.typeContrat">
@@ -128,7 +128,7 @@ type Tab = 'fiche' | 'liste' | 'fonct' | 'contrat' | 'stage';
         </div>
       </div>
 
-      <div class="fs">Pièces justificatives</div>
+      <div class="fsec">Pièces justificatives</div>
       <div class="fr3">
         <div class="fg">
           <div class="fl">Numéro CNI <span class="req">*</span></div>
@@ -245,7 +245,7 @@ type Tab = 'fiche' | 'liste' | 'fonct' | 'contrat' | 'stage';
         <div class="kcard"><div class="kv" style="color:#F77F00">{{ rh.totalContrat() }}</div><div class="kl">Total contractuels</div></div>
         <div class="kcard"><div class="kv" style="color:#009A44">{{ contractuelsActifs().length }}</div><div class="kl">CDD en cours</div></div>
       </div>
-      <div class="fs" style="margin-top:.75rem">Liste des contractuels</div>
+      <div class="fsec" style="margin-top:.75rem">Liste des contractuels</div>
       <table class="tbl">
         <thead><tr><th>Matricule</th><th>Agent</th><th>Poste</th><th>Direction</th><th>Statut</th></tr></thead>
         <tbody>
@@ -274,7 +274,7 @@ type Tab = 'fiche' | 'liste' | 'fonct' | 'contrat' | 'stage';
       <div class="kpi4">
         <div class="kcard"><div class="kv" style="color:#009A44">{{ rh.totalStagiaires() }}</div><div class="kl">Stagiaires actifs</div></div>
       </div>
-      <div class="fs" style="margin-top:.75rem">Liste des stagiaires</div>
+      <div class="fsec" style="margin-top:.75rem">Liste des stagiaires</div>
       <table class="tbl">
         <thead><tr><th>Matricule</th><th>Agent</th><th>Poste</th><th>Direction</th><th>Statut</th></tr></thead>
         <tbody>

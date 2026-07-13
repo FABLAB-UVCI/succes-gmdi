@@ -129,7 +129,7 @@ body { font-family: var(--font); background: var(--bg-page); color: var(--txt); 
 /* ══════════════════════════════════════════════════════════════════════════
    FORM
 ══════════════════════════════════════════════════════════════════════════ */
-.fs {
+.fsec {
   font-size: 11px;
   font-weight: 700;
   color: var(--ci-vert);
@@ -141,7 +141,7 @@ body { font-family: var(--font); background: var(--bg-page); color: var(--txt); 
   gap: 8px;
 }
 
-.fs::before {
+.fsec::before {
   content: '';
   display: inline-block;
   width: 14px;
@@ -150,7 +150,7 @@ body { font-family: var(--font); background: var(--bg-page); color: var(--txt); 
   border-radius: 2px;
 }
 
-.fs::after {
+.fsec::after {
   content: '';
   flex: 1;
   height: 1px;
@@ -158,7 +158,7 @@ body { font-family: var(--font); background: var(--bg-page); color: var(--txt); 
   opacity: .3;
 }
 
-.fs:first-child { margin-top: 0; }
+.fsec:first-child { margin-top: 0; }
 
 .fr  { display: grid; grid-template-columns: 1fr 1fr;           gap: 10px; margin-bottom: 10px; }
 .fr3 { display: grid; grid-template-columns: 1fr 1fr 1fr;       gap: 10px; margin-bottom: 10px; }
