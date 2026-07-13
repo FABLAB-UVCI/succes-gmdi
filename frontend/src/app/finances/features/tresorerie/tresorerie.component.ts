@@ -1,5 +1,5 @@
 // src/app/features/tresorerie/tresorerie.component.ts
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { FinancesService } from '../../core/services/finances.service';
 import { ToastService } from '../../core/services/toast.service';
@@ -26,10 +26,10 @@ type TresoTab = 'caisse' | 'banque' | 'rapproch';
         <div class="ch"><h3><i class="ti ti-cash"></i>Caisse principale</h3></div>
         <div class="pb">
           <div class="kpi4">
-            <div class="kcard"><div class="kv" style="color:#009A44">{{ 52400000 | fcfa }}</div><div class="kl">Solde caisse actuel</div><div class="ks">Aujourd'hui</div></div>
-            <div class="kcard"><div class="kv" style="color:#F77F00">{{ 935000 | fcfa }}</div><div class="kl">Encaissements du jour</div></div>
-            <div class="kcard"><div class="kv" style="color:#E24B4A">{{ 450000 | fcfa }}</div><div class="kl">Décaissements du jour</div></div>
-            <div class="kcard"><div class="kv" style="color:#185FA5">4</div><div class="kl">Opérations du jour</div></div>
+            <div class="kcard"><div class="kv" style="color:#009A44">{{ soldeCaisse() | fcfa }}</div><div class="kl">Solde caisse actuel</div><div class="ks">Dernier mouvement</div></div>
+            <div class="kcard"><div class="kv" style="color:#F77F00">{{ encaissementsJour() | fcfa }}</div><div class="kl">Encaissements du jour</div></div>
+            <div class="kcard"><div class="kv" style="color:#E24B4A">{{ decaissementsJour() | fcfa }}</div><div class="kl">Décaissements du jour</div></div>
+            <div class="kcard"><div class="kv" style="color:#8c4a00">{{ mouvementsJour().length }}</div><div class="kl">Opérations du jour</div></div>
           </div>
           <div class="fs" style="margin-top:.75rem">Mouvements de caisse</div>
           <table class="tbl">
@@ -58,8 +58,8 @@ type TresoTab = 'caisse' | 'banque' | 'rapproch';
         <div class="ch"><h3><i class="ti ti-building-bank"></i>Compte bancaire — Banque du Trésor</h3></div>
         <div class="pb">
           <div class="kpi4">
-            <div class="kcard"><div class="kv" style="color:#009A44">{{ 36100000 | fcfa }}</div><div class="kl">Solde bancaire (FCFA)</div></div>
-            <div class="kcard"><div class="kv" style="color:#185FA5">{{ 88500000 | fcfa }}</div><div class="kl">Trésorerie globale</div><div class="ks">Caisse + Banque</div></div>
+            <div class="kcard"><div class="kv" style="color:#009A44">{{ soldeBanque() | fcfa }}</div><div class="kl">Solde bancaire (FCFA)</div></div>
+            <div class="kcard"><div class="kv" style="color:#8c4a00">{{ tresorerieGlobale() | fcfa }}</div><div class="kl">Trésorerie globale</div><div class="ks">Caisse + Banque</div></div>
           </div>
           <div class="fs" style="margin-top:.75rem">Relevé bancaire — Mai 2025</div>
           <table class="tbl">
@@ -86,10 +86,10 @@ type TresoTab = 'caisse' | 'banque' | 'rapproch';
         <div class="ch"><h3><i class="ti ti-arrows-exchange"></i>Rapprochement bancaire — Mai 2025</h3></div>
         <div class="pb">
           <div class="kpi4">
-            <div class="kcard"><div class="kv" style="color:#009A44">{{ 36100000 | fcfa }}</div><div class="kl">Solde relevé banque</div></div>
-            <div class="kcard"><div class="kv" style="color:#185FA5">{{ 36100000 | fcfa }}</div><div class="kl">Solde livres comptables</div></div>
+            <div class="kcard"><div class="kv" style="color:#009A44">{{ soldeBanque() | fcfa }}</div><div class="kl">Solde relevé banque</div></div>
+            <div class="kcard"><div class="kv" style="color:#8c4a00">{{ soldeBanque() | fcfa }}</div><div class="kl">Solde livres comptables</div></div>
             <div class="kcard"><div class="kv" style="color:#009A44">0 FCFA</div><div class="kl">Écart constaté</div></div>
-            <div class="kcard"><div class="kv" style="color:#009A44">VALIDÉ</div><div class="kl">Statut rapprochement</div></div>
+            <div class="kcard"><div class="kv" style="color:#009A44">{{ rapprochValide() ? 'VALIDÉ' : 'EN ATTENTE' }}</div><div class="kl">Statut rapprochement</div></div>
           </div>
           <div style="display:flex;gap:8px;margin-top:.75rem">
             <button class="bp" (click)="validerRapproch()"><i class="ti ti-check"></i>Valider le rapprochement</button>
@@ -100,10 +100,16 @@ type TresoTab = 'caisse' | 'banque' | 'rapproch';
     }
   `
 })
-export class TresorerieComponent {
+export class TresorerieComponent implements OnInit {
   svc   = inject(FinancesService);
   toast = inject(ToastService);
   activeTab = signal<TresoTab>('caisse');
+  rapprochValide = signal(false);
+
+  ngOnInit(): void {
+    this.svc.chargerMouvementsCaisse();
+    this.svc.chargerMouvementsBanque();
+  }
 
   tabs = [
     { id: 'caisse'   as TresoTab, label: 'Caisse',                  icon: 'ti-cash' },
@@ -111,6 +117,22 @@ export class TresorerieComponent {
     { id: 'rapproch' as TresoTab, label: 'Rapprochement bancaire',   icon: 'ti-arrows-exchange' },
   ];
 
+  private aujourdhui = new Date().toISOString().slice(0, 10);
+
+  soldeCaisse = computed(() => {
+    const m = this.svc.mouvementsCaisse();
+    return m.length ? m[m.length - 1].soldeApres : 0;
+  });
+  soldeBanque = computed(() => {
+    const m = this.svc.mouvementsBanque();
+    return m.length ? m[m.length - 1].solde : 0;
+  });
+  tresorerieGlobale = computed(() => this.soldeCaisse() + this.soldeBanque());
+
+  mouvementsJour   = computed(() => this.svc.mouvementsCaisse().filter(m => m.date === this.aujourdhui));
+  encaissementsJour = computed(() => this.mouvementsJour().filter(m => m.type === 'encaissement').reduce((s, m) => s + m.montant, 0));
+  decaissementsJour = computed(() => this.mouvementsJour().filter(m => m.type === 'decaissement').reduce((s, m) => s + m.montant, 0));
+
   setTab(t: TresoTab): void { this.activeTab.set(t); }
-  validerRapproch(): void { this.toast.show('Rapprochement bancaire mai 2025 validé'); }
+  validerRapproch(): void { this.rapprochValide.set(true); this.toast.show('Rapprochement bancaire validé'); }
 }

@@ -1,5 +1,5 @@
 // src/app/features/budget/budget.component.ts
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgFor, NgIf, NgClass } from '@angular/common';
 import { FinancesService } from '../../core/services/finances.service';
@@ -97,36 +97,37 @@ type BudgetTab = 'elaboration' | 'execution' | 'previsionnel' | 'revision';
         <div class="pb">
           <div class="kpi4">
             <div class="kcard">
-              <div class="kv" style="color:#009A44">202 500 000</div>
-              <div class="kl">Recettes réalisées (FCFA)</div><div class="ks">/ 520 000 000 prévues</div>
-              <div class="kb"><div style="width:39%;background:#009A44"></div></div>
+              <div class="kv" style="color:#009A44">{{ svc.totalRecettesEncaissees() | fcfa }}</div>
+              <div class="kl">Recettes réalisées (FCFA)</div><div class="ks">/ {{ totalPrev() | fcfa }} prévues</div>
+              <div class="kb"><div [style.width.%]="svc.pct(svc.totalRecettesEncaissees(), totalPrev())" style="background:#009A44"></div></div>
             </div>
             <div class="kcard">
-              <div class="kv" style="color:#F77F00">87 500 000</div>
-              <div class="kl">Dépenses réalisées (FCFA)</div><div class="ks">/ 280 000 000 prévues</div>
-              <div class="kb"><div style="width:31%;background:#F77F00"></div></div>
+              <div class="kv" style="color:#F77F00">{{ svc.totalDepensesPayees() | fcfa }}</div>
+              <div class="kl">Dépenses réalisées (FCFA)</div><div class="ks">/ {{ totalReal() | fcfa }} engagées</div>
+              <div class="kb"><div [style.width.%]="svc.pct(svc.totalDepensesPayees(), totalReal())" style="background:#F77F00"></div></div>
             </div>
             <div class="kcard">
-              <div class="kv" style="color:#185FA5">39%</div>
-              <div class="kl">Taux d'exécution recettes</div><div class="ks">Jan–Mai 2025</div>
-              <div class="kb"><div style="width:39%;background:#185FA5"></div></div>
+              <div class="kv" style="color:#185FA5">{{ svc.pct(svc.totalRecettesEncaissees(), totalPrev()) }}%</div>
+              <div class="kl">Taux d'exécution recettes</div><div class="ks">Exercice en cours</div>
+              <div class="kb"><div [style.width.%]="svc.pct(svc.totalRecettesEncaissees(), totalPrev())" style="background:#185FA5"></div></div>
             </div>
             <div class="kcard">
-              <div class="kv" style="color:#009A44">115 000 000</div>
+              <div class="kv" style="color:#009A44">{{ excedent() | fcfa }}</div>
               <div class="kl">Excédent budgétaire (FCFA)</div><div class="ks">Recettes – Dépenses</div>
             </div>
           </div>
           <div class="fl" style="margin-bottom:6px">Évolution mensuelle recettes vs dépenses (FCFA M)</div>
           <div class="chbars">
-            @for (m of moisData; track m.label) {
+            @for (m of svc.executionMensuelle(); track m.mois) {
               <div style="display:flex;flex-direction:column;align-items:center;flex:1;gap:2px">
                 <div style="display:flex;align-items:flex-end;gap:2px;width:100%">
-                  <div [style.height.px]="barHeight(m.rec)" style="flex:1;background:#009A44;border-radius:2px 2px 0 0;opacity:.8"></div>
-                  <div [style.height.px]="barHeight(m.dep)" style="flex:1;background:#F77F00;border-radius:2px 2px 0 0;opacity:.8"></div>
+                  <div [style.height.px]="barHeight(m.recettes)" style="flex:1;background:#009A44;border-radius:2px 2px 0 0;opacity:.8"></div>
+                  <div [style.height.px]="barHeight(m.depenses)" style="flex:1;background:#F77F00;border-radius:2px 2px 0 0;opacity:.8"></div>
                 </div>
-                <span style="font-size:9px;color:var(--color-text-secondary)">{{ m.label }}</span>
+                <span style="font-size:9px;color:var(--color-text-secondary)">{{ m.mois }}</span>
               </div>
             }
+            @empty { <div class="empty-row" style="width:100%">Aucune donnée d'exécution mensuelle</div> }
           </div>
           <div style="font-size:10px;color:var(--color-text-secondary);margin-top:4px;display:flex;gap:12px">
             <span><span style="display:inline-block;width:10px;height:10px;background:#009A44;border-radius:2px;margin-right:4px"></span>Recettes</span>
@@ -195,15 +196,20 @@ type BudgetTab = 'elaboration' | 'execution' | 'previsionnel' | 'revision';
           <div class="fr3">
             <div class="fg">
               <div class="fl">Chapitre <span class="req">*</span></div>
-              <select class="fsel" [(ngModel)]="rev.chapitre">
+              <select class="fsel" [(ngModel)]="rev.chapitre" (ngModelChange)="rev.ligneId=''">
                 <option value="fonctionnement">Fonctionnement</option>
                 <option value="investissement">Investissement</option>
                 <option value="personnel">Personnel</option>
               </select>
             </div>
             <div class="fg">
-              <div class="fl">Montant initial (FCFA)</div>
-              <input class="fi" type="number" [(ngModel)]="rev.initial" placeholder="Montant original">
+              <div class="fl">Ligne budgétaire <span class="req">*</span></div>
+              <select class="fsel" [(ngModel)]="rev.ligneId">
+                <option value="">-- Choisir --</option>
+                @for (l of lignesDuChapitre(); track l.id) {
+                  <option [value]="l.id">{{ l.article }} — {{ l.designation }}</option>
+                }
+              </select>
             </div>
             <div class="fg">
               <div class="fl">Nouveau montant (FCFA) <span class="req">*</span></div>
@@ -224,9 +230,14 @@ type BudgetTab = 'elaboration' | 'execution' | 'previsionnel' | 'revision';
     }
   `
 })
-export class BudgetComponent {
+export class BudgetComponent implements OnInit {
   svc   = inject(FinancesService);
   toast = inject(ToastService);
+
+  ngOnInit(): void {
+    this.svc.chargerLignesBudget();
+    this.svc.chargerExecutionMensuelle();
+  }
 
   activeTab = signal<BudgetTab>('elaboration');
   toastMsg  = signal('');
@@ -239,21 +250,18 @@ export class BudgetComponent {
   ];
 
   form = { exercice:'2025', type:'previsionnel', chapitre:'' as Chapitre | '', article:'', designation:'', montant:null as number|null, engage:null as number|null };
-  rev  = { chapitre:'fonctionnement', initial:null as number|null, nouveau:null as number|null, motif:'' };
+  rev  = { chapitre:'fonctionnement' as Chapitre, ligneId:'', nouveau:null as number|null, motif:'' };
 
-  moisData = [
-    { label:'Jan', rec:38200000, dep:15000000 },
-    { label:'Fév', rec:41500000, dep:17200000 },
-    { label:'Mar', rec:39800000, dep:16800000 },
-    { label:'Avr', rec:44100000, dep:18500000 },
-    { label:'Mai', rec:48600000, dep:20000000 },
-  ];
-
-  maxRec = Math.max(...this.moisData.map(m => m.rec));
-  barHeight(v: number): number { return Math.round(v / this.maxRec * 60); }
+  barHeight(v: number): number {
+    const max = Math.max(1, ...this.svc.executionMensuelle().map(m => Math.max(m.recettes, m.depenses)));
+    return Math.round(v / max * 60);
+  }
 
   totalPrev = computed(() => this.svc.lignesBudget().reduce((s, l) => s + l.montantPrevisionnel, 0));
   totalReal = computed(() => this.svc.lignesBudget().reduce((s, l) => s + l.montantConsomme, 0));
+  excedent  = computed(() => this.svc.totalRecettesEncaissees() - this.svc.totalDepensesPayees());
+
+  lignesDuChapitre() { return this.svc.lignesBudget().filter(l => l.chapitre === this.rev.chapitre); }
 
   setTab(t: BudgetTab): void { this.activeTab.set(t); }
 
@@ -277,9 +285,11 @@ export class BudgetComponent {
   }
 
   soumettreRevision(): void {
-    if (!this.rev.motif) { alert('Motif obligatoire'); return; }
-    this.toast.show('Révision budgétaire soumise pour approbation');
-    this.rev.motif = '';
+    if (!this.rev.motif || !this.rev.ligneId || !this.rev.nouveau) {
+      this.toast.showError('Ligne budgétaire, montant et motif obligatoires'); return;
+    }
+    this.svc.soumettrRevision(this.rev.motif, this.rev.ligneId, this.rev.nouveau);
+    this.rev = { chapitre:'fonctionnement', ligneId:'', nouveau:null, motif:'' };
   }
 
   resetForm(): void {

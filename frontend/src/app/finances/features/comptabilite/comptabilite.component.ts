@@ -1,5 +1,5 @@
 // src/app/features/comptabilite/comptabilite.component.ts
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { FinancesService } from '../../core/services/finances.service';
 import { FcfaPipe } from '../../shared/pipes/fcfa.pipe';
@@ -148,9 +148,14 @@ type ComptaTab = 'journal' | 'grandlivre' | 'balance' | 'bilan';
     }
   `
 })
-export class ComptabiliteComponent {
+export class ComptabiliteComponent implements OnInit {
   svc = inject(FinancesService);
   activeTab = signal<ComptaTab>('journal');
+
+  ngOnInit(): void {
+    this.svc.chargerEcritures();
+    this.svc.chargerComptes();
+  }
 
   tabs = [
     { id: 'journal'    as ComptaTab, label: 'Journal comptable', icon: 'ti-notebook' },

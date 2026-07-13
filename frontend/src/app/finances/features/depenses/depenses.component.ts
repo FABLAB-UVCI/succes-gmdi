@@ -1,5 +1,5 @@
 // src/app/features/depenses/depenses.component.ts
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgClass } from '@angular/common';
 import { FinancesService } from '../../core/services/finances.service';
@@ -167,13 +167,13 @@ type DepTab = 'dsaisie' | 'dliste' | 'salaires';
         <div class="ch"><h3><i class="ti ti-users"></i>Paiement des salaires</h3></div>
         <div class="pb">
           <div class="kpi4">
-            <div class="kcard"><div class="kv" style="color:#F77F00">180 000 000</div><div class="kl">Masse salariale prévisionnelle</div><div class="ks">FCFA / an 2025</div></div>
-            <div class="kcard"><div class="kv" style="color:#009A44">75 000 000</div><div class="kl">Salaires versés Jan–Mai</div><div class="ks">FCFA cumulés</div></div>
-            <div class="kcard"><div class="kv" style="color:#185FA5">347</div><div class="kl">Agents à payer</div><div class="ks">Mai 2025</div></div>
-            <div class="kcard"><div class="kv" style="color:#009A44">15 000 000</div><div class="kl">Masse salariale mai</div><div class="ks">FCFA</div></div>
+            <div class="kcard"><div class="kv" style="color:#F77F00">{{ depensesPersonnel().reduce((s,d)=>s+d.montant,0) | fcfa }}</div><div class="kl">Masse salariale engagée</div><div class="ks">FCFA — exercice en cours</div></div>
+            <div class="kcard"><div class="kv" style="color:#009A44">{{ salairesVerses() | fcfa }}</div><div class="kl">Salaires versés</div><div class="ks">FCFA cumulés</div></div>
+            <div class="kcard"><div class="kv" style="color:#8c4a00">{{ agentsAPayer().length }}</div><div class="kl">Dépenses de personnel à payer</div><div class="ks">Non réglées</div></div>
+            <div class="kcard"><div class="kv" style="color:#009A44">{{ agentsAPayer().reduce((s,d)=>s+d.montant,0) | fcfa }}</div><div class="kl">Reste à payer</div><div class="ks">FCFA</div></div>
           </div>
           <div style="display:flex;gap:8px;margin-top:.75rem">
-            <button class="bp" (click)="lancerPaiement()"><i class="ti ti-cash"></i>Lancer le paiement mai 2025</button>
+            <button class="bp" [disabled]="!agentsAPayer().length" (click)="lancerPaiement()"><i class="ti ti-cash"></i>Payer les {{ agentsAPayer().length }} dépense(s) de personnel en attente</button>
             <button class="bs"><i class="ti ti-download"></i>Exporter état de paie</button>
             <button class="bd"><i class="ti ti-printer"></i>Imprimer bulletins</button>
           </div>
@@ -182,9 +182,11 @@ type DepTab = 'dsaisie' | 'dliste' | 'salaires';
     }
   `
 })
-export class DepensesComponent {
+export class DepensesComponent implements OnInit {
   svc   = inject(FinancesService);
   toast = inject(ToastService);
+
+  ngOnInit(): void { this.svc.chargerDepenses(); }
 
   activeTab = signal<DepTab>('dsaisie');
   toastMsg  = signal('');
@@ -202,6 +204,10 @@ export class DepensesComponent {
   ];
 
   form = { objet:'', fournisseur:'', chapitre:'' as Chapitre|'', article:'', montant:null as number|null, dateEngagement:'', description:'', numeroCcompte:'', factureName:'', factureFile: null as File|null };
+
+  depensesPersonnel = computed(() => this.svc.depenses().filter(d => d.chapitre === 'personnel'));
+  salairesVerses = computed(() => this.depensesPersonnel().filter(d => d.statut === 'paye').reduce((s, d) => s + d.montant, 0));
+  agentsAPayer = computed(() => this.depensesPersonnel().filter(d => d.statut !== 'paye'));
 
   depensesFiltrees = computed(() => {
     let d = [...this.svc.depenses()];
@@ -271,7 +277,10 @@ export class DepensesComponent {
   }
 
   lancerPaiement(): void {
-    this.toast.show('Paiement salaires mai 2025 lancé — 347 agents');
+    const aPayer = this.agentsAPayer();
+    if (!aPayer.length) return;
+    aPayer.forEach(d => this.svc.payerDepense(d.id));
+    this.toast.show(`Paiement lancé — ${aPayer.length} dépense(s) de personnel réglée(s)`);
   }
 
   onFileSelect(event: Event): void {

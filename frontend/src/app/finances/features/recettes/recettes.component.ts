@@ -1,5 +1,5 @@
 // src/app/features/recettes/recettes.component.ts
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgClass } from '@angular/common';
 import { FinancesService } from '../../core/services/finances.service';
@@ -249,9 +249,11 @@ type RecetteTab = 'saisie' | 'liste' | 'enc';
     }
   `
 })
-export class RecettesComponent {
+export class RecettesComponent implements OnInit {
   svc   = inject(FinancesService);
   toast = inject(ToastService);
+
+  ngOnInit(): void { this.svc.chargerRecettes(); }
 
   activeTab = signal<RecetteTab>('saisie');
   toastMsg  = signal('');
@@ -356,7 +358,10 @@ export class RecettesComponent {
 
   validerEncaissement(): void {
     if (!this.enc.ref || !this.enc.montant) { this.showToast('Référence et montant obligatoires', true); return; }
-    this.showToast('Encaissement validé — Reçu généré — ' + this.enc.ref);
+    const rec = this.svc.recettes().find(r => r.reference === this.enc.ref || r.contribuable.toLowerCase() === this.enc.ref.toLowerCase());
+    if (!rec) { this.showToast('Aucune recette trouvée pour cette référence', true); return; }
+    this.svc.encaisserRecette(rec.id);
+    this.showToast('Encaissement validé — Reçu généré — ' + rec.reference);
     this.enc.ref = ''; this.enc.montant = null;
   }
 
