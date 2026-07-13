@@ -114,7 +114,13 @@ export class CommunicationService {
 
   publierPost(data: { contenu: string; plateformes: string[]; programme?: boolean; date?: string }): Observable<any> {
     return this.rsApi.publierPost(data).pipe(
-      tap(r => this.calendrier.update(l => [{ id: String(r.data.id), date: r.data.date, contenu: r.data.contenu, plateformes: r.data.plateformes.split(','), responsable: r.data.responsable, statut: r.data.statut as any }, ...l]))
+      tap(r => {
+        this.calendrier.update(l => [{ id: String(r.data.id), date: r.data.date, contenu: r.data.contenu, plateformes: r.data.plateformes.split(','), responsable: r.data.responsable, statut: r.data.statut as any }, ...l]);
+        if (!data.programme) {
+          this.kpi.update(k => ({ ...k, publicationsMois: k.publicationsMois + 1 }));
+          this.comptes.update(l => l.map(c => data.plateformes.includes(c.plateforme) ? { ...c, publications: c.publications + 1 } : c));
+        }
+      })
     );
   }
 
@@ -132,7 +138,10 @@ export class CommunicationService {
   ajouterPartenaire(data: PartenaireCreateRequest): Observable<Partenaire> {
     return this.relApi.createPartenaire(data).pipe(
       map(r => ({ id: String(r.data.id), nom: r.data.nom, nomContact: r.data.nom_contact ?? '', type: r.data.type, domaine: r.data.domaine, contact: r.data.contact, dateDebut: r.data.date_debut, statut: r.data.statut as any })),
-      tap(p => this.partenaires.update(l => [p, ...l]))
+      tap(p => {
+        this.partenaires.update(l => [p, ...l]);
+        this.kpi.update(k => ({ ...k, partenairesActifs: k.partenairesActifs + 1 }));
+      })
     );
   }
 
@@ -244,7 +253,7 @@ export class CommunicationService {
   ouvrirConsultation(data: ConsultationCreateRequest): Observable<ConsultationPublique> {
     return this.consApi.create(data).pipe(
       map(r => ({ id: String(r.data.id), titre: r.data.titre, theme: r.data.theme, dateOuverture: r.data.date_ouverture, dateCloture: r.data.date_cloture, participants: 0, statut: 'programme' as const })),
-      tap(c => this.consultations.update(l => [...l, c]))
+      tap(c => this.consultations.update(l => [c, ...l]))
     );
   }
 

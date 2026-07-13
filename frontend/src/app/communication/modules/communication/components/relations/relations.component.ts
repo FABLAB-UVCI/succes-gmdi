@@ -109,9 +109,9 @@ type Tab = 'partenaires' | 'presse' | 'medias';
 @if (active()==='medias') {
   <div class="ph"><div class="pt"><i class="ti ti-microphone"></i>Gestion des relations médias</div></div>
   <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:.75rem 1rem;border-bottom:.5px solid var(--color-border-tertiary)">
-    <div class="mini-kpi"><span class="mk-v" style="color:#F77F00">28</span><span class="mk-l">Médias référencés</span></div>
-    <div class="mini-kpi"><span class="mk-v" style="color:#009A44">12</span><span class="mk-l">Articles positifs ce mois</span></div>
-    <div class="mini-kpi"><span class="mk-v" style="color:#F77F00">4</span><span class="mk-l">Articles mitigés</span></div>
+    <div class="mini-kpi"><span class="mk-v" style="color:#F77F00">{{medias.length}}</span><span class="mk-l">Médias référencés</span></div>
+    <div class="mini-kpi"><span class="mk-v" style="color:#009A44">{{nbArticles('Positive')}}</span><span class="mk-l">Articles positifs ce mois</span></div>
+    <div class="mini-kpi"><span class="mk-v" style="color:#F77F00">{{nbArticles('Mitigée')}}</span><span class="mk-l">Articles mitigés</span></div>
     <div class="mini-kpi"><span class="mk-v" style="color:#C9A84C">6</span><span class="mk-l">Demandes d'interview</span></div>
   </div>
   <div class="tbl-wrap">
@@ -182,6 +182,8 @@ export class RelationsComponent implements OnInit {
       error: (err) => { this.saving.set(false); this.toast.showError('press', err?.error?.message || 'Une erreur est survenue.'); }
     });
   }
+
+  nbArticles(tonalite: string): number { return this.revuePresse.filter(a => a.tonalite === tonalite).length; }
 
   chipTon(t: string): string { return { Positive:'cv', Neutre:'cm', Mitigée:'cp', Négative:'ce' }[t] ?? 'cn'; }
   chipMedia(t: string): string { return { Télévision:'ci', Radio:'cg', 'Presse écrite':'co', Web:'cbl' }[t] ?? 'cm'; }

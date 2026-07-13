@@ -275,22 +275,16 @@ export class CommunicationShellComponent implements OnInit {
     { id: 'sms' as Section,      label: 'SMS & Notifications',     icon: 'ti-device-mobile-message' },
   ];
 
-  ngOnInit(): void { this.com.loadStats(); this.com.loadActualites(); this.com.loadReclamations(); }
+  ngOnInit(): void { this.com.loadStats(); }
 
   toggleSidebar(): void  { this.sidebarOpen.update(v => !v); this.syncBodyScrollLock(); }
   closeSidebar(): void   { this.sidebarOpen.set(false); this.syncBodyScrollLock(); }
   private syncBodyScrollLock(): void { document.body.style.overflow = this.sidebarOpen() ? 'hidden' : ''; }
 
+  // Chaque section charge ses propres données dans son ngOnInit (elle est
+  // recréée à chaque activation du @if) — pas besoin de les redéclencher ici.
   navigate(s: Section): void {
     this.active.set(s);
     this.closeSidebar();
-    switch (s) {
-      case 'actualites': this.com.loadActualites(); break;
-      case 'reseaux':    this.com.loadComptes(); this.com.loadCalendrier(); break;
-      case 'relations':  this.com.loadPartenaires(); break;
-      case 'documents':  this.com.loadDocuments(); break;
-      case 'citoyens':   this.com.loadReclamations(); this.com.loadSuggestions(); this.com.loadConsultations(); break;
-      case 'sms':        this.com.loadSmsHistorique(); break;
-    }
   }
 }

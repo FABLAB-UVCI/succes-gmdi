@@ -128,7 +128,7 @@ const NB_DEST: Record<string, number> = { tous: 12500, quartier: 3800, commercan
     <div class="mini-kpi"><span class="mk-v" style="color:#F77F00">{{com.smsHistorique().length}}</span><span class="mk-l">Campagnes ce mois</span></div>
     <div class="mini-kpi"><span class="mk-v" style="color:#006B30">{{totalSms() | number}}</span><span class="mk-l">SMS envoyés</span></div>
     <div class="mini-kpi"><span class="mk-v" style="color:#009A44">{{com.kpi().tauxLivraisonSms}}%</span><span class="mk-l">Taux de livraison</span></div>
-    <div class="mini-kpi"><span class="mk-v" style="color:#C9A84C">1 850</span><span class="mk-l">FCFA coût moyen camp.</span></div>
+    <div class="mini-kpi"><span class="mk-v" style="color:#C9A84C">{{coutMoyenCampagne() | number}}</span><span class="mk-l">FCFA coût moyen camp.</span></div>
   </div>
   <div style="padding:.75rem 1rem;display:flex;flex-direction:column;gap:8px">
     @for (s of com.smsHistorique(); track s.id) {
@@ -178,6 +178,11 @@ export class SmsComponent implements OnInit {
   nbDest(d: string): number { return NB_DEST[d] ?? 0; }
   coutEstime(d: string): number { return Math.round(this.nbDest(d) * 0.15); }
   totalSms(): number { return this.com.smsHistorique().filter(s => s.statut === 'envoye').reduce((acc, s) => acc + s.nbDestinataires, 0); }
+  coutMoyenCampagne(): number {
+    const h = this.com.smsHistorique();
+    if (!h.length) return 0;
+    return Math.round(h.reduce((acc, s) => acc + s.nbDestinataires * 0.15, 0) / h.length);
+  }
 
   envoyerAlerte(): void {
     if (!this.fAlt.message || !this.fAlt.cible) { this.toast.showError('alt', 'Message et groupe cible obligatoires'); return; }

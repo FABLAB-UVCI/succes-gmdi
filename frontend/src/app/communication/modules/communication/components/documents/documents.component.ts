@@ -126,10 +126,10 @@ type Tab = 'photos' | 'videos' | 'archives';
     <div class="pt"><i class="ti ti-archive"></i>Archives documentaires</div>
   </div>
   <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:.75rem 1rem;border-bottom:.5px solid var(--color-border-tertiary)">
-    <div class="mini-kpi"><span class="mk-v" style="color:#F77F00">1 248</span><span class="mk-l">Documents archivés</span></div>
+    <div class="mini-kpi"><span class="mk-v" style="color:#F77F00">{{com.kpi().documentsArchives | number:'1.0-0':'fr-FR'}}</span><span class="mk-l">Documents archivés</span></div>
     <div class="mini-kpi"><span class="mk-v" style="color:#E1306C">{{photos().length}}</span><span class="mk-l">Photos</span></div>
     <div class="mini-kpi"><span class="mk-v" style="color:#C9A84C">{{videos().length}}</span><span class="mk-l">Vidéos</span></div>
-    <div class="mini-kpi"><span class="mk-v" style="color:#009A44">838</span><span class="mk-l">Documents PDF / Office</span></div>
+    <div class="mini-kpi"><span class="mk-v" style="color:#009A44">{{autresDocuments().length}}</span><span class="mk-l">Documents PDF / Office</span></div>
   </div>
   <div style="padding:6px 8px;border-bottom:.5px solid var(--color-border-tertiary);display:flex;gap:8px">
     <input class="fi" style="max-width:200px" [(ngModel)]="searchArc" placeholder="Rechercher dans les archives...">
@@ -183,6 +183,7 @@ export class DocumentsComponent implements OnInit {
 
   photos  = () => this.com.documents().filter(d => d.type === 'photo');
   videos  = () => this.com.documents().filter(d => d.type === 'video');
+  autresDocuments = () => this.com.documents().filter(d => d.type !== 'photo' && d.type !== 'video');
 
   filteredDocuments() {
     const q = this.searchArc.toLowerCase().trim();
