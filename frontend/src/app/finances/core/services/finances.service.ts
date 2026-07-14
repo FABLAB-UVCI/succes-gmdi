@@ -1,5 +1,6 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Observable, tap } from 'rxjs';
 import { environment } from '@env/environment';
 import { ToastService } from './toast.service';
 import {
@@ -140,24 +141,16 @@ export class FinancesService {
   }
 
   // ── Actions Recettes ──────────────────────────────────────────────
-  ajouterRecette(r: Omit<Recette, 'id' | 'reference'>): void {
-    this.http.post<Recette>(`${this.api}/recettes`, r).subscribe({
-      next: rec => {
-        this.recettes.update(list => [...list, rec]);
-        this.toast.show(`Recette ${rec.reference} créée`);
-      },
-      error: (err) => this.toast.showError(err?.error?.message || 'Erreur création recette')
-    });
+  ajouterRecette(r: Omit<Recette, 'id' | 'reference'>): Observable<Recette> {
+    return this.http.post<Recette>(`${this.api}/recettes`, r).pipe(
+      tap(rec => this.recettes.update(list => [...list, rec]))
+    );
   }
 
-  modifierRecette(id: string, r: Omit<Recette, 'id' | 'reference'>): void {
-    this.http.put<Recette>(`${this.api}/recettes/${id}`, r).subscribe({
-      next: rec => {
-        this.recettes.update(list => list.map(x => x.id === rec.id ? rec : x));
-        this.toast.show(`Recette ${rec.reference} modifiée`);
-      },
-      error: (err) => this.toast.showError(err?.error?.message || 'Erreur modification recette')
-    });
+  modifierRecette(id: string, r: Omit<Recette, 'id' | 'reference'>): Observable<Recette> {
+    return this.http.put<Recette>(`${this.api}/recettes/${id}`, r).pipe(
+      tap(rec => this.recettes.update(list => list.map(x => x.id === rec.id ? rec : x)))
+    );
   }
 
   supprimerRecette(id: string): void {
@@ -181,24 +174,16 @@ export class FinancesService {
   }
 
   // ── Actions Dépenses ──────────────────────────────────────────────
-  ajouterDepense(d: Omit<Depense, 'id' | 'reference'>): void {
-    this.http.post<Depense>(`${this.api}/depenses`, d).subscribe({
-      next: dep => {
-        this.depenses.update(list => [...list, dep]);
-        this.toast.show(`Dépense ${dep.reference} enregistrée`);
-      },
-      error: (err) => this.toast.showError(err?.error?.message || 'Erreur création dépense')
-    });
+  ajouterDepense(d: Omit<Depense, 'id' | 'reference'>): Observable<Depense> {
+    return this.http.post<Depense>(`${this.api}/depenses`, d).pipe(
+      tap(dep => this.depenses.update(list => [...list, dep]))
+    );
   }
 
-  modifierDepense(id: string, d: Omit<Depense, 'id' | 'reference'>): void {
-    this.http.put<Depense>(`${this.api}/depenses/${id}`, d).subscribe({
-      next: dep => {
-        this.depenses.update(list => list.map(x => x.id === dep.id ? dep : x));
-        this.toast.show(`Dépense ${dep.reference} modifiée`);
-      },
-      error: (err) => this.toast.showError(err?.error?.message || 'Erreur modification dépense')
-    });
+  modifierDepense(id: string, d: Omit<Depense, 'id' | 'reference'>): Observable<Depense> {
+    return this.http.put<Depense>(`${this.api}/depenses/${id}`, d).pipe(
+      tap(dep => this.depenses.update(list => list.map(x => x.id === dep.id ? dep : x)))
+    );
   }
 
   supprimerDepense(id: string): void {

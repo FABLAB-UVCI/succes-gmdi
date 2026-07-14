@@ -2,12 +2,13 @@
 
 namespace App\Modules\Finances\Models;
 
+use App\Modules\Finances\Models\Concerns\HasSequentialReference;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Depense extends Model
 {
-    use HasFactory;
+    use HasFactory, HasSequentialReference;
 
     protected $fillable = [
         'reference', 'objet', 'fournisseur', 'montant',
@@ -22,8 +23,8 @@ class Depense extends Model
         parent::boot();
         static::creating(function ($d) {
             if (!$d->reference) {
-                $count = static::count() + 143;
-                $d->reference = 'DEP-' . date('Y') . '-' . str_pad($count, 4, '0', STR_PAD_LEFT);
+                $seq = static::nextSequence('reference', 'DEP-' . date('Y') . '-%', 4);
+                $d->reference = 'DEP-' . date('Y') . '-' . str_pad($seq, 4, '0', STR_PAD_LEFT);
             }
         });
     }

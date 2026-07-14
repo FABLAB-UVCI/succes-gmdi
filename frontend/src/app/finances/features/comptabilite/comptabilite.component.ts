@@ -84,7 +84,7 @@ type ComptaTab = 'journal' | 'grandlivre' | 'balance' | 'bilan';
     @if (activeTab() === 'balance') {
       <div class="card">
         <div class="ch">
-          <h3><i class="ti ti-scale"></i>Balance des comptes — Mai 2025</h3>
+          <h3><i class="ti ti-scale"></i>Balance des comptes — {{ moisCourant }}</h3>
           <button class="bs" (click)="svc.exportJSON(svc.comptes(),'balance')"><i class="ti ti-download"></i>Exporter</button>
         </div>
         <div class="pb">
@@ -115,7 +115,7 @@ type ComptaTab = 'journal' | 'grandlivre' | 'balance' | 'bilan';
     <!-- BILAN -->
     @if (activeTab() === 'bilan') {
       <div class="card">
-        <div class="ch"><h3><i class="ti ti-report"></i>Bilan comptable — Exercice 2025</h3></div>
+        <div class="ch"><h3><i class="ti ti-report"></i>Bilan comptable — Exercice {{ anneeCourante }}</h3></div>
         <div class="pb">
           <div class="grid2">
             <div>
@@ -151,6 +151,8 @@ type ComptaTab = 'journal' | 'grandlivre' | 'balance' | 'bilan';
 export class ComptabiliteComponent implements OnInit {
   svc = inject(FinancesService);
   activeTab = signal<ComptaTab>('journal');
+  readonly anneeCourante = new Date().getFullYear();
+  readonly moisCourant = new Date().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
 
   ngOnInit(): void {
     this.svc.chargerEcritures();

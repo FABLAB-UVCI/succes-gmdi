@@ -2,12 +2,13 @@
 
 namespace App\Modules\Finances\Models;
 
+use App\Modules\Finances\Models\Concerns\HasSequentialReference;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Recette extends Model
 {
-    use HasFactory;
+    use HasFactory, HasSequentialReference;
 
     protected $fillable = [
         'reference', 'contribuable', 'adresse', 'service_emetteur',
@@ -22,8 +23,8 @@ class Recette extends Model
         parent::boot();
         static::creating(function ($r) {
             if (!$r->reference) {
-                $count = static::count() + 10289;
-                $r->reference = 'TX-' . date('Y') . '-' . str_pad($count, 5, '0', STR_PAD_LEFT);
+                $seq = static::nextSequence('reference', 'TX-' . date('Y') . '-%', 5);
+                $r->reference = 'TX-' . date('Y') . '-' . str_pad($seq, 5, '0', STR_PAD_LEFT);
             }
         });
     }

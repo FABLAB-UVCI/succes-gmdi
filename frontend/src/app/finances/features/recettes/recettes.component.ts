@@ -311,14 +311,16 @@ export class RecettesComponent implements OnInit {
       operateur: this.form.operateur,
       numeroTransaction: this.form.numeroTransaction
     };
-    if (this.editingId()) {
-      this.svc.modifierRecette(this.editingId()!, payload);
-      this.showToast('Recette modifiée');
-    } else {
-      this.svc.ajouterRecette(payload);
-      this.showToast('Recette créée');
-    }
-    this.resetForm();
+    const obs = this.editingId()
+      ? this.svc.modifierRecette(this.editingId()!, payload)
+      : this.svc.ajouterRecette(payload);
+    obs.subscribe({
+      next: () => {
+        this.showToast(this.editingId() ? 'Recette modifiée' : 'Recette créée');
+        this.resetForm();
+      },
+      error: (err) => this.showToast(err?.error?.message || 'Erreur lors de l\'enregistrement', true)
+    });
   }
 
   editerRecette(r: Recette): void {

@@ -61,7 +61,7 @@ type TresoTab = 'caisse' | 'banque' | 'rapproch';
             <div class="kcard"><div class="kv" style="color:#009A44">{{ soldeBanque() | fcfa }}</div><div class="kl">Solde bancaire (FCFA)</div></div>
             <div class="kcard"><div class="kv" style="color:#8c4a00">{{ tresorerieGlobale() | fcfa }}</div><div class="kl">Trésorerie globale</div><div class="ks">Caisse + Banque</div></div>
           </div>
-          <div class="fs" style="margin-top:.75rem">Relevé bancaire — Mai 2025</div>
+          <div class="fs" style="margin-top:.75rem">Relevé bancaire — {{ moisCourant }}</div>
           <table class="tbl">
             <thead><tr><th>Date</th><th>Libellé</th><th>Débit</th><th>Crédit</th><th>Solde</th></tr></thead>
             <tbody>
@@ -83,7 +83,7 @@ type TresoTab = 'caisse' | 'banque' | 'rapproch';
     <!-- RAPPROCHEMENT -->
     @if (activeTab() === 'rapproch') {
       <div class="card">
-        <div class="ch"><h3><i class="ti ti-arrows-exchange"></i>Rapprochement bancaire — Mai 2025</h3></div>
+        <div class="ch"><h3><i class="ti ti-arrows-exchange"></i>Rapprochement bancaire — {{ moisCourant }}</h3></div>
         <div class="pb">
           <div class="kpi4">
             <div class="kcard"><div class="kv" style="color:#009A44">{{ soldeBanque() | fcfa }}</div><div class="kl">Solde relevé banque</div></div>
@@ -105,6 +105,7 @@ export class TresorerieComponent implements OnInit {
   toast = inject(ToastService);
   activeTab = signal<TresoTab>('caisse');
   rapprochValide = signal(false);
+  readonly moisCourant = new Date().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
 
   ngOnInit(): void {
     this.svc.chargerMouvementsCaisse();

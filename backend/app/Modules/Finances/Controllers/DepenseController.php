@@ -4,6 +4,7 @@ namespace App\Modules\Finances\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Modules\Finances\Models\Depense;
+use App\Modules\Finances\Models\LigneBudget;
 use Illuminate\Http\Request;
 
 class DepenseController extends Controller
@@ -63,6 +64,14 @@ class DepenseController extends Controller
             'statut'        => 'valide',
             'date_paiement' => now()->format('Y-m-d'),
         ]);
+
+        // Répercuter le paiement sur la ligne budgétaire correspondante (même
+        // chapitre + article) : montant_consomme restait figé à 0 jusqu'ici,
+        // le taux d'exécution budgétaire affiché ne bougeait donc jamais.
+        LigneBudget::where('chapitre', $depense->chapitre)
+            ->where('article', $depense->article)
+            ->increment('montant_consomme', $depense->montant);
+
         return response()->json($depense);
     }
 

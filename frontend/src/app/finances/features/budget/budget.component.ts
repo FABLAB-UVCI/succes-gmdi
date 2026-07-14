@@ -35,7 +35,7 @@ type BudgetTab = 'elaboration' | 'execution' | 'previsionnel' | 'revision';
             <div class="fg">
               <div class="fl">Exercice <span class="req">*</span></div>
               <select class="fsel" [(ngModel)]="form.exercice">
-                <option>2025</option><option>2026</option>
+                @for (a of exercices; track a) { <option>{{ a }}</option> }
               </select>
             </div>
             <div class="fg">
@@ -89,7 +89,7 @@ type BudgetTab = 'elaboration' | 'execution' | 'previsionnel' | 'revision';
     @if (activeTab() === 'execution') {
       <div class="card">
         <div class="ch">
-          <h3><i class="ti ti-chart-bar"></i>Exécution budgétaire — 2025</h3>
+          <h3><i class="ti ti-chart-bar"></i>Exécution budgétaire — {{ anneeCourante }}</h3>
           <button class="bs" (click)="svc.exportJSON(svc.lignesBudget(),'execution_budgetaire')">
             <i class="ti ti-download"></i>Exporter
           </button>
@@ -141,7 +141,7 @@ type BudgetTab = 'elaboration' | 'execution' | 'previsionnel' | 'revision';
     @if (activeTab() === 'previsionnel') {
       <div class="card">
         <div class="ch">
-          <h3><i class="ti ti-list"></i>Budget prévisionnel 2025</h3>
+          <h3><i class="ti ti-list"></i>Budget prévisionnel {{ anneeCourante }}</h3>
           <button class="bs" (click)="svc.exportJSON(svc.lignesBudget(),'budget_previsionnel')">
             <i class="ti ti-download"></i>Exporter JSON
           </button>
@@ -249,7 +249,10 @@ export class BudgetComponent implements OnInit {
     { id: 'revision'    as BudgetTab, label: 'Révisions',            icon: 'ti-edit' },
   ];
 
-  form = { exercice:'2025', type:'previsionnel', chapitre:'' as Chapitre | '', article:'', designation:'', montant:null as number|null, engage:null as number|null };
+  readonly anneeCourante = new Date().getFullYear();
+  readonly exercices = [this.anneeCourante - 1, this.anneeCourante, this.anneeCourante + 1];
+
+  form = { exercice: String(this.anneeCourante), type:'previsionnel', chapitre:'' as Chapitre | '', article:'', designation:'', montant:null as number|null, engage:null as number|null };
   rev  = { chapitre:'fonctionnement' as Chapitre, ligneId:'', nouveau:null as number|null, motif:'' };
 
   barHeight(v: number): number {
@@ -293,7 +296,7 @@ export class BudgetComponent implements OnInit {
   }
 
   resetForm(): void {
-    this.form = { exercice:'2025', type:'previsionnel', chapitre:'', article:'', designation:'', montant:null, engage:null };
+    this.form = { exercice: String(this.anneeCourante), type:'previsionnel', chapitre:'', article:'', designation:'', montant:null, engage:null };
   }
 
   private showToast(msg: string): void {

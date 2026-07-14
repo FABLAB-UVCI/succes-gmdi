@@ -30,9 +30,9 @@ class ComptabiliteController extends Controller
             'piece'   => 'nullable|string|max:50',
         ]);
 
-        $count   = EcritureComptable::count() + 1;
+        $seq   = EcritureComptable::nextSequence('numero', 'JR-%', 3);
         $ecriture = EcritureComptable::create([
-            'numero'  => 'JR-' . str_pad($count, 3, '0', STR_PAD_LEFT),
+            'numero'  => 'JR-' . str_pad($seq, 3, '0', STR_PAD_LEFT),
             'date'    => now()->format('Y-m-d'),
             'journal' => $data['journal'],
             'libelle' => $data['libelle'],

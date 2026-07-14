@@ -239,14 +239,16 @@ export class DepensesComponent implements OnInit {
       description: this.form.description,
       statut: 'en_attente' as const
     };
-    if (this.editingId()) {
-      this.svc.modifierDepense(this.editingId()!, payload);
-      this.showToast('Dépense modifiée');
-    } else {
-      this.svc.ajouterDepense(payload);
-      this.showToast('Dépense engagée');
-    }
-    this.resetForm();
+    const obs = this.editingId()
+      ? this.svc.modifierDepense(this.editingId()!, payload)
+      : this.svc.ajouterDepense(payload);
+    obs.subscribe({
+      next: () => {
+        this.showToast(this.editingId() ? 'Dépense modifiée' : 'Dépense engagée');
+        this.resetForm();
+      },
+      error: (err) => this.showToast(err?.error?.message || 'Erreur lors de l\'enregistrement', true)
+    });
   }
 
   editerDepense(d: Depense): void {

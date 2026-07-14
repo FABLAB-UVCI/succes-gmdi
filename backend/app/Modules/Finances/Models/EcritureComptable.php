@@ -2,12 +2,13 @@
 
 namespace App\Modules\Finances\Models;
 
+use App\Modules\Finances\Models\Concerns\HasSequentialReference;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class EcritureComptable extends Model
 {
-    use HasFactory;
+    use HasFactory, HasSequentialReference;
 
     protected $table = 'ecritures_comptables';
 
