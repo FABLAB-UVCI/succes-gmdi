@@ -11,6 +11,6 @@ use Illuminate\Database\Eloquent\Model;
 /** Table : lotissements */
 class Lotissement extends Model
 {
-    protected $fillable = ['reference','denomination','promoteur','localisation','superficie','nombre_lots','lots_disponibles','date_approb','statut'];
-    protected $casts    = ['date_approb'=>'date','superficie'=>'float','nombre_lots'=>'integer','lots_disponibles'=>'integer'];
+    protected $fillable = ['reference','denomination','promoteur','localisation','superficie','nombre_lots','lots_disponibles','date_approb','statut','avancement'];
+    protected $casts    = ['date_approb'=>'date','superficie'=>'float','nombre_lots'=>'integer','lots_disponibles'=>'integer','avancement'=>'integer'];
 }

@@ -223,7 +223,7 @@ export interface SuiviChantier {
   observations: string;
   recommandations?: string;
   controleur: string;
-  statut: 'conforme' | 'retard' | 'anomalie';
+  statut: 'actif' | 'arrete' | 'termine' | 'retard';
 }
 
 // ── Géolocalisation équipements ───────────────────────────────────────────────

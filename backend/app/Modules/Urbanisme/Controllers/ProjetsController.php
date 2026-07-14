@@ -59,6 +59,7 @@ class ProjetsController extends Controller
             'lots_disponibles'=> $nombre_lots,
             'date_approb'     => $date_approb,
             'statut'          => $v['statut'] ?? 'etude',
+            'avancement'      => 0,
         ]);
         return response()->json(['success'=>true,'message'=>"Lotissement enregistré — {$l->reference}",'data'=>$this->fmtLot($l)], 201);
     }
@@ -82,8 +83,7 @@ class ProjetsController extends Controller
     {
         $l = Lotissement::findOrFail($id);
         $request->validate(['avancement'=>'required|integer|between:0,100']);
-        // Stocker l'avancement dans lots_disponibles proportionnellement ou dans un champ dédié si disponible
-        $updates = [];
+        $updates = ['avancement' => $request->avancement];
         if ($request->avancement >= 100) $updates['statut'] = 'termine';
         $l->update($updates);
         return response()->json(['success'=>true,'message'=>"Avancement : {$request->avancement}%",'data'=>$this->fmtLot($l->fresh())]);
@@ -106,7 +106,7 @@ class ProjetsController extends Controller
             'date_approb'     => $l->date_approb?->format('Y-m-d'),
             'date_agrement'   => $l->date_approb?->format('Y-m-d'),
             'statut'          => $l->statut,
-            'avancement'      => 0,
+            'avancement'      => $l->avancement,
             'created_at'      => $l->created_at?->toISOString(),
         ];
     }
