@@ -180,6 +180,8 @@ type Tab = 'fiche' | 'liste' | 'fonct' | 'contrat' | 'stage';
         <option value="">Tous statuts</option>
         <option value="actif">Actif</option>
         <option value="conge">En congé</option>
+        <option value="suspendu">Suspendu</option>
+        <option value="parti">Parti</option>
       </select>
       <span class="rc">{{ agentsFiltres().length }} agent(s)</span>
     </div>
@@ -206,10 +208,10 @@ type Tab = 'fiche' | 'liste' | 'fonct' | 'contrat' | 'stage';
               <td>{{ a.direction }}</td>
               <td><span class="chip" [ngClass]="chipContrat(a.typeContrat)">{{ labelContrat(a.typeContrat) }}</span></td>
               <td class="right">{{ a.salaireBrut | fcfa }}</td>
-              <td><span class="chip" [ngClass]="a.statut === 'actif' ? 'cv' : 'cp'">{{ a.statut === 'actif' ? 'Actif' : 'En congé' }}</span></td>
+              <td><span class="chip" [ngClass]="chipStatutAgent(a.statut)">{{ labelStatutAgent(a.statut) }}</span></td>
               <td>
                 <button class="bti" title="Voir fiche" (click)="voirFiche(a)"><i class="ti ti-eye"></i></button>
-                @if (a.statut !== 'actif') {
+                @if (a.statut !== 'actif' && a.statut !== 'parti') {
                   <button class="bti ok" title="Remettre actif" (click)="reactiverAgent(a)"><i class="ti ti-check"></i></button>
                 }
               </td>
@@ -255,7 +257,7 @@ type Tab = 'fiche' | 'liste' | 'fonct' | 'contrat' | 'stage';
               <td class="bold">{{ a.nomComplet }}</td>
               <td>{{ a.poste }}</td>
               <td>{{ a.direction }}</td>
-              <td><span class="chip" [ngClass]="a.statut === 'actif' ? 'cv' : 'cp'">{{ a.statut === 'actif' ? 'Actif' : 'En congé' }}</span></td>
+              <td><span class="chip" [ngClass]="chipStatutAgent(a.statut)">{{ labelStatutAgent(a.statut) }}</span></td>
             </tr>
           } @empty {
             <tr><td colspan="5" class="empty">Aucun contractuel enregistré</td></tr>
@@ -284,7 +286,7 @@ type Tab = 'fiche' | 'liste' | 'fonct' | 'contrat' | 'stage';
               <td class="bold">{{ a.nomComplet }}</td>
               <td>{{ a.poste }}</td>
               <td>{{ a.direction }}</td>
-              <td><span class="chip" [ngClass]="a.statut === 'actif' ? 'cv' : 'cp'">{{ a.statut === 'actif' ? 'Actif' : 'En congé' }}</span></td>
+              <td><span class="chip" [ngClass]="chipStatutAgent(a.statut)">{{ labelStatutAgent(a.statut) }}</span></td>
             </tr>
           } @empty {
             <tr><td colspan="5" class="empty">Aucun stagiaire enregistré</td></tr>
@@ -329,8 +331,8 @@ export class PersonnelComponent {
     this.rh.filtrerAgents(this.filtre.recherche, this.filtre.direction, this.filtre.contrat, this.filtre.statut)
   );
 
-  contractuelsActifs = computed(() => this.rh.agents().filter(a => a.typeContrat === 'contractuel'));
-  stagiaires         = computed(() => this.rh.agents().filter(a => a.typeContrat === 'stage'));
+  contractuelsActifs = computed(() => this.rh.agentsActifs().filter(a => a.typeContrat === 'contractuel'));
+  stagiaires         = computed(() => this.rh.agentsActifs().filter(a => a.typeContrat === 'stage'));
 
   creerAgent(): void {
     const { matricule, nom, prenom, poste, direction, salaireBrut, dateEmbauche, dateNaissance, telephone, email, grade } = this.form;
@@ -399,6 +401,9 @@ export class PersonnelComponent {
   labelContrat(t: string): string {
     return { fonctionnaire: 'Fonctionnaire', contractuel: 'Contractuel', stage: 'Stagiaire' }[t] ?? t;
   }
+
+  chipStatutAgent(s: string): string { return { actif: 'cv', conge: 'cp', suspendu: 'cw', parti: 'cr' }[s] ?? 'cp'; }
+  labelStatutAgent(s: string): string { return { actif: 'Actif', conge: 'En congé', suspendu: 'Suspendu', parti: 'Parti' }[s] ?? s; }
 
   private emptyForm() {
     return {

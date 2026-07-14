@@ -3,6 +3,7 @@
 namespace App\Modules\Rh\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Modules\Rh\Models\Agent;
 use App\Modules\Rh\Models\Depart;
 use Illuminate\Http\Request;
 
@@ -36,7 +37,16 @@ class DepartController extends Controller
     public function update(Request $request, string $id)
     {
         $d = Depart::findOrFail($id);
-        $d->update($request->only(['statut', 'observations', 'dernier_salaire', 'derniere_presence']));
+        $data = $request->only(['statut', 'observations', 'dernier_salaire', 'derniere_presence']);
+        $d->update($data);
+
+        // Marquer l'agent comme "parti" à la validation du départ : sans cela,
+        // l'agent restait "actif" indéfiniment et continuait d'être compté
+        // dans tous les effectifs/KPIs RH malgré un départ validé.
+        if (($data['statut'] ?? null) === 'valide') {
+            Agent::where('matricule', $d->matricule)->update(['statut' => 'parti']);
+        }
+
         return response()->json($d);
     }
 

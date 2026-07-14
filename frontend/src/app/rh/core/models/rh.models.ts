@@ -1,6 +1,6 @@
 // ── Agent ──────────────────────────────────────────────────────────────────
 export type TypeContrat = 'fonctionnaire' | 'contractuel' | 'stage';
-export type StatutAgent = 'actif' | 'conge' | 'suspendu';
+export type StatutAgent = 'actif' | 'conge' | 'suspendu' | 'parti';
 export type Categorie  = 'A' | 'B' | 'C' | 'Stagiaire';
 
 export interface Agent {
@@ -61,6 +61,8 @@ export interface Recrutement {
   direction: string;
   nbPostes: number;
   type: 'concours' | 'direct' | 'stage';
+  diplomeRequis?: string;
+  salairePropose?: number;
   cloture: string;
   candidatures: number;
   statut: StatutRecrutement;

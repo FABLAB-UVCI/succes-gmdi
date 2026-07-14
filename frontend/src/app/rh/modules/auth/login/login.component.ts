@@ -121,7 +121,7 @@ import { AuthService } from '../../../core/services/auth.service';
           <span class="badge orange">GMDI v2</span>
           <span class="badge vert">Sécurisé</span>
         </div>
-        <p>© 2025 — Mairie de la Commune</p>
+        <p>© {{ anneeCourante }} — Mairie de la Commune</p>
       </div>
     </div>
 
@@ -497,6 +497,7 @@ export class LoginComponent {
   error        = signal('');
   loading      = signal(false);
   showPassword = signal(false);
+  readonly anneeCourante = new Date().getFullYear();
 
   constructor(private auth: AuthService, private router: Router) {}
 

@@ -33,7 +33,7 @@ interface CritereEval {
 <!-- ── Plan de formation ───────────────────────────────────────────────── -->
 @if (activeTab() === 'plan') {
   <div class="card">
-    <div class="ch"><h3><i class="ti ti-list-check"></i>Plan de formation 2025</h3></div>
+    <div class="ch"><h3><i class="ti ti-list-check"></i>Plan de formation {{ anneeCourante }}</h3></div>
     <app-toast [visible]="toast.get('f')?.visible ?? false" [message]="toast.get('f')?.message ?? ''" [type]="toast.get('f')?.type ?? 'success'" />
     <div class="pb">
       <div class="fsec">Nouvelle formation</div>
@@ -160,7 +160,7 @@ interface CritereEval {
           <div style="font-size: 0.7rem; color: #6c757d;">Présence régulière et ponctualité</div>
           @for (note of [0,1,2,3,4]; track note) {
             <div style="text-align: center;">
-              <input type="radio" name="assiduite" [value]="note" (change)="ev.assiduite = note" style="transform: scale(1.2); cursor: pointer;">
+              <input type="radio" name="assiduite" [value]="note" [checked]="ev.assiduite === note" (change)="ev.assiduite = note" style="transform: scale(1.2); cursor: pointer;">
             </div>
           }
         </div>
@@ -171,7 +171,7 @@ interface CritereEval {
           <div style="font-size: 0.7rem; color: #6c757d;">Tenue professionnelle et hygiène</div>
           @for (note of [0,1,2,3,4]; track note) {
             <div style="text-align: center;">
-              <input type="radio" name="proprete" [value]="note" (change)="ev.proprete = note" style="transform: scale(1.2); cursor: pointer;">
+              <input type="radio" name="proprete" [value]="note" [checked]="ev.proprete === note" (change)="ev.proprete = note" style="transform: scale(1.2); cursor: pointer;">
             </div>
           }
         </div>
@@ -182,7 +182,7 @@ interface CritereEval {
           <div style="font-size: 0.7rem; color: #6c757d;">Respect des horaires d'arrivée et départ</div>
           @for (note of [0,1,2,3,4]; track note) {
             <div style="text-align: center;">
-              <input type="radio" name="ponctualite" [value]="note" (change)="ev.ponctualite = note" style="transform: scale(1.2); cursor: pointer;">
+              <input type="radio" name="ponctualite" [value]="note" [checked]="ev.ponctualite === note" (change)="ev.ponctualite = note" style="transform: scale(1.2); cursor: pointer;">
             </div>
           }
         </div>
@@ -193,7 +193,7 @@ interface CritereEval {
           <div style="font-size: 0.7rem; color: #6c757d;">Précision, soin et absence d'erreurs</div>
           @for (note of [0,1,2,3,4]; track note) {
             <div style="text-align: center;">
-              <input type="radio" name="qualite" [value]="note" (change)="ev.qualite = note" style="transform: scale(1.2); cursor: pointer;">
+              <input type="radio" name="qualite" [value]="note" [checked]="ev.qualite === note" (change)="ev.qualite = note" style="transform: scale(1.2); cursor: pointer;">
             </div>
           }
         </div>
@@ -204,7 +204,7 @@ interface CritereEval {
           <div style="font-size: 0.7rem; color: #6c757d;">Rendement et respect des délais</div>
           @for (note of [0,1,2,3,4]; track note) {
             <div style="text-align: center;">
-              <input type="radio" name="productivite" [value]="note" (change)="ev.productivite = note" style="transform: scale(1.2); cursor: pointer;">
+              <input type="radio" name="productivite" [value]="note" [checked]="ev.productivite === note" (change)="ev.productivite = note" style="transform: scale(1.2); cursor: pointer;">
             </div>
           }
         </div>
@@ -215,7 +215,7 @@ interface CritereEval {
           <div style="font-size: 0.7rem; color: #6c757d;">Proactivité et propositions d'amélioration</div>
           @for (note of [0,1,2,3,4]; track note) {
             <div style="text-align: center;">
-              <input type="radio" name="initiative" [value]="note" (change)="ev.initiative = note" style="transform: scale(1.2); cursor: pointer;">
+              <input type="radio" name="initiative" [value]="note" [checked]="ev.initiative === note" (change)="ev.initiative = note" style="transform: scale(1.2); cursor: pointer;">
             </div>
           }
         </div>
@@ -226,7 +226,7 @@ interface CritereEval {
           <div style="font-size: 0.7rem; color: #6c757d;">Esprit d'équipe et entraide</div>
           @for (note of [0,1,2,3,4]; track note) {
             <div style="text-align: center;">
-              <input type="radio" name="relation" [value]="note" (change)="ev.relation = note" style="transform: scale(1.2); cursor: pointer;">
+              <input type="radio" name="relation" [value]="note" [checked]="ev.relation === note" (change)="ev.relation = note" style="transform: scale(1.2); cursor: pointer;">
             </div>
           }
         </div>
@@ -237,7 +237,7 @@ interface CritereEval {
           <div style="font-size: 0.7rem; color: #6c757d;">Respect et communication avec supérieurs</div>
           @for (note of [0,1,2,3,4]; track note) {
             <div style="text-align: center;">
-              <input type="radio" name="hierarchie" [value]="note" (change)="ev.hierarchie = note" style="transform: scale(1.2); cursor: pointer;">
+              <input type="radio" name="hierarchie" [value]="note" [checked]="ev.hierarchie === note" (change)="ev.hierarchie = note" style="transform: scale(1.2); cursor: pointer;">
             </div>
           }
         </div>
@@ -248,7 +248,7 @@ interface CritereEval {
           <div style="font-size: 0.7rem; color: #6c757d;">Conformité aux procédures internes</div>
           @for (note of [0,1,2,3,4]; track note) {
             <div style="text-align: center;">
-              <input type="radio" name="regles" [value]="note" (change)="ev.regles = note" style="transform: scale(1.2); cursor: pointer;">
+              <input type="radio" name="regles" [value]="note" [checked]="ev.regles === note" (change)="ev.regles = note" style="transform: scale(1.2); cursor: pointer;">
             </div>
           }
         </div>
@@ -362,6 +362,7 @@ export class FormationComponent {
   constructor(readonly rh: RhService, readonly toast: ToastService) {}
 
   activeTab = signal<Tab>('plan');
+  readonly anneeCourante = new Date().getFullYear();
 
   tabs = [
     { id: 'plan'   as Tab, label: 'Plan de formation', icon: 'ti-list-check'  },
@@ -460,9 +461,6 @@ export class FormationComponent {
       regles: 0,
       commentaires: ''
     };
-    // Réinitialiser les radios
-    const radios = document.querySelectorAll('input[type="radio"]');
-    radios.forEach(radio => (radio as HTMLInputElement).checked = false);
   }
 
   // Enregistrer l'évaluation
@@ -523,19 +521,12 @@ export class FormationComponent {
       agents: this.fo.agents,
       cout: this.fo.cout || 0
     }).subscribe({
-      next: () => this.toast.show('f', `Formation planifiée — ${this.fo.titre} (Formateur: ${this.fo.formateur})`),
+      next: () => {
+        this.toast.show('f', `Formation planifiée — ${this.fo.titre} (Formateur: ${this.fo.formateur})`);
+        this.fo = { titre: '', organisme: '', formateur: '', dateDebut: '', dateFin: '', cout: 0, agents: '' };
+      },
       error: () => this.toast.showError('f', 'Erreur lors de la planification'),
     });
-    
-    this.fo = { 
-      titre: '', 
-      organisme: '', 
-      formateur: '', 
-      dateDebut: '', 
-      dateFin: '', 
-      cout: 0, 
-      agents: '' 
-    };
   }
 
   // Émettre une attestation

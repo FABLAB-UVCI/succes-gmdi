@@ -1,4 +1,4 @@
-import { Component, signal, OnInit } from '@angular/core';
+import { Component, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RhService } from '../../../../core/services/rh.service';
@@ -27,8 +27,8 @@ interface JourCal { label: string; classe: string; }
 @if (activeTab() === 'pointage') {
   <div class="card">
     <div class="ch">
-      <h3><i class="ti ti-fingerprint"></i>Pointage du jour — 26 mai 2025</h3>
-      <div class="ha"><span style="font-size:12px;color:var(--color-text-secondary)">Présents: <strong>312</strong> / 347</span></div>
+      <h3><i class="ti ti-fingerprint"></i>Pointage du jour — {{ dateDuJour }}</h3>
+      <div class="ha"><span style="font-size:12px;color:var(--color-text-secondary)">Présents (estimé) : <strong>{{ presentsEstimes() }}</strong> / {{ rh.totalAgents() }}</span></div>
     </div>
     <div class="pb">
       <div class="fr3" style="margin-bottom:.75rem">
@@ -46,7 +46,7 @@ interface JourCal { label: string; classe: string; }
         </div>
       </div>
       <app-toast [visible]="toast.get('pt')?.visible ?? false" [message]="toast.get('pt')?.message ?? ''" [type]="toast.get('pt')?.type ?? 'success'" />
-      <div class="fsec">Récapitulatif du mois de mai</div>
+      <div class="fsec">Récapitulatif du mois de {{ nomMoisCourant }}</div>
       <div class="pres-grid">
         @for (j of calendrier; track $index) {
           <div class="pres-day" [ngClass]="j.classe">{{ j.label }}</div>
@@ -232,6 +232,25 @@ export class PresenceComponent implements OnInit {
 
   calendrier: JourCal[] = [];
   pt = { matricule: '', statut: 'present' };
+
+  readonly dateDuJour = new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+  readonly nomMoisCourant = new Date().toLocaleDateString('fr-FR', { month: 'long' });
+
+  /** Estimation à partir des congés approuvés en cours et des absences déclarées aujourd'hui (aucun pointage réel n'est enregistré). */
+  presentsEstimes = computed(() => {
+    const today = new Date().toISOString().slice(0, 10);
+    const enConge = new Set(
+      this.rh.conges().filter(c => {
+        if (c.statut !== 'approuve') return false;
+        const debut = c.dateDebut;
+        const fin = new Date(new Date(debut).getTime() + (c.duree - 1) * 86400000).toISOString().slice(0, 10);
+        return today >= debut && today <= fin;
+      }).map(c => c.matricule)
+    );
+    const absentsAuj = new Set(this.rh.absences().filter(a => a.date === today).map(a => a.matricule));
+    const indisponibles = new Set([...enConge, ...absentsAuj]);
+    return Math.max(0, this.rh.totalAgents() - indisponibles.size);
+  });
   cg = { matricule: '', type: 'annuel', duree: null as number|null, dateDebut: '', motif: '', pieceJointe: null as File | null };
   ab = { matricule: '', date: '', motif: 'Absence injustifiée', pj: '' };
   pm = { matricule: '', motif: 'Mariage', date: '', duree: null as number|null };
@@ -270,6 +289,10 @@ export class PresenceComponent implements OnInit {
       this.toast.showError('cg', 'Champs obligatoires manquants'); return;
     }
     const agent = this.rh.findAgent(this.cg.matricule);
+    if (agent && Number(this.cg.duree) > agent.congesRestants) {
+      this.toast.showError('cg', `Solde insuffisant — ${agent.congesRestants} jour(s) restant(s) pour ${agent.nomComplet}`);
+      return;
+    }
 
     // Afficher dans la console le fichier si présent
     if (this.cg.pieceJointe) {

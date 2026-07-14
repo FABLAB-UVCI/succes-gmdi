@@ -1,10 +1,11 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RhService } from '../../../../core/services/rh.service';
 import { ToastService } from '../../../../core/services/toast.service';
 import { ToastComponent } from '../../../../shared/components/toast.component';
 import { FcfaPipe } from '../../../../shared/pipes/fcfa.pipe';
+import { Agent } from '../../../../core/models/rh.models';
 
 type Tab = 'salaires' | 'primes' | 'bulletins';
 
@@ -24,16 +25,16 @@ type Tab = 'salaires' | 'primes' | 'bulletins';
 <!-- ── Salaires ────────────────────────────────────────────────────────── -->
 @if (activeTab() === 'salaires') {
   <div class="card">
-    <div class="ch"><h3><i class="ti ti-cash"></i>Gestion des salaires — Mai 2025</h3></div>
+    <div class="ch"><h3><i class="ti ti-cash"></i>Gestion des salaires — {{ moisCourant }}</h3></div>
     <div class="pb">
       <div class="kpi4" style="margin-bottom:1rem">
-        <div class="kcard"><div class="kv" style="color:#C9A84C">15 000 000</div><div class="kl">Masse salariale mai (FCFA)</div></div>
-        <div class="kcard"><div class="kv" style="color:#009A44">347</div><div class="kl">Agents à payer</div></div>
-        <div class="kcard"><div class="kv" style="color:#8c4a00">43 285</div><div class="kl">Salaire moyen (FCFA)</div></div>
-        <div class="kcard"><div class="kv" style="color:#F77F00">2 250 000</div><div class="kl">Total retenues CNPS</div></div>
+        <div class="kcard"><div class="kv" style="color:#C9A84C">{{ masseSalariale() | fcfa }}</div><div class="kl">Masse salariale du mois</div></div>
+        <div class="kcard"><div class="kv" style="color:#009A44">{{ rh.lignesPaie().length }}</div><div class="kl">Agents à payer</div></div>
+        <div class="kcard"><div class="kv" style="color:#8c4a00">{{ salaireMoyen() | fcfa }}</div><div class="kl">Salaire moyen (FCFA)</div></div>
+        <div class="kcard"><div class="kv" style="color:#F77F00">{{ totalRetenues() | fcfa }}</div><div class="kl">Total retenues</div></div>
       </div>
       <div style="display:flex;gap:8px;margin-bottom:1rem">
-        <button class="bp" (click)="lancerPaiement()"><i class="ti ti-send"></i>Lancer paiement mai 2025</button>
+        <button class="bp" (click)="lancerPaiement()"><i class="ti ti-send"></i>Lancer paiement {{ moisCourant }}</button>
         <button class="bs"><i class="ti ti-download"></i>État de paie</button>
         <button class="bd"><i class="ti ti-printer"></i>Imprimer tous les bulletins</button>
       </div>
@@ -90,7 +91,7 @@ type Tab = 'salaires' | 'primes' | 'bulletins';
       <div class="fr">
         <div class="fg"><div class="fl">Mois concerné</div>
           <select class="fsel" [(ngModel)]="prime.mois">
-            <option>Mai 2025</option><option>Juin 2025</option><option>Juillet 2025</option>
+            @for (m of moisOptions; track m) { <option>{{ m }}</option> }
           </select>
         </div>
         <div class="fg"><div class="fl">Justification</div><input class="fi" [(ngModel)]="prime.justification" placeholder="Ex: Performance exceptionnelle Q1"></div>
@@ -121,7 +122,7 @@ type Tab = 'salaires' | 'primes' | 'bulletins';
         <div class="fg"><div class="fl">Rechercher un agent</div><input class="fi" [(ngModel)]="bul.recherche" placeholder="Matricule ou nom"></div>
         <div class="fg"><div class="fl">Mois</div>
           <select class="fsel" [(ngModel)]="bul.mois">
-            <option>Mai 2025</option><option>Avril 2025</option><option>Mars 2025</option>
+            @for (m of moisOptions; track m) { <option>{{ m }}</option> }
           </select>
         </div>
         <div class="fg" style="justify-content:flex-end;flex-direction:row;align-items:center;padding-top:14px;gap:6px">
@@ -129,29 +130,28 @@ type Tab = 'salaires' | 'primes' | 'bulletins';
         </div>
       </div>
 
-      @if (showBulletin()) {
+      @if (showBulletin() && bulletinAgent(); as ag) {
         <div style="border:.5px solid var(--color-border-tertiary);border-radius:8px;padding:1rem;margin-top:.5rem">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem">
             <div>
-              <div style="font-size:15px;font-weight:500;color:var(--color-text-primary)">{{ agentBulletin() }}</div>
-              <div style="font-size:12px;color:var(--color-text-secondary)">Chef Service État Civil — EC-001</div>
+              <div style="font-size:15px;font-weight:500;color:var(--color-text-primary)">{{ ag.nomComplet }}</div>
+              <div style="font-size:12px;color:var(--color-text-secondary)">{{ ag.poste }} — {{ ag.matricule }}</div>
             </div>
-            <span class="chip cv">Payé</span>
+            <span class="chip cw">{{ bul.mois }}</span>
           </div>
           <table class="tbl" style="margin-bottom:.5rem">
             <thead><tr><th>Élément</th><th>Base</th><th>Montant (FCFA)</th></tr></thead>
             <tbody>
-              <tr><td class="bold">Salaire de base</td><td>Indice 800</td><td class="right">450 000</td></tr>
-              <tr><td class="bold">Prime d'ancienneté</td><td>10%</td><td class="right">45 000</td></tr>
-              <tr><td class="bold">Indemnité responsabilité</td><td>Forfait</td><td class="right">30 000</td></tr>
-              <tr><td class="bold">Indemnité transport</td><td>Forfait</td><td class="right">25 000</td></tr>
-              <tr style="background:var(--color-background-secondary)"><td class="bold">TOTAL BRUT</td><td></td><td class="right bold">550 000</td></tr>
-              <tr><td style="color:#E24B4A">Cotisation CNPS</td><td>3.6%</td><td class="right" style="color:#E24B4A">-18 000</td></tr>
-              <tr><td style="color:#E24B4A">Retraite</td><td>3%</td><td class="right" style="color:#E24B4A">-13 500</td></tr>
-              <tr><td style="color:#E24B4A">IR retenu à la source</td><td>15%</td><td class="right" style="color:#E24B4A">-67 500</td></tr>
+              <tr><td class="bold">Salaire de base</td><td>—</td><td class="right">{{ bulletinCalc()!.base | fcfa }}</td></tr>
+              <tr><td class="bold">Prime d'ancienneté</td><td>10%</td><td class="right">{{ bulletinCalc()!.primeAnciennete | fcfa }}</td></tr>
+              <tr><td class="bold">Indemnité transport</td><td>Forfait</td><td class="right">{{ bulletinCalc()!.indemniteTransport | fcfa }}</td></tr>
+              <tr style="background:var(--color-background-secondary)"><td class="bold">TOTAL BRUT</td><td></td><td class="right bold">{{ bulletinCalc()!.totalBrut | fcfa }}</td></tr>
+              <tr><td style="color:#E24B4A">Cotisation CNPS</td><td>3.6%</td><td class="right" style="color:#E24B4A">-{{ bulletinCalc()!.cnps | fcfa }}</td></tr>
+              <tr><td style="color:#E24B4A">Retraite</td><td>3%</td><td class="right" style="color:#E24B4A">-{{ bulletinCalc()!.retraite | fcfa }}</td></tr>
+              <tr><td style="color:#E24B4A">IR retenu à la source</td><td>15%</td><td class="right" style="color:#E24B4A">-{{ bulletinCalc()!.ir | fcfa }}</td></tr>
               <tr style="background:var(--color-background-secondary)">
                 <td class="bold" style="color:#009A44">NET À PAYER</td><td></td>
-                <td class="right bold" style="color:#009A44">451 000</td>
+                <td class="right bold" style="color:#009A44">{{ bulletinCalc()!.net | fcfa }}</td>
               </tr>
             </tbody>
           </table>
@@ -160,6 +160,8 @@ type Tab = 'salaires' | 'primes' | 'bulletins';
             <button class="bd"><i class="ti ti-printer"></i>Imprimer</button>
           </div>
         </div>
+      } @else if (showBulletin()) {
+        <div style="padding:1rem;font-size:12px;color:#E24B4A">Agent introuvable — vérifiez le matricule ou le nom saisi.</div>
       }
     </div>
   </div>
@@ -171,7 +173,21 @@ export class PaieComponent {
 
   activeTab = signal<Tab>('salaires');
   showBulletin = signal(false);
-  agentBulletin = signal('TRAORÉ Adjoa');
+  bulletinAgent = signal<Agent | null>(null);
+
+  bulletinCalc = computed(() => {
+    const ag = this.bulletinAgent();
+    if (!ag) return null;
+    const base = ag.salaireBrut;
+    const primeAnciennete = Math.round(base * 0.10);
+    const indemniteTransport = 25000;
+    const totalBrut = base + primeAnciennete + indemniteTransport;
+    const cnps = Math.round(totalBrut * 0.036);
+    const retraite = Math.round(totalBrut * 0.03);
+    const ir = Math.round(totalBrut * 0.15);
+    const net = totalBrut - cnps - retraite - ir;
+    return { base, primeAnciennete, indemniteTransport, totalBrut, cnps, retraite, ir, net };
+  });
 
   tabs = [
     { id: 'salaires'  as Tab, label: 'Salaires',          icon: 'ti-cash'         },
@@ -179,11 +195,27 @@ export class PaieComponent {
     { id: 'bulletins' as Tab, label: 'Bulletins de paie',  icon: 'ti-file-invoice' },
   ];
 
-  prime = { matricule: '', type: '', montant: null as number|null, mois: 'Mai 2025', justification: '' };
-  bul = { recherche: '', mois: 'Mai 2025' };
+  private capitalize(s: string): string { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+  readonly moisCourant = this.capitalize(new Date().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }));
+  readonly moisOptions = Array.from({ length: 4 }, (_, i) => {
+    const d = new Date(); d.setMonth(d.getMonth() - i);
+    return this.capitalize(d.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }));
+  });
+
+  prime = { matricule: '', type: '', montant: null as number|null, mois: this.moisCourant, justification: '' };
+  bul = { recherche: '', mois: this.moisCourant };
+
+  masseSalariale = computed(() => this.rh.lignesPaie().reduce((s, l) => s + l.brut, 0));
+  totalRetenues  = computed(() => this.rh.lignesPaie().reduce((s, l) => s + l.retenues, 0));
+  salaireMoyen   = computed(() => {
+    const lignes = this.rh.lignesPaie();
+    return lignes.length ? Math.round(lignes.reduce((s, l) => s + l.brut, 0) / lignes.length) : 0;
+  });
 
   lancerPaiement(): void {
-    this.toast.show('pa', 'Paiement des salaires mai 2025 lancé — 347 agents — 15 000 000 FCFA');
+    const n = this.rh.lignesPaie().length;
+    this.toast.show('pa', `Paiement des salaires ${this.moisCourant} lancé — ${n} agent(s) — ${this.rh.formaterFCFA(this.masseSalariale())}`);
   }
 
   attribuerPrime(): void {
@@ -191,14 +223,11 @@ export class PaieComponent {
       this.toast.showError('pr', 'Remplir tous les champs obligatoires'); return;
     }
     this.toast.show('pr', `Prime attribuée — ${this.prime.matricule} — ${this.prime.type} : ${this.rh.formaterFCFA(this.prime.montant)}`);
-    this.prime = { matricule: '', type: '', montant: null, mois: 'Mai 2025', justification: '' };
+    this.prime = { matricule: '', type: '', montant: null, mois: this.moisCourant, justification: '' };
   }
 
   voirBulletin(): void {
-    if (this.bul.recherche) {
-      const ag = this.rh.findAgent(this.bul.recherche);
-      if (ag) this.agentBulletin.set(ag.nomComplet);
-    }
+    this.bulletinAgent.set(this.bul.recherche ? this.rh.findAgent(this.bul.recherche) ?? null : null);
     this.showBulletin.set(true);
   }
 }

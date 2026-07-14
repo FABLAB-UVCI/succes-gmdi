@@ -73,7 +73,7 @@ interface NavItem { id: Section; label: string; icon: string; }
           <i class="ti ti-users hi" aria-hidden="true"></i>
           <div>
             <h2>Ressources Humaines</h2>
-            <p>Gestion du personnel municipal — 2025</p>
+            <p>Gestion du personnel municipal — {{ anneeCourante }}</p>
           </div>
         </div>
         <div class="mkpis">
@@ -107,6 +107,7 @@ export class RhShellComponent {
 
   activeSection = signal<Section>('personnel');
   sidebarOpen   = signal(false);
+  readonly anneeCourante = new Date().getFullYear();
 
   navItems: NavItem[] = [
     { id: 'personnel', label: 'Personnel',    icon: 'ti-users'    },

@@ -16,11 +16,13 @@ class RecrutementController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'poste'     => 'required|string',
-            'direction' => 'required|string',
-            'nb_postes' => 'required|integer|min:1',
-            'type'      => 'required|in:concours,direct,stage',
-            'cloture'   => 'required|date',
+            'poste'           => 'required|string',
+            'direction'       => 'required|string',
+            'nb_postes'       => 'required|integer|min:1',
+            'type'            => 'required|in:concours,direct,stage',
+            'diplome_requis'  => 'nullable|string',
+            'salaire_propose' => 'nullable|numeric|min:0',
+            'cloture'         => 'required|date',
         ]);
         $data['candidatures'] = 0;
         $data['statut']       = 'en_cours';
@@ -35,7 +37,7 @@ class RecrutementController extends Controller
     public function update(Request $request, string $id)
     {
         $r = Recrutement::findOrFail($id);
-        $r->update($request->only(['statut', 'candidatures', 'poste', 'direction', 'nb_postes', 'type', 'cloture']));
+        $r->update($request->only(['statut', 'candidatures', 'poste', 'direction', 'nb_postes', 'type', 'diplome_requis', 'salaire_propose', 'cloture']));
         return response()->json($r);
     }
 

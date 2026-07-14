@@ -31,13 +31,15 @@ export class RhService {
   readonly departs     = signal<Depart[]>([]);
 
   // ── Computed KPIs ────────────────────────────────────────────────────────
-  readonly totalAgents     = computed(() => this.agents().length);
-  readonly totalFonct      = computed(() => this.agents().filter(a => a.typeContrat === 'fonctionnaire').length);
-  readonly totalContrat    = computed(() => this.agents().filter(a => a.typeContrat === 'contractuel').length);
-  readonly totalStagiaires = computed(() => this.agents().filter(a => a.typeContrat === 'stage').length);
+  // Un agent "parti" (départ validé) ne doit plus compter dans les effectifs actifs.
+  readonly agentsActifs     = computed(() => this.agents().filter(a => a.statut !== 'parti'));
+  readonly totalAgents      = computed(() => this.agentsActifs().length);
+  readonly totalFonct       = computed(() => this.agentsActifs().filter(a => a.typeContrat === 'fonctionnaire').length);
+  readonly totalContrat     = computed(() => this.agentsActifs().filter(a => a.typeContrat === 'contractuel').length);
+  readonly totalStagiaires  = computed(() => this.agentsActifs().filter(a => a.typeContrat === 'stage').length);
 
   readonly parCategorie = computed(() => {
-    const fonct = this.agents().filter(a => a.typeContrat === 'fonctionnaire');
+    const fonct = this.agentsActifs().filter(a => a.typeContrat === 'fonctionnaire');
     return {
       A: fonct.filter(a => a.categorie === 'A').length,
       B: fonct.filter(a => a.categorie === 'B').length,
@@ -46,10 +48,10 @@ export class RhService {
   });
 
   readonly lignesPaie = computed<LignePaie[]>(() =>
-    this.agents().slice(0, 4).map(a => {
+    this.agentsActifs().map(a => {
       const retenues = Math.round(a.salaireBrut * 0.22);
-      const net = a.salaireBrut - retenues + 50000;
-      return { matricule: a.matricule, nomComplet: a.nomComplet, poste: a.poste, brut: a.salaireBrut, retenues, net, mode: 'Virement', statut: 'Payé' };
+      const net = a.salaireBrut - retenues;
+      return { matricule: a.matricule, nomComplet: a.nomComplet, poste: a.poste, brut: a.salaireBrut, retenues, net, mode: 'Virement', statut: 'En attente' };
     })
   );
 
@@ -110,7 +112,15 @@ export class RhService {
 
   approuverConge(id: string): Observable<Conge> {
     return this.http.put<any>(`${this.api}/conges/${id}`, { statut: 'approuve' }).pipe(
-      tap(res => this.conges.update(list => list.map(c => c.id === id ? this._mapConge(res) : c)))
+      tap(res => {
+        const conge = this._mapConge(res);
+        this.conges.update(list => list.map(c => c.id === id ? conge : c));
+        // Le backend décompte le solde de l'agent à l'approbation ; répercuter
+        // localement pour ne pas afficher un solde périmé avant rechargement.
+        this.agents.update(list => list.map(a =>
+          a.matricule === conge.matricule ? { ...a, congesRestants: Math.max(0, a.congesRestants - conge.duree) } : a
+        ));
+      })
     );
   }
 
@@ -132,7 +142,8 @@ export class RhService {
   // ── CRUD Recrutements ─────────────────────────────────────────────────────
   ouvrirPoste(r: Omit<Recrutement, 'id' | 'candidatures' | 'statut'>): Observable<Recrutement> {
     return this.http.post<any>(`${this.api}/recrutements`, {
-      poste: r.poste, direction: r.direction, nb_postes: r.nbPostes, type: r.type, cloture: r.cloture
+      poste: r.poste, direction: r.direction, nb_postes: r.nbPostes, type: r.type,
+      diplome_requis: r.diplomeRequis, salaire_propose: r.salairePropose, cloture: r.cloture
     }).pipe(
       tap(res => this.recrutements.update(list => [this._mapRecrutement(res), ...list]))
     );
@@ -157,7 +168,12 @@ export class RhService {
 
   validerDepart(id: string): Observable<Depart> {
     return this.http.put<Depart>(`${this.api}/departs/${id}`, { statut: 'valide' }).pipe(
-      tap(res => this.departs.update(list => list.map(d => d.id === id ? res : d)))
+      tap(res => {
+        this.departs.update(list => list.map(d => d.id === id ? res : d));
+        // Le backend passe l'agent lié en statut "parti" ; répercuter localement
+        // pour ne pas le voir rester "actif" jusqu'au prochain rechargement.
+        this.agents.update(list => list.map(a => a.matricule === res.matricule ? { ...a, statut: 'parti' as const } : a));
+      })
     );
   }
 
@@ -235,8 +251,9 @@ export class RhService {
   private _mapRecrutement(r: any): Recrutement {
     return {
       id: String(r.id), poste: r.poste, direction: r.direction,
-      nbPostes: Number(r.nb_postes), type: r.type, cloture: r.cloture,
-      candidatures: Number(r.candidatures), statut: r.statut,
+      nbPostes: Number(r.nb_postes), type: r.type,
+      diplomeRequis: r.diplome_requis, salairePropose: r.salaire_propose != null ? Number(r.salaire_propose) : undefined,
+      cloture: r.cloture, candidatures: Number(r.candidatures), statut: r.statut,
     };
   }
   private _mapRecrutements(list: any[]): Recrutement[] { return list.map(r => this._mapRecrutement(r)); }

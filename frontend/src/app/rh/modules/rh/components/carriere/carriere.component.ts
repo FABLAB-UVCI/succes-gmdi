@@ -4,13 +4,14 @@ import { FormsModule } from '@angular/forms';
 import { RhService } from '../../../../core/services/rh.service';
 import { ToastService } from '../../../../core/services/toast.service';
 import { ToastComponent } from '../../../../shared/components/toast.component';
+import { FcfaPipe } from '../../../../shared/pipes/fcfa.pipe';
 
 type Tab = 'recrutement' | 'affectation' | 'promotion' | 'mutation' | 'depart';
 
 @Component({
   selector: 'app-carriere',
   standalone: true,
-  imports: [CommonModule, FormsModule, ToastComponent],
+  imports: [CommonModule, FormsModule, ToastComponent, FcfaPipe],
   template: `
 <div class="nav">
   @for (t of tabs; track t.id) {
@@ -59,7 +60,7 @@ type Tab = 'recrutement' | 'affectation' | 'promotion' | 'mutation' | 'depart';
       </div>
       <div class="fsec" style="margin-top:.75rem">Recrutements en cours</div>
       <table class="tbl">
-        <thead><tr><th>Poste</th><th>Direction</th><th>Postes</th><th>Type</th><th>Clôture</th><th>Candidatures</th><th>Statut</th></tr></thead>
+        <thead><tr><th>Poste</th><th>Direction</th><th>Postes</th><th>Type</th><th>Diplôme requis</th><th>Salaire proposé</th><th>Clôture</th><th>Candidatures</th><th>Statut</th></tr></thead>
         <tbody>
           @for (r of rh.recrutements(); track r.id) {
             <tr>
@@ -67,6 +68,8 @@ type Tab = 'recrutement' | 'affectation' | 'promotion' | 'mutation' | 'depart';
               <td>{{ r.direction }}</td>
               <td>{{ r.nbPostes }}</td>
               <td><span class="chip cgo">{{ r.type }}</span></td>
+              <td>{{ r.diplomeRequis || '—' }}</td>
+              <td class="right">{{ r.salairePropose ? (r.salairePropose | fcfa) : '—' }}</td>
               <td>{{ r.cloture || '—' }}</td>
               <td>{{ r.candidatures }}</td>
               <td><span class="chip" [ngClass]="chipRecr(r.statut)">{{ r.statut }}</span></td>
@@ -85,8 +88,8 @@ type Tab = 'recrutement' | 'affectation' | 'promotion' | 'mutation' | 'depart';
     <app-toast [visible]="toast.get('aff')?.visible ?? false" [message]="toast.get('aff')?.message ?? ''" [type]="toast.get('aff')?.type ?? 'success'" />
     <div class="pb">
       <div class="fr">
-        <div class="fg"><div class="fl">Matricule de l'agent <span class="req">*</span></div><input class="fi" [(ngModel)]="aff.matricule" placeholder="Ex: EC-001"></div>
-        <div class="fg"><div class="fl">Nom et prénoms</div><input class="fi" [(ngModel)]="aff.nom" placeholder="Auto-rempli après recherche"></div>
+        <div class="fg"><div class="fl">Matricule de l'agent <span class="req">*</span></div><input class="fi" [(ngModel)]="aff.matricule" placeholder="Ex: EC-001" (blur)="chercherAgentAff()"></div>
+        <div class="fg"><div class="fl">Nom et prénoms</div><input class="fi" [(ngModel)]="aff.nom" placeholder="Auto-rempli après recherche" readonly style="color:var(--color-text-secondary)"></div>
       </div>
       <div class="fr">
         <div class="fg"><div class="fl">Direction actuelle</div><input class="fi" [(ngModel)]="aff.dirActuelle" placeholder="Direction actuelle" readonly style="color:var(--color-text-secondary)"></div>
@@ -114,15 +117,15 @@ type Tab = 'recrutement' | 'affectation' | 'promotion' | 'mutation' | 'depart';
     <app-toast [visible]="toast.get('prom')?.visible ?? false" [message]="toast.get('prom')?.message ?? ''" [type]="toast.get('prom')?.type ?? 'success'" />
     <div class="pb">
       <div class="fr">
-        <div class="fg"><div class="fl">Matricule de l'agent <span class="req">*</span></div><input class="fi" [(ngModel)]="prom.matricule" placeholder="Ex: FIN-001"></div>
-        <div class="fg"><div class="fl">Nom et prénoms</div><input class="fi" [(ngModel)]="prom.nom" placeholder="Nom de l'agent"></div>
+        <div class="fg"><div class="fl">Matricule de l'agent <span class="req">*</span></div><input class="fi" [(ngModel)]="prom.matricule" placeholder="Ex: FIN-001" (blur)="chercherAgentProm()"></div>
+        <div class="fg"><div class="fl">Nom et prénoms</div><input class="fi" [(ngModel)]="prom.nom" placeholder="Auto-rempli après recherche" readonly style="color:var(--color-text-secondary)"></div>
       </div>
       <div class="fr">
-        <div class="fg"><div class="fl">Grade actuel</div><input class="fi" [(ngModel)]="prom.gradeActuel" placeholder="Grade actuel"></div>
+        <div class="fg"><div class="fl">Grade actuel</div><input class="fi" [(ngModel)]="prom.gradeActuel" placeholder="Auto-rempli après recherche" readonly style="color:var(--color-text-secondary)"></div>
         <div class="fg"><div class="fl">Nouveau grade <span class="req">*</span></div><input class="fi" [(ngModel)]="prom.gradeNouveau" placeholder="Nouveau grade"></div>
       </div>
       <div class="fr">
-        <div class="fg"><div class="fl">Ancien salaire (FCFA)</div><input class="fi" type="number" [(ngModel)]="prom.salActuel" placeholder="Salaire actuel"></div>
+        <div class="fg"><div class="fl">Ancien salaire (FCFA)</div><input class="fi" type="number" [(ngModel)]="prom.salActuel" placeholder="Auto-rempli après recherche" readonly style="color:var(--color-text-secondary)"></div>
         <div class="fg"><div class="fl">Nouveau salaire (FCFA) <span class="req">*</span></div><input class="fi" type="number" [(ngModel)]="prom.salNouveau" placeholder="Nouveau salaire"></div>
       </div>
       <div class="fr">
@@ -147,11 +150,11 @@ type Tab = 'recrutement' | 'affectation' | 'promotion' | 'mutation' | 'depart';
     <app-toast [visible]="toast.get('mut')?.visible ?? false" [message]="toast.get('mut')?.message ?? ''" [type]="toast.get('mut')?.type ?? 'success'" />
     <div class="pb">
       <div class="fr">
-        <div class="fg"><div class="fl">Matricule <span class="req">*</span></div><input class="fi" [(ngModel)]="mut.matricule" placeholder="Matricule de l'agent"></div>
-        <div class="fg"><div class="fl">Nom et prénoms</div><input class="fi" [(ngModel)]="mut.nom" placeholder="Nom de l'agent"></div>
+        <div class="fg"><div class="fl">Matricule <span class="req">*</span></div><input class="fi" [(ngModel)]="mut.matricule" placeholder="Matricule de l'agent" (blur)="chercherAgentMut()"></div>
+        <div class="fg"><div class="fl">Nom et prénoms</div><input class="fi" [(ngModel)]="mut.nom" placeholder="Auto-rempli après recherche" readonly style="color:var(--color-text-secondary)"></div>
       </div>
       <div class="fr">
-        <div class="fg"><div class="fl">Service d'origine</div><input class="fi" [(ngModel)]="mut.origine" placeholder="Ex: Mairie de Cocody"></div>
+        <div class="fg"><div class="fl">Service d'origine</div><input class="fi" [(ngModel)]="mut.origine" placeholder="Auto-rempli après recherche" readonly style="color:var(--color-text-secondary)"></div>
         <div class="fg"><div class="fl">Service d'accueil <span class="req">*</span></div><input class="fi" [(ngModel)]="mut.destination" placeholder="Ex: Mairie de Yopougon"></div>
       </div>
       <div class="fr">
@@ -177,11 +180,11 @@ type Tab = 'recrutement' | 'affectation' | 'promotion' | 'mutation' | 'depart';
       <div class="fr">
         <div class="fg">
           <div class="fl">Matricule de l'agent <span class="req">*</span></div>
-          <input class="fi" [(ngModel)]="depart.matricule" placeholder="Ex: EC-001">
+          <input class="fi" [(ngModel)]="depart.matricule" placeholder="Ex: EC-001" (blur)="chercherAgentDepart()">
         </div>
         <div class="fg">
           <div class="fl">Nom et prénoms</div>
-          <input class="fi" [(ngModel)]="depart.nom" placeholder="Auto-rempli après recherche">
+          <input class="fi" [(ngModel)]="depart.nom" placeholder="Auto-rempli après recherche" readonly style="color:var(--color-text-secondary)">
         </div>
       </div>
 
@@ -314,11 +317,39 @@ export class CarriereComponent {
   prom = { matricule:'', nom:'', gradeActuel:'', gradeNouveau:'', salActuel: null as number|null, salNouveau: null as number|null, dateEffet:'', type:'Avancement à l\'ancienneté' };
   mut = { matricule:'', nom:'', origine:'', destination:'', date:'', motif:'Rapprochement familial' };
 
+  chercherAgentAff(): void {
+    if (!this.aff.matricule) return;
+    const agent = this.rh.findAgent(this.aff.matricule);
+    if (agent) { this.aff.nom = agent.nomComplet; this.aff.dirActuelle = agent.direction; }
+    else { this.aff.nom = ''; this.aff.dirActuelle = ''; this.toast.showError('aff', `Agent introuvable — ${this.aff.matricule}`); }
+  }
+
+  chercherAgentProm(): void {
+    if (!this.prom.matricule) return;
+    const agent = this.rh.findAgent(this.prom.matricule);
+    if (agent) { this.prom.nom = agent.nomComplet; this.prom.gradeActuel = agent.grade; this.prom.salActuel = agent.salaireBrut; }
+    else { this.prom.nom = ''; this.prom.gradeActuel = ''; this.prom.salActuel = null; this.toast.showError('prom', `Agent introuvable — ${this.prom.matricule}`); }
+  }
+
+  chercherAgentMut(): void {
+    if (!this.mut.matricule) return;
+    const agent = this.rh.findAgent(this.mut.matricule);
+    if (agent) { this.mut.nom = agent.nomComplet; this.mut.origine = agent.direction; }
+    else { this.mut.nom = ''; this.mut.origine = ''; this.toast.showError('mut', `Agent introuvable — ${this.mut.matricule}`); }
+  }
+
+  chercherAgentDepart(): void {
+    if (!this.depart.matricule) return;
+    const agent = this.rh.findAgent(this.depart.matricule);
+    if (agent) { this.depart.nom = agent.nomComplet; }
+    else { this.depart.nom = ''; this.toast.showError('dep', `Agent introuvable — ${this.depart.matricule}`); }
+  }
+
   ouvrirPoste(): void {
     if (!this.rc.poste || !this.rc.direction || !this.rc.cloture) {
       this.toast.showError('c', 'Poste, direction et date de clôture obligatoires'); return;
     }
-    this.rh.ouvrirPoste({ poste: this.rc.poste, direction: this.rc.direction, nbPostes: this.rc.nbPostes, type: this.rc.type as any, cloture: this.rc.cloture }).subscribe({
+    this.rh.ouvrirPoste({ poste: this.rc.poste, direction: this.rc.direction, nbPostes: this.rc.nbPostes, type: this.rc.type as any, diplomeRequis: this.rc.diplome, salairePropose: this.rc.salaire ?? undefined, cloture: this.rc.cloture }).subscribe({
       next: () => {
         this.toast.show('c', `Annonce publiée — ${this.rc.poste} (${this.rc.direction})`);
         this.rc = { poste:'', direction:'', nbPostes:1, type:'concours', cloture:'', diplome:'Licence', salaire: null };

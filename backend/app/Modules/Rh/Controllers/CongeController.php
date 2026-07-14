@@ -3,6 +3,7 @@
 namespace App\Modules\Rh\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Modules\Rh\Models\Agent;
 use App\Modules\Rh\Models\Conge;
 use Illuminate\Http\Request;
 
@@ -24,6 +25,15 @@ class CongeController extends Controller
             'motif'       => 'nullable|string',
             'piece_jointe'=> 'nullable|string',
         ]);
+
+        // Refuser la demande si elle dépasse le solde de congés restants de l'agent
+        $agent = Agent::where('matricule', $data['matricule'])->first();
+        if ($agent && $data['duree'] > $agent->conges_restants) {
+            return response()->json([
+                'message' => "Solde de congés insuffisant : {$agent->conges_restants} jour(s) restant(s), {$data['duree']} demandé(s).",
+            ], 422);
+        }
+
         $data['statut'] = 'soumis';
         return response()->json(Conge::create($data), 201);
     }
@@ -40,6 +50,22 @@ class CongeController extends Controller
             'statut' => 'sometimes|in:soumis,approuve,refuse,en_cours',
             'motif'  => 'nullable|string',
         ]);
+
+        // Décompter le solde de congés de l'agent uniquement au moment où la
+        // demande passe à "approuve" (jamais fait auparavant : conges_restants
+        // restait figé à sa valeur initiale quelle que soit l'issue des demandes).
+        if (($data['statut'] ?? null) === 'approuve' && $conge->statut !== 'approuve') {
+            $agent = Agent::where('matricule', $conge->matricule)->first();
+            if ($agent) {
+                if ($conge->duree > $agent->conges_restants) {
+                    return response()->json([
+                        'message' => "Solde de congés insuffisant : {$agent->conges_restants} jour(s) restant(s), {$conge->duree} demandé(s).",
+                    ], 422);
+                }
+                $agent->update(['conges_restants' => $agent->conges_restants - $conge->duree]);
+            }
+        }
+
         $conge->update($data);
         return response()->json($conge);
     }
