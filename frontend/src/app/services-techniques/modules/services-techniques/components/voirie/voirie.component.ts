@@ -117,7 +117,7 @@ type Tab = 'routes' | 'entretiens' | 'reparations';
   }
   <div class="tbl-wrap">
     <table>
-      <thead><tr><th>Route</th><th>Type entretien</th><th>Début</th><th>Fin prévue</th><th>Équipe</th><th>Coût estimé</th><th>Statut</th></tr></thead>
+      <thead><tr><th>Route</th><th>Type entretien</th><th>Début</th><th>Fin prévue</th><th>Équipe</th><th>Coût estimé</th><th>Statut</th><th>Action</th></tr></thead>
       <tbody>
         @for (e of st.entretiensVoirie(); track e.id) {
           <tr>
@@ -128,9 +128,16 @@ type Tab = 'routes' | 'entretiens' | 'reparations';
             <td>{{e.equipe}}</td>
             <td>{{e.coutEstime | number}} FCFA</td>
             <td><span class="chip" [ngClass]="chipStatut(e.statut)">{{e.statut}}</span></td>
+            <td>
+              @if (e.statut !== 'termine') {
+                <button class="btn-s" style="padding:3px 8px;font-size:11px" (click)="terminerEntretien(e.id)">
+                  <i class="ti ti-check"></i>Terminer
+                </button>
+              }
+            </td>
           </tr>
         }
-        @empty { <tr><td colspan="7" class="empty-row">Aucun entretien planifié</td></tr> }
+        @empty { <tr><td colspan="8" class="empty-row">Aucun entretien planifié</td></tr> }
       </tbody>
     </table>
   </div>
@@ -173,7 +180,7 @@ type Tab = 'routes' | 'entretiens' | 'reparations';
   }
   <div class="tbl-wrap">
     <table>
-      <thead><tr><th>Localisation</th><th>Description</th><th>Priorité</th><th>Signalé par</th><th>Date</th><th>Statut</th></tr></thead>
+      <thead><tr><th>Localisation</th><th>Description</th><th>Priorité</th><th>Signalé par</th><th>Date</th><th>Statut</th><th>Action</th></tr></thead>
       <tbody>
         @for (r of st.reparationsVoirie(); track r.id) {
           <tr>
@@ -183,9 +190,16 @@ type Tab = 'routes' | 'entretiens' | 'reparations';
             <td>{{r.signalePar}}</td>
             <td>{{r.dateSignalement}}</td>
             <td><span class="chip" [ngClass]="chipStatutPanne(r.statut)">{{r.statut}}</span></td>
+            <td>
+              @if (r.statut === 'signalee') {
+                <button class="btn-s" style="padding:3px 8px;font-size:11px" (click)="intervenir(r.id)">
+                  <i class="ti ti-tool"></i>Intervenir
+                </button>
+              }
+            </td>
           </tr>
         }
-        @empty { <tr><td colspan="6" class="empty-row">Aucune réparation signalée</td></tr> }
+        @empty { <tr><td colspan="7" class="empty-row">Aucune réparation signalée</td></tr> }
       </tbody>
     </table>
   </div>
@@ -248,6 +262,9 @@ export class VoirieComponent implements OnInit {
 
   onRoutePhoto(e: Event) { const f = (e.target as HTMLInputElement).files; if (f) this.routePhotos = Array.from(f); }
   onRepPhoto(e: Event)   { const f = (e.target as HTMLInputElement).files; if (f) this.repPhotos   = Array.from(f); }
+
+  terminerEntretien(id: string): void { this.st.terminerEntretienVoirie(id); this.toast.show('v', 'Entretien terminé'); }
+  intervenir(id: string): void { this.st.intervenirReparation(id); this.toast.show('v', 'Intervention démarrée'); }
 
   chipEtat(e: string): string { return { bon:'cv', moyen:'cp', degrade:'cn', critique:'ce' }[e] ?? 'cp'; }
   chipStatut(s: string): string { return { planifie:'cm', en_cours:'cp', termine:'cv', suspendu:'ce' }[s] ?? 'cp'; }

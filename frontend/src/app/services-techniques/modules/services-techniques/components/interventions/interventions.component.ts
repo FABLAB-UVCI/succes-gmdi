@@ -162,7 +162,7 @@ type Tab = 'demandes' | 'bons' | 'equipes';
   }
   <div class="tbl-wrap">
     <table>
-      <thead><tr><th>N° Bon</th><th>Description</th><th>Service</th><th>Équipe</th><th>Chef</th><th>Début</th><th>Statut</th></tr></thead>
+      <thead><tr><th>N° Bon</th><th>Description</th><th>Service</th><th>Équipe</th><th>Chef</th><th>Début</th><th>Statut</th><th>Action</th></tr></thead>
       <tbody>
         @for (b of st.bons(); track b.id) {
           <tr>
@@ -173,9 +173,16 @@ type Tab = 'demandes' | 'bons' | 'equipes';
             <td>{{b.chef}}</td>
             <td>{{b.dateDebut}}</td>
             <td><span class="chip" [ngClass]="chipBon(b.statut)">{{b.statut}}</span></td>
+            <td>
+              @if (b.statut !== 'termine') {
+                <button class="btn-s" style="padding:3px 8px;font-size:11px" (click)="terminerBon(b.id)">
+                  <i class="ti ti-check"></i>Terminer
+                </button>
+              }
+            </td>
           </tr>
         }
-        @empty { <tr><td colspan="7" class="empty-row">Aucun bon de travail émis</td></tr> }
+        @empty { <tr><td colspan="8" class="empty-row">Aucun bon de travail émis</td></tr> }
       </tbody>
     </table>
   </div>
@@ -271,8 +278,14 @@ export class InterventionsComponent implements OnInit {
 
   onDemPhoto(e: Event) { const f = (e.target as HTMLInputElement).files; if (f) this.demPhotos = Array.from(f); }
 
-  assigner(id: string): void { this.st.assignerDemande(id, 'KOUAMÉ Jean'); this.toast.show('int', 'Demande assignée à KOUAMÉ Jean'); }
+  assigner(id: string): void {
+    const agent = prompt('Assigner cette demande à (nom de l\'agent) :');
+    if (!agent) return;
+    this.st.assignerDemande(id, agent);
+    this.toast.show('int', `Demande assignée à ${agent}`);
+  }
   cloturer(id: string): void { this.st.cloturerDemande(id); this.toast.show('int', 'Demande clôturée'); }
+  terminerBon(id: string): void { this.st.terminerBonTravail(id); this.toast.show('int', 'Bon de travail terminé'); }
 
   chipPrio(p: string): string   { return { normale:'cv', haute:'cp', urgente:'ce' }[p] ?? 'cp'; }
   chipDem(s: string): string    { return { ouverte:'ce', assignee:'cm', en_cours:'cp', terminee:'cv', cloturee:'cn' }[s] ?? 'cm'; }

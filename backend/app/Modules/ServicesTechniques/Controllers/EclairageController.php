@@ -42,7 +42,7 @@ class EclairageController extends Controller
             'puissance'    => 'nullable|numeric|min:1',
             'date_posee'   => 'nullable|date',
         ]);
-        $seq = str_pad(Lampadaire::count() + 1, 3, '0', STR_PAD_LEFT);
+        $seq = str_pad(Lampadaire::nextSequence('ECL-%', 3), 3, '0', STR_PAD_LEFT);
         $l = Lampadaire::create(array_merge($v, [
             'reference' => "ECL-{$seq}",
             'statut'    => 'fonctionnel',
@@ -94,7 +94,7 @@ class EclairageController extends Controller
             'localisation' => 'required|string|max:200',
             'description'  => 'required|string|max:300',
         ]);
-        $seq = str_pad(PanneEclairage::count() + 1, 4, '0', STR_PAD_LEFT);
+        $seq = str_pad(PanneEclairage::nextSequence('PAN-' . date('Y') . '-%', 4), 4, '0', STR_PAD_LEFT);
         $p = PanneEclairage::create(array_merge($v, [
             'reference'        => "PAN-" . date('Y') . "-{$seq}",
             'date_signalement' => now()->format('Y-m-d'),

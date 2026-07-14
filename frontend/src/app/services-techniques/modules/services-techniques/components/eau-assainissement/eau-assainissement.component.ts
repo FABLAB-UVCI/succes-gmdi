@@ -63,9 +63,11 @@ type Tab = 'caniveaux' | 'drainage' | 'dechets';
             <td><span class="chip" [ngClass]="chipEtat(c.etat)">{{c.etat}}</span></td>
             <td>{{c.dateDernierNettoyage || '—'}}</td>
             <td>
-              <button class="btn-s" style="padding:3px 8px;font-size:11px" (click)="toast.show('eau','Nettoyage enregistré')">
-                <i class="ti ti-wash"></i>Nettoyage
-              </button>
+              @if (c.etat !== 'bon') {
+                <button class="btn-s" style="padding:3px 8px;font-size:11px" (click)="nettoyer(c.id)">
+                  <i class="ti ti-wash"></i>Nettoyage
+                </button>
+              }
             </td>
           </tr>
         }
@@ -248,6 +250,11 @@ export class EauAssainissementComponent implements OnInit {
   }
 
   onDrainPhoto(e: Event) { const f = (e.target as HTMLInputElement).files; if (f) this.drainPhotos = Array.from(f); }
+
+  nettoyer(id: string): void {
+    this.st.signalerNettoyageCaniveau(id);
+    this.toast.show('eau', 'Nettoyage enregistré');
+  }
 
   chipEtat(e: string): string       { return { bon:'cv', colmate:'cp', degrade:'ce' }[e] ?? 'cp'; }
   chipStatut(s: string): string     { return { planifie:'cm', en_cours:'cp', termine:'cv', suspendu:'ce' }[s] ?? 'cp'; }

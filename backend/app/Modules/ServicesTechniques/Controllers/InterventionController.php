@@ -49,7 +49,7 @@ class InterventionController extends Controller
             'priorite'     => 'nullable|in:normale,haute,urgente',
         ]);
 
-        $seq = str_pad(DemandeIntervention::count() + 1, 6, '0', STR_PAD_LEFT);
+        $seq = str_pad(DemandeIntervention::nextSequence('DI-' . date('Y') . '-%', 6), 6, '0', STR_PAD_LEFT);
         $d = DemandeIntervention::create(array_merge($v, [
             'reference'  => 'DI-' . date('Y') . '-' . $seq,
             'statut'     => 'ouverte',
@@ -125,7 +125,7 @@ class InterventionController extends Controller
             'materiaux'   => 'nullable|string|max:400',
         ]);
 
-        $seq = str_pad(BonTravail::count() + 1, 6, '0', STR_PAD_LEFT);
+        $seq = str_pad(BonTravail::nextSequence('BT-' . date('Y') . '-%', 6), 6, '0', STR_PAD_LEFT);
         $b = BonTravail::create(array_merge($v, [
             'reference' => 'BT-' . date('Y') . '-' . $seq,
             'statut'    => 'planifie',

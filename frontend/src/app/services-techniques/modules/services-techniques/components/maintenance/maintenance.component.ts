@@ -243,12 +243,12 @@ export class MaintenanceComponent implements OnInit {
   }
 
   valider(id: string): void {
-    this.st.planningMaint.update(l => l.map(p => p.id===id ? {...p, statut:'effectue' as const} : p));
+    this.st.validerPlanningMaintenance(id);
     this.toast.show('maint', 'Maintenance validée comme effectuée');
   }
 
   resoudre(id: string): void {
-    this.st.maintenanceCorrective.update(l => l.map(c => c.id===id ? {...c, statut:'resolu' as const, dateResolution: new Date().toISOString().slice(0,10)} : c));
+    this.st.resoudreMaintenanceCorrective(id);
     this.toast.show('maint', 'Panne marquée comme résolue');
   }
 

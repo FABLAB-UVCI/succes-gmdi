@@ -65,8 +65,8 @@ export class ServicesTechniquesService {
   readonly maintenanceCorrective = signal<MaintenanceCorrective[]>([]);
 
   readonly kpi = signal<KpiServicesTechniques>({
-    interventionsEnCours: 12, pannesSignalees: 5, travauxPlanifies: 8,
-    demandesCitoyennes: 24, tauxResolution: 78, delaiMoyenJours: 4
+    interventionsEnCours: 0, pannesSignalees: 0, travauxPlanifies: 0,
+    demandesCitoyennes: 0, tauxResolution: 0, delaiMoyenJours: 0
   });
 
   readonly loadingDemandes = signal(false);
@@ -113,6 +113,12 @@ export class ServicesTechniquesService {
     );
   }
 
+  terminerEntretienVoirie(id: string): void {
+    this.entVoirieApi.terminer(Number(id)).pipe(
+      tap(r => this.entretiensVoirie.update(l => l.map(e => e.id === id ? { ...e, statut: 'termine' as const, dateFin: r.data.date_fin ?? undefined } : e)))
+    ).subscribe();
+  }
+
   loadReparationsVoirie(): void {
     this.repVoirieApi.getAll().pipe(
       tap(r => this.reparationsVoirie.set(r.data.map(x => ({
@@ -130,6 +136,12 @@ export class ServicesTechniquesService {
       map(r => ({ id: String(r.data.id), route: r.data.route, description: r.data.description, priorite: r.data.priorite as any, signalePar: r.data.signale_par, dateSignalement: r.data.date_signalement, statut: r.data.statut as any })),
       tap(r => this.reparationsVoirie.update(l => [r, ...l]))
     );
+  }
+
+  intervenirReparation(id: string): void {
+    this.repVoirieApi.intervenir(Number(id)).pipe(
+      tap(() => this.reparationsVoirie.update(l => l.map(r => r.id === id ? { ...r, statut: 'en_intervention' as const } : r)))
+    ).subscribe();
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -215,6 +227,12 @@ export class ServicesTechniquesService {
       map(r => ({ id: String(r.data.id), localisation: r.data.localisation, quartier: r.data.quartier, longueur: r.data.longueur, etat: r.data.etat as any })),
       tap(c => this.caniveaux.update(l => [c, ...l]))
     );
+  }
+
+  signalerNettoyageCaniveau(id: string): void {
+    this.caniveauApi.signalerNettoyage(Number(id)).pipe(
+      tap(r => this.caniveaux.update(l => l.map(c => c.id === id ? { ...c, etat: 'bon' as const, dateDernierNettoyage: r.data.date_dernier_nettoyage ?? undefined } : c)))
+    ).subscribe();
   }
 
   ajouterDrainage(f: { localisation: string; type: string; dateIntervention: string; equipe: string; observations?: string }): Observable<InterventionDrainage> {
@@ -379,6 +397,12 @@ export class ServicesTechniquesService {
     );
   }
 
+  terminerBonTravail(id: string): void {
+    this.bonApi.terminer(Number(id)).pipe(
+      tap(r => this.bons.update(l => l.map(b => b.id === id ? { ...b, statut: 'termine' as const, dateFin: r.data.date_fin ?? undefined } : b)))
+    ).subscribe();
+  }
+
   loadEquipes(): void {
     this.equipeApi.getAll().pipe(
       tap(r => this.equipes.set(r.data.map(x => ({
@@ -419,6 +443,12 @@ export class ServicesTechniquesService {
     );
   }
 
+  validerPlanningMaintenance(id: string): void {
+    this.planningApi.valider(Number(id)).pipe(
+      tap(() => this.planningMaint.update(l => l.map(p => p.id === id ? { ...p, statut: 'effectue' as const } : p)))
+    ).subscribe();
+  }
+
   loadMaintenanceCorrective(): void {
     this.correctApi.getAll().pipe(
       tap(r => this.maintenanceCorrective.set(r.data.map(x => ({
@@ -439,6 +469,12 @@ export class ServicesTechniquesService {
       })),
       tap(m => this.maintenanceCorrective.update(l => [m, ...l]))
     );
+  }
+
+  resoudreMaintenanceCorrective(id: string, coutReel?: number): void {
+    this.correctApi.resoudre(Number(id), coutReel).pipe(
+      tap(r => this.maintenanceCorrective.update(l => l.map(c => c.id === id ? { ...c, statut: 'resolu' as const, technicien: r.data.technicien ?? c.technicien, dateResolution: r.data.date_resolution ?? undefined } : c)))
+    ).subscribe();
   }
 
   // ═══════════════════════════════════════════════════════════════════════════

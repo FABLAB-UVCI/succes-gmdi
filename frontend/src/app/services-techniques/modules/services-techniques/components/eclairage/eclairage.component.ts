@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ServicesTechniquesService } from '../../../../core/services/services-techniques.service';
 import { ToastService } from '../../../../core/services/toast.service';
+import { AuthService } from '../../../../core/services/auth.service';
 
 type Tab = 'lampadaires' | 'pannes' | 'maintenance';
 
@@ -196,6 +197,7 @@ type Tab = 'lampadaires' | 'pannes' | 'maintenance';
 export class EclairageComponent implements OnInit {
   readonly st    = inject(ServicesTechniquesService);
   readonly toast = inject(ToastService);
+  readonly auth  = inject(AuthService);
   active = signal<Tab>('lampadaires');
   showAdd      = signal(false);
   showSignal   = signal(false);
@@ -241,7 +243,9 @@ export class EclairageComponent implements OnInit {
   }
 
   resoudre(id: string): void {
-    this.st.resoudrePanne(id, 'KOUAMÉ Séraphin');
+    const technicien = prompt('Nom du technicien ayant résolu la panne :', this.auth.currentUser()?.name ?? '');
+    if (technicien === null) return;
+    this.st.resoudrePanne(id, technicien || 'Non renseigné');
     this.toast.show('ecl', 'Panne marquée comme résolue');
   }
 
