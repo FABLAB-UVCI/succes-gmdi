@@ -192,10 +192,13 @@ export type Section = 'actualites' | 'reseaux' | 'relations' | 'documents' | 'ci
     .sidebar {
       width: 260px;
       background: linear-gradient(180deg, #1a3a1f 0%, #0d2414 100%);
-      min-height: calc(100vh - 65px);
+      height: calc(100vh - 65px);
       padding: 20px 0 40px;
       border-right: 1px solid rgba(255,255,255,.06);
       flex-shrink: 0;
+      position: sticky;
+      top: 65px;
+      align-self: flex-start;
       overflow-y: auto;
       overscroll-behavior: contain;
       transition: transform .28s cubic-bezier(.4,0,.2,1);
