@@ -261,6 +261,9 @@ export class MaintenanceComponent implements OnInit {
   ent = { bien: '', type: '', date: '', periodicite: 'Trimestrielle', cout: null as number|null };
   rep = { bien: '', description: '', priorite: 'normale', prestataire: '', cout: null as number|null };
 
+  readonly dateMin = new Date().toISOString().slice(0, 10);
+  readonly dateMax = '2030-12-31';
+
   ngOnInit(): void { this.pat.loadEntretiens(); this.pat.loadReparations(); }
 
   planifierEntretien(): void {
