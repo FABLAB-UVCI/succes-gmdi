@@ -1,4 +1,4 @@
-import { Component, signal, OnInit, inject } from '@angular/core';
+import { Component, signal, computed, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PatrimoineService } from '../../../../core/services/patrimoine.service';
@@ -29,10 +29,10 @@ type Tab = 'terrains' | 'batiments' | 'marches' | 'centres';
     </div>
     <div class="pb">
       <div class="kg" style="margin-bottom:.75rem">
-        <div class="kc"><div class="kv" style="color:#C9A84C">12</div><div class="kl">Terrains enregistrés</div></div>
-        <div class="kc"><div class="kv" style="color:#009A44">2 340 000 m²</div><div class="kl">Superficie totale</div></div>
-        <div class="kc"><div class="kv" style="color:#003366">980 000 000</div><div class="kl">Valeur estimée (FCFA)</div></div>
-        <div class="kc"><div class="kv" style="color:#F77F00">4</div><div class="kl">Sans titre foncier</div></div>
+        <div class="kc"><div class="kv" style="color:#C9A84C">{{ terStats().total }}</div><div class="kl">Terrains enregistrés</div></div>
+        <div class="kc"><div class="kv" style="color:#009A44">{{ terStats().superficie | number:'1.0-0' }} m²</div><div class="kl">Superficie totale</div></div>
+        <div class="kc"><div class="kv" style="color:#003366">{{ terStats().valeur | fcfa }}</div><div class="kl">Valeur estimée</div></div>
+        <div class="kc"><div class="kv" style="color:#F77F00">{{ terStats().sansTitre }}</div><div class="kl">Sans titre foncier</div></div>
       </div>
       @if (toast.get('ter')?.visible) { <div class="toast on"><i class="ti ti-check"></i>{{ toast.get('ter')?.message }}</div> }
       <div class="sl">Enregistrer un terrain</div>
@@ -167,6 +167,16 @@ export class ImmobilierComponent implements OnInit {
   ];
 
   ter = { localisation: '', superficie: null as number|null, valeur: null as number|null, titreFoncier: '', usage: 'Réserve foncière', dateAcquisition: '' };
+
+  terStats = computed(() => {
+    const t = this.pat.terrains();
+    return {
+      total: t.length,
+      superficie: t.reduce((s, x) => s + (x.superficie || 0), 0),
+      valeur: t.reduce((s, x) => s + (x.valeur || 0), 0),
+      sansTitre: t.filter(x => !x.titreFoncier).length,
+    };
+  });
 
   ngOnInit(): void { this.pat.loadTerrains(); }
 

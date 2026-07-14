@@ -18,48 +18,54 @@ class StatsPatrimoineController extends Controller
     public function dashboard(Request $request)
     {
         // ── Biens ─────────────────────────────────────────────────────────────
-        $totalBiens       = Bien::count();
-        $valeurTotale     = Bien::sum('valeur_actuelle');
-        $valeurAcqTotale  = Bien::sum('valeur_acquisition');
+        // Chargés une seule fois et agrégés en PHP pour utiliser la valeur nette
+        // comptable RECALCULÉE (valeur_actuelle_calculee), et non la colonne
+        // `valeur_actuelle` qui n'est jamais mise à jour après la création du bien
+        // — sinon ces stats divergent du tableau d'amortissement (AmortissementController).
+        $biens            = Bien::all();
+        $totalBiens       = $biens->count();
+        $valeurTotale     = $biens->sum(fn($b) => $b->valeur_actuelle_calculee);
+        $valeurAcqTotale  = $biens->sum('valeur_acquisition');
         $urgences         = Reparation::where('priorite', 'urgente')->where('statut', 'en_cours')->count();
 
         // ── Loyers (marchés locatifs) ─────────────────────────────────────────
-        $loyersMensuel = Bien::where('statut', 'loue')->sum('valeur_actuelle') * 0.006; // approx. 0.6%/mois
+        $loyersMensuel = $biens->where('statut', 'loue')->sum(fn($b) => $b->valeur_actuelle_calculee) * 0.006; // approx. 0.6%/mois
 
         // ── Par catégorie ──────────────────────────────────────────────────────
-        $parCategorieRaw = Bien::selectRaw('categorie, COUNT(*) as nb, SUM(valeur_actuelle) as valeur')
-            ->groupBy('categorie')
-            ->get();
-
-        $parCategorie = $parCategorieRaw->map(fn($r) => [
-            'categorie' => $r->categorie,
-            'nombre'    => (int) $r->nb,
-            'valeur'    => (float) $r->valeur,
-            'part'      => $totalBiens > 0 ? round((int) $r->nb / $totalBiens * 100, 1) : 0,
-        ]);
+        $parCategorie = $biens->groupBy('categorie')->map(function ($grp, $cat) use ($totalBiens) {
+            return [
+                'categorie' => $cat,
+                'nombre'    => $grp->count(),
+                'valeur'    => $grp->sum(fn($b) => $b->valeur_actuelle_calculee),
+                'part'      => $totalBiens > 0 ? round($grp->count() / $totalBiens * 100, 1) : 0,
+            ];
+        })->values();
 
         // ── Par statut ────────────────────────────────────────────────────────
-        $parStatut = Bien::selectRaw('statut, COUNT(*) as nb, SUM(valeur_actuelle) as valeur')
-            ->groupBy('statut')
-            ->get()
-            ->map(fn($r) => ['statut' => $r->statut, 'nombre' => (int) $r->nb, 'valeur' => (float) $r->valeur]);
+        $parStatut = $biens->groupBy('statut')->map(function ($grp, $statut) {
+            return [
+                'statut' => $statut,
+                'nombre' => $grp->count(),
+                'valeur' => $grp->sum(fn($b) => $b->valeur_actuelle_calculee),
+            ];
+        })->values();
 
         // ── Dépréciation par catégorie ────────────────────────────────────────
-        $depreciationCategorie = Bien::selectRaw(
-            'categorie, SUM(valeur_acquisition) as valeur_brute, AVG(taux_amortissement) as taux_moyen, SUM(valeur_acquisition - valeur_actuelle) as depreciation, SUM(valeur_actuelle) as valeur_nette'
-        )
-            ->groupBy('categorie')
-            ->get()
-            ->map(fn($r) => [
-                'categorie'            => $r->categorie,
-                'valeur_brute'         => (float) $r->valeur_brute,
-                'taux_moyen'           => round((float) $r->taux_moyen, 1),
-                'depreciation_annuelle'=> round((float) $r->valeur_brute * ((float) $r->taux_moyen / 100)),
-                'valeur_nette'         => (float) $r->valeur_nette,
-            ]);
+        $depreciationCategorie = $biens->groupBy('categorie')->map(function ($grp, $cat) {
+            $valeurBrute = $grp->sum('valeur_acquisition');
+            $valeurNette = $grp->sum(fn($b) => $b->valeur_actuelle_calculee);
+            $tauxMoyen   = $grp->avg('taux_amortissement');
+            return [
+                'categorie'             => $cat,
+                'valeur_brute'          => $valeurBrute,
+                'taux_moyen'            => round($tauxMoyen, 1),
+                'depreciation_annuelle' => round($valeurBrute * ($tauxMoyen / 100)),
+                'valeur_nette'          => $valeurNette,
+            ];
+        })->values();
 
         // ── Amortissements calculés dynamiquement depuis les biens ────────────
-        $biensAmortissables = Bien::where('taux_amortissement', '>', 0)->get();
+        $biensAmortissables = $biens->where('taux_amortissement', '>', 0);
         $amortCumules = 0;
         $vnc          = 0;
         $biensAmortis = 0;

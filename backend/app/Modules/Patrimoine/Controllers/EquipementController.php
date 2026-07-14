@@ -19,7 +19,7 @@ class EquipementController extends Controller
             'date_acquisition' => 'nullable|date',
         ]);
 
-        $ref = 'PAT-EQP-' . str_pad(Bien::where('categorie', 'equipement')->count() + 1, 3, '0', STR_PAD_LEFT);
+        $ref = Bien::nextReference('equipement', 'EQP');
 
         $bien = Bien::create([
             'reference'          => $ref,

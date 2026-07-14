@@ -102,10 +102,10 @@ const STAT_CHIP:  Record<string, string> = { occupe:'ci', disponible:'cv', loue:
     <div class="ch"><h3><i class="ti ti-armchair"></i>Mobilier de bureau</h3></div>
     <div class="pb">
       <div class="kg" style="margin-bottom:.75rem">
-        <div class="kc"><div class="kv" style="color:#C9A84C">48</div><div class="kl">Articles mobilier</div></div>
-        <div class="kc"><div class="kv" style="color:#009A44">38</div><div class="kl">En bon état</div><div class="bar"><div style="width:79%;background:#009A44"></div></div></div>
-        <div class="kc"><div class="kv" style="color:#F77F00">8</div><div class="kl">Usagé</div></div>
-        <div class="kc"><div class="kv" style="color:#E24B4A">2</div><div class="kl">Hors service</div></div>
+        <div class="kc"><div class="kv" style="color:#C9A84C">{{ mobStats().total }}</div><div class="kl">Articles mobilier</div></div>
+        <div class="kc"><div class="kv" style="color:#009A44">{{ mobStats().disponibles }}</div><div class="kl">Disponibles</div><div class="bar"><div [style.width]="mobStats().pct + '%'" style="background:#009A44"></div></div></div>
+        <div class="kc"><div class="kv" style="color:#F77F00">{{ mobStats().maintenance }}</div><div class="kl">En maintenance</div></div>
+        <div class="kc"><div class="kv" style="color:#E24B4A">{{ mobStats().valeur | fcfa }}</div><div class="kl">Valeur totale</div></div>
       </div>
       @if (toast.get('mob')?.visible) { <div class="toast on"><i class="ti ti-check"></i>{{ toast.get('mob')?.message }}</div> }
       <div class="sl">Enregistrer du mobilier</div>
@@ -148,10 +148,10 @@ const STAT_CHIP:  Record<string, string> = { occupe:'ci', disponible:'cv', loue:
     <div class="ch"><h3><i class="ti ti-device-desktop"></i>Parc informatique</h3></div>
     <div class="pb">
       <div class="kg" style="margin-bottom:.75rem">
-        <div class="kc"><div class="kv" style="color:#C9A84C">94</div><div class="kl">Unités informatiques</div></div>
-        <div class="kc"><div class="kv" style="color:#009A44">76</div><div class="kl">En service</div><div class="bar"><div style="width:81%;background:#009A44"></div></div></div>
-        <div class="kc"><div class="kv" style="color:#E24B4A">12</div><div class="kl">Obsolètes</div></div>
-        <div class="kc"><div class="kv" style="color:#F77F00">6</div><div class="kl">En réparation</div></div>
+        <div class="kc"><div class="kv" style="color:#C9A84C">{{ infStats().total }}</div><div class="kl">Unités informatiques</div></div>
+        <div class="kc"><div class="kv" style="color:#009A44">{{ infStats().disponibles }}</div><div class="kl">En service</div><div class="bar"><div [style.width]="infStats().pct + '%'" style="background:#009A44"></div></div></div>
+        <div class="kc"><div class="kv" style="color:#F77F00">{{ infStats().maintenance }}</div><div class="kl">En réparation</div></div>
+        <div class="kc"><div class="kv" style="color:#E24B4A">{{ infStats().valeur | fcfa }}</div><div class="kl">Valeur totale</div></div>
       </div>
       @if (toast.get('inf')?.visible) { <div class="toast on"><i class="ti ti-check"></i>{{ toast.get('inf')?.message }}</div> }
       <div class="sl">Enregistrer du matériel informatique</div>
@@ -198,10 +198,10 @@ const STAT_CHIP:  Record<string, string> = { occupe:'ci', disponible:'cv', loue:
     </div>
     <div class="pb">
       <div class="kg" style="margin-bottom:.75rem">
-        <div class="kc"><div class="kv" style="color:#C9A84C">8</div><div class="kl">Véhicules au total</div></div>
-        <div class="kc"><div class="kv" style="color:#009A44">6</div><div class="kl">En service</div><div class="bar"><div style="width:75%;background:#009A44"></div></div></div>
-        <div class="kc"><div class="kv" style="color:#E24B4A">1</div><div class="kl">En panne</div></div>
-        <div class="kc"><div class="kv" style="color:#F77F00">1</div><div class="kl">En maintenance</div></div>
+        <div class="kc"><div class="kv" style="color:#C9A84C">{{ vehStats().total }}</div><div class="kl">Véhicules au total</div></div>
+        <div class="kc"><div class="kv" style="color:#009A44">{{ vehStats().service }}</div><div class="kl">En service</div><div class="bar"><div [style.width]="vehStats().pct + '%'" style="background:#009A44"></div></div></div>
+        <div class="kc"><div class="kv" style="color:#E24B4A">{{ vehStats().panne }}</div><div class="kl">En panne</div></div>
+        <div class="kc"><div class="kv" style="color:#F77F00">{{ vehStats().maint }}</div><div class="kl">En maintenance</div></div>
       </div>
       @if (toast.get('veh')?.visible) { <div class="toast on"><i class="ti ti-check"></i>{{ toast.get('veh')?.message }}</div> }
       <div class="sl">Enregistrer un véhicule</div>
@@ -250,10 +250,10 @@ const STAT_CHIP:  Record<string, string> = { occupe:'ci', disponible:'cv', loue:
     <div class="ch"><h3><i class="ti ti-settings"></i>Équipements techniques</h3></div>
     <div class="pb">
       <div class="kg" style="margin-bottom:.75rem">
-        <div class="kc"><div class="kv" style="color:#C9A84C">36</div><div class="kl">Équipements enregistrés</div></div>
-        <div class="kc"><div class="kv" style="color:#009A44">28</div><div class="kl">Opérationnels</div><div class="bar"><div style="width:78%;background:#009A44"></div></div></div>
-        <div class="kc"><div class="kv" style="color:#F77F00">5</div><div class="kl">En maintenance</div></div>
-        <div class="kc"><div class="kv" style="color:#E24B4A">3</div><div class="kl">Hors service</div></div>
+        <div class="kc"><div class="kv" style="color:#C9A84C">{{ eqpStats().total }}</div><div class="kl">Équipements enregistrés</div></div>
+        <div class="kc"><div class="kv" style="color:#009A44">{{ eqpStats().disponibles }}</div><div class="kl">Opérationnels</div><div class="bar"><div [style.width]="eqpStats().pct + '%'" style="background:#009A44"></div></div></div>
+        <div class="kc"><div class="kv" style="color:#F77F00">{{ eqpStats().maintenance }}</div><div class="kl">En maintenance</div></div>
+        <div class="kc"><div class="kv" style="color:#E24B4A">{{ eqpStats().valeur | fcfa }}</div><div class="kl">Valeur totale</div></div>
       </div>
       @if (toast.get('eqp')?.visible) { <div class="toast on"><i class="ti ti-check"></i>{{ toast.get('eqp')?.message }}</div> }
       <div class="sl">Enregistrer un équipement</div>
@@ -356,6 +356,28 @@ export class InventaireComponent implements OnInit {
   biensFiltres = computed(() => this.pat.filtrerBiens(this.filtreSearch(), this.filtreCategorie(), this.filtreStatut()));
   totalValeur  = computed(() => this.biensFiltres().reduce((s, b) => s + b.valeurActuelle, 0));
 
+  mobStats = computed(() => this.catStats('mobilier'));
+  infStats = computed(() => this.catStats('informatique'));
+  eqpStats = computed(() => this.catStats('equipement'));
+
+  vehStats = computed(() => {
+    const v = this.pat.vehicules();
+    const total   = v.length;
+    const service = v.filter(x => x.statut === 'occupe').length;
+    const panne   = v.filter(x => x.statut === 'en_panne').length;
+    const maint   = v.filter(x => x.statut === 'en_maintenance').length;
+    return { total, service, panne, maint, pct: total ? Math.round(service / total * 100) : 0 };
+  });
+
+  private catStats(cat: string) {
+    const items = this.pat.biens().filter(b => b.categorie === cat);
+    const total       = items.length;
+    const disponibles = items.filter(b => b.statut !== 'en_maintenance').length;
+    const maintenance = items.filter(b => b.statut === 'en_maintenance').length;
+    const valeur      = items.reduce((s, b) => s + b.valeurActuelle, 0);
+    return { total, disponibles, maintenance, valeur, pct: total ? Math.round(disponibles / total * 100) : 0 };
+  }
+
   ngOnInit(): void { this.pat.loadBiens(); this.pat.loadVehicules(); }
 
   navigate(tab: Tab): void {
@@ -437,7 +459,7 @@ export class InventaireComponent implements OnInit {
 
   exportLocal(): void { this.pat.exportLocal(this.pat.biens(), 'inventaire_biens'); }
 
-  assExpire(date: string): boolean { return !!date && date < '2025-06'; }
+  assExpire(date: string): boolean { return !!date && date < new Date().toISOString().slice(0, 7); }
 
   catColor(c: string): string { return CAT_COLORS[c] ?? '#888'; }
   catIcon(c: string): string  { return CAT_ICONS[c] ?? 'ti-box'; }

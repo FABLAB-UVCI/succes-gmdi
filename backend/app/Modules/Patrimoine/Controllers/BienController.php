@@ -164,8 +164,7 @@ class BienController extends Controller
     private function genReference(string $categorie): string
     {
         $pfx = self::REF_PREFIX[$categorie] ?? 'GEN';
-        $seq = Bien::where('categorie', $categorie)->count() + 1;
-        return "PAT-{$pfx}-" . str_pad($seq, 3, '0', STR_PAD_LEFT);
+        return Bien::nextReference($categorie, $pfx);
     }
 
     public function format(Bien $b): array
@@ -178,7 +177,7 @@ class BienController extends Controller
             'localisation'        => $b->localisation,
             'superficie'          => $b->superficie,
             'valeur_acquisition'  => $b->valeur_acquisition,
-            'valeur_actuelle'     => $b->valeur_actuelle,
+            'valeur_actuelle'     => $b->valeur_actuelle_calculee,
             'date_acquisition'    => $b->date_acquisition?->format('Y-m-d'),
             'affectation'         => $b->affectation,
             'statut'              => $b->statut,

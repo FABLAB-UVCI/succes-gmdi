@@ -73,7 +73,7 @@ export class VehiculeApiService {
   private http = inject(HttpClient);
   private base = `${API()}/patrimoine/vehicules`;
 
-  getAll(f: { statut?: string; page?: number } = {}): Observable<PaginatedResponse<VehiculeApi>> {
+  getAll(f: { statut?: string; page?: number; per_page?: number } = {}): Observable<PaginatedResponse<VehiculeApi>> {
     let p = new HttpParams();
     Object.entries(f).forEach(([k, v]) => { if (v) p = p.set(k, String(v)); });
     return this.http.get<PaginatedResponse<VehiculeApi>>(this.base, { params: p });
@@ -101,8 +101,10 @@ export class TerrainApiService {
   private http = inject(HttpClient);
   private base = `${API()}/patrimoine/terrains`;
 
-  getAll(): Observable<PaginatedResponse<TerrainApi>> {
-    return this.http.get<PaginatedResponse<TerrainApi>>(this.base);
+  getAll(f: { per_page?: number } = {}): Observable<PaginatedResponse<TerrainApi>> {
+    let p = new HttpParams();
+    Object.entries(f).forEach(([k, v]) => { if (v) p = p.set(k, String(v)); });
+    return this.http.get<PaginatedResponse<TerrainApi>>(this.base, { params: p });
   }
 
   create(data: TerrainCreateRequest): Observable<ApiResponse<TerrainApi>> {
@@ -149,7 +151,7 @@ export class AffectationApiService {
   private http = inject(HttpClient);
   private base = `${API()}/patrimoine/affectations`;
 
-  getHistorique(f: { reference?: string; page?: number } = {}): Observable<PaginatedResponse<MouvementApi>> {
+  getHistorique(f: { reference?: string; page?: number; per_page?: number } = {}): Observable<PaginatedResponse<MouvementApi>> {
     let p = new HttpParams();
     Object.entries(f).forEach(([k, v]) => { if (v) p = p.set(k, String(v)); });
     return this.http.get<PaginatedResponse<MouvementApi>>(this.base, { params: p });
@@ -173,7 +175,7 @@ export class EntretienApiService {
   private http = inject(HttpClient);
   private base = `${API()}/patrimoine/entretiens`;
 
-  getAll(f: { statut?: string; page?: number } = {}): Observable<PaginatedResponse<EntretienApi>> {
+  getAll(f: { statut?: string; page?: number; per_page?: number } = {}): Observable<PaginatedResponse<EntretienApi>> {
     let p = new HttpParams();
     Object.entries(f).forEach(([k, v]) => { if (v) p = p.set(k, String(v)); });
     return this.http.get<PaginatedResponse<EntretienApi>>(this.base, { params: p });
@@ -200,9 +202,9 @@ export class ReparationApiService {
   private http = inject(HttpClient);
   private base = `${API()}/patrimoine/reparations`;
 
-  getAll(f: { statut?: string; priorite?: string } = {}): Observable<PaginatedResponse<ReparationApi>> {
+  getAll(f: { statut?: string; priorite?: string; per_page?: number } = {}): Observable<PaginatedResponse<ReparationApi>> {
     let p = new HttpParams();
-    Object.entries(f).forEach(([k, v]) => { if (v) p = p.set(k, v); });
+    Object.entries(f).forEach(([k, v]) => { if (v) p = p.set(k, String(v)); });
     return this.http.get<PaginatedResponse<ReparationApi>>(this.base, { params: p });
   }
 

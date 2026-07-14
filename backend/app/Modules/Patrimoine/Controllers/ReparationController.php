@@ -53,8 +53,10 @@ class ReparationController extends Controller
         ]));
 
         // Si le bien est dans l'inventaire, le passer en maintenance
-        Bien::where('designation', 'like', "%{$rep->bien}%")
-            ->orWhere('reference', $rep->bien)
+        Bien::where(function ($q) use ($rep) {
+                $q->where('designation', 'like', "%{$rep->bien}%")
+                  ->orWhere('reference', $rep->bien);
+            })
             ->update(['statut' => 'en_maintenance']);
 
         return response()->json([
@@ -86,9 +88,11 @@ class ReparationController extends Controller
             'cout_reel'    => $request->get('cout_reel', $rep->cout_estime),
         ]);
 
-        // Remettre le bien en service
-        Bien::where('designation', 'like', "%{$rep->bien}%")
-            ->orWhere('reference', $rep->bien)
+        // Remettre le bien en service (seulement s'il était bien en maintenance)
+        Bien::where(function ($q) use ($rep) {
+                $q->where('designation', 'like', "%{$rep->bien}%")
+                  ->orWhere('reference', $rep->bien);
+            })
             ->where('statut', 'en_maintenance')
             ->update(['statut' => 'occupe']);
 

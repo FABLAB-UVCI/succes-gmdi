@@ -38,8 +38,11 @@ export class PatrimoineService {
   readonly reparations  = signal<Reparation[]>([]);
   readonly amortissements = signal<LigneAmortissement[]>([]);
 
-  readonly kpi = signal<KpiPatrimoine>({ totalBiens: 432, valeurTotale: 2000900000, loyersMensuel: 12500000, urgences: 3 });
-  readonly statsAmort = signal<StatsAmortissement>({ valeurAcquisitionTotale: 2000900000, valeurNetteTotale: 1843700000, amortissementsCumules: 157200000, biensAmortis: 2 });
+  readonly kpi = signal<KpiPatrimoine>({ totalBiens: 0, valeurTotale: 0, loyersMensuel: 0, urgences: 0 });
+  readonly statsAmort = signal<StatsAmortissement>({ valeurAcquisitionTotale: 0, valeurNetteTotale: 0, amortissementsCumules: 0, biensAmortis: 0 });
+  readonly repartitionCategorie = signal<{ categorie: string; nombre: number; valeur: number; part: number }[]>([]);
+  readonly repartitionStatut = signal<{ statut: string; nombre: number; valeur: number }[]>([]);
+  readonly depreciationCategorie = signal<{ categorie: string; valeurBrute: number; tauxMoyen: number; depreciationAnnuelle: number; valeurNette: number }[]>([]);
 
   readonly loadingBiens = signal(false);
   readonly totalBiens   = computed(() => this.biens().length);
@@ -55,7 +58,7 @@ export class PatrimoineService {
 
   loadBiens(f: BienFilters = {}): void {
     this.loadingBiens.set(true);
-    this.bienApi.getAll(f).pipe(
+    this.bienApi.getAll({ per_page: 1000, ...f }).pipe(
       tap(res => { this.biens.set(res.data.map(b => this.mapBien(b))); this.loadingBiens.set(false); })
     ).subscribe({ error: () => this.loadingBiens.set(false) });
   }
@@ -128,7 +131,7 @@ export class PatrimoineService {
   // ═══════════════════════════════════════════════════════════════════════════
 
   loadVehicules(): void {
-    this.vehApi.getAll().pipe(
+    this.vehApi.getAll({ per_page: 1000 }).pipe(
       tap(r => this.vehicules.set(r.data.map(v => this.mapVehicule(v))))
     ).subscribe();
   }
@@ -149,7 +152,7 @@ export class PatrimoineService {
   // ═══════════════════════════════════════════════════════════════════════════
 
   loadTerrains(): void {
-    this.terApi.getAll().pipe(
+    this.terApi.getAll({ per_page: 1000 }).pipe(
       tap(r => this.terrains.set(r.data.map(t => this.mapTerrain(t))))
     ).subscribe();
   }
@@ -160,7 +163,7 @@ export class PatrimoineService {
       usage: f.usage, titre_foncier: f.titreFoncier, date_acquisition: f.dateAcquisition,
     }).pipe(
       map(r => this.mapTerrain(r.data)),
-      tap(t => this.terrains.update(l => [...l, t]))
+      tap(t => this.terrains.update(l => [t, ...l]))
     );
   }
 
@@ -169,7 +172,7 @@ export class PatrimoineService {
   // ═══════════════════════════════════════════════════════════════════════════
 
   loadMouvements(): void {
-    this.affApi.getHistorique().pipe(
+    this.affApi.getHistorique({ per_page: 1000 }).pipe(
       tap(r => this.mouvements.set(r.data.map(m => this.mapMouvement(m))))
     ).subscribe();
   }
@@ -193,7 +196,7 @@ export class PatrimoineService {
   // ═══════════════════════════════════════════════════════════════════════════
 
   loadEntretiens(): void {
-    this.entApi.getAll().pipe(
+    this.entApi.getAll({ per_page: 1000 }).pipe(
       tap(r => this.entretiens.set(r.data.map(e => this.mapEntretien(e))))
     ).subscribe();
   }
@@ -221,7 +224,7 @@ export class PatrimoineService {
   // ═══════════════════════════════════════════════════════════════════════════
 
   loadReparations(): void {
-    this.repApi.getAll().pipe(
+    this.repApi.getAll({ per_page: 1000 }).pipe(
       tap(r => this.reparations.set(r.data.map(r2 => this.mapReparation(r2))))
     ).subscribe();
   }
@@ -263,6 +266,12 @@ export class PatrimoineService {
       tap(s => {
         this.kpi.set({ totalBiens: s.total_biens, valeurTotale: s.valeur_totale, loyersMensuel: s.loyers_mensuel, urgences: s.urgences });
         this.statsAmort.set({ valeurAcquisitionTotale: s.valeur_acquisition_totale, valeurNetteTotale: s.valeur_nette_totale, amortissementsCumules: s.amortissements_cumules, biensAmortis: s.biens_amortis });
+        this.repartitionCategorie.set(s.repartition_categorie ?? []);
+        this.repartitionStatut.set(s.repartition_statut ?? []);
+        this.depreciationCategorie.set((s.depreciation_categorie ?? []).map(d => ({
+          categorie: d.categorie, valeurBrute: d.valeur_brute, tauxMoyen: d.taux_moyen,
+          depreciationAnnuelle: d.depreciation_annuelle, valeurNette: d.valeur_nette,
+        })));
       })
     ).subscribe();
   }

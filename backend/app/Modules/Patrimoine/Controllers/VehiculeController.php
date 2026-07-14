@@ -38,7 +38,7 @@ class VehiculeController extends Controller
         $veh = Vehicule::create(array_merge($validated, ['statut' => 'occupe']));
 
         // Crée aussi un Bien lié dans l'inventaire général
-        $ref = 'PAT-VEH-' . str_pad(Bien::where('categorie', 'vehicule')->count() + 1, 3, '0', STR_PAD_LEFT);
+        $ref = Bien::nextReference('vehicule', 'VEH');
         Bien::create([
             'reference' => $ref, 'designation' => $veh->modele,
             'categorie' => 'vehicule', 'localisation' => 'Garage communal',

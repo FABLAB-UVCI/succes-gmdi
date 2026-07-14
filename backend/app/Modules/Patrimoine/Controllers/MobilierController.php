@@ -19,7 +19,7 @@ class MobilierController extends Controller
             'etat'             => 'nullable|string|max:30',
         ]);
 
-        $ref = 'PAT-MOB-' . str_pad(Bien::where('categorie', 'mobilier')->count() + 1, 3, '0', STR_PAD_LEFT);
+        $ref = Bien::nextReference('mobilier', 'MOB');
         $val = ($v['valeur_unitaire'] ?? 0) * ($v['quantite'] ?? 1);
 
         $bien = Bien::create([

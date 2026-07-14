@@ -11,7 +11,7 @@ class TerrainController extends Controller
 {
     public function index(Request $request)
     {
-        $data = Terrain::query()->orderByDesc('created_at')->paginate(20);
+        $data = Terrain::query()->orderByDesc('created_at')->paginate((int) $request->get('per_page', 20));
         return response()->json([
             'data'  => $data->map(fn($t) => $this->fmt($t)),
             'meta'  => $this->meta($data),
@@ -32,7 +32,7 @@ class TerrainController extends Controller
 
         $terrain = Terrain::create(array_merge($v, ['statut' => 'Reserve']));
 
-        $ref = 'PAT-TER-' . str_pad(Bien::where('categorie', 'terrain')->count() + 1, 3, '0', STR_PAD_LEFT);
+        $ref = Bien::nextReference('terrain', 'TER');
         Bien::create([
             'reference'          => $ref,
             'designation'        => "Terrain — {$terrain->localisation}",

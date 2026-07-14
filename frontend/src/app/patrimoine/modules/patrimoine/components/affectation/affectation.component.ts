@@ -350,11 +350,12 @@ export class MaintenanceComponent implements OnInit {
     <div style="overflow-x:auto;margin-bottom:1rem">
       <table class="tbl"><thead><tr><th>Catégorie</th><th>Valeur brute (FCFA)</th><th>Taux moyen amort.</th><th>Dépréciation annuelle</th><th>Valeur nette estimée</th></tr></thead>
       <tbody>
-        <tr><td class="bold">Véhicules</td><td class="right">78 000 000</td><td class="right">20%</td><td class="right" style="color:#F77F00">15 600 000</td><td class="right bold">27 000 000</td></tr>
-        <tr><td class="bold">Équipements</td><td class="right">30 000 000</td><td class="right">10%</td><td class="right" style="color:#F77F00">3 000 000</td><td class="right bold">18 000 000</td></tr>
-        <tr><td class="bold">Informatique</td><td class="right">8 500 000</td><td class="right">33%</td><td class="right" style="color:#F77F00">2 805 000</td><td class="right bold">2 000 000</td></tr>
-        <tr><td class="bold">Mobilier</td><td class="right">3 200 000</td><td class="right">20%</td><td class="right" style="color:#F77F00">640 000</td><td class="right bold">1 600 000</td></tr>
-        <tr><td class="bold">Immobilier</td><td class="right">1 430 000 000</td><td class="right">2%</td><td class="right" style="color:#F77F00">28 600 000</td><td class="right bold">816 000 000</td></tr>
+        @for (d of pat.depreciationCategorie(); track d.categorie) {
+          <tr><td class="bold">{{ d.categorie }}</td><td class="right">{{ d.valeurBrute | fcfa }}</td><td class="right">{{ d.tauxMoyen }}%</td><td class="right" style="color:#F77F00">{{ d.depreciationAnnuelle | fcfa }}</td><td class="right bold">{{ d.valeurNette | fcfa }}</td></tr>
+        }
+        @empty {
+          <tr><td colspan="5" style="text-align:center;padding:1.5rem;font-style:italic;font-size:12px;color:var(--color-text-secondary)">Aucune donnée</td></tr>
+        }
       </tbody></table>
     </div>
   </div>
@@ -394,12 +395,12 @@ export class AmortissementComponent implements OnInit {
   <div class="ch"><h3><i class="ti ti-report"></i>Rapports patrimoniaux annuels</h3></div>
   <div class="pb">
     <div class="kg6" style="margin-bottom:1rem">
-      <div class="kc"><div class="kv" style="color:#C9A84C">{{ pat.kpi().totalBiens }}</div><div class="kl">Biens inventoriés</div><div class="bar"><div style="width:43%;background:#C9A84C"></div></div><div class="ks2">Cible : 1 000 en 2025</div></div>
-      <div class="kc"><div class="kv" style="color:#003366">2,0 Mrd</div><div class="kl">Valeur totale (FCFA)</div></div>
-      <div class="kc"><div class="kv" style="color:#009A44">1,84 Mrd</div><div class="kl">Valeur nette comptable</div></div>
-      <div class="kc"><div class="kv" style="color:#F77F00">157 M</div><div class="kl">Amort. cumulés</div></div>
-      <div class="kc"><div class="kv" style="color:#185FA5">12,5 M</div><div class="kl">Loyers/mois (FCFA)</div></div>
-      <div class="kc"><div class="kv" style="color:#009A44">96%</div><div class="kl">Biens géolocalisés</div><div class="bar"><div style="width:96%;background:#009A44"></div></div></div>
+      <div class="kc"><div class="kv" style="color:#C9A84C">{{ pat.kpi().totalBiens }}</div><div class="kl">Biens inventoriés</div></div>
+      <div class="kc"><div class="kv" style="color:#003366">{{ pat.kpi().valeurTotale | fcfa }}</div><div class="kl">Valeur totale</div></div>
+      <div class="kc"><div class="kv" style="color:#009A44">{{ pat.statsAmort().valeurNetteTotale | fcfa }}</div><div class="kl">Valeur nette comptable</div></div>
+      <div class="kc"><div class="kv" style="color:#F77F00">{{ pat.statsAmort().amortissementsCumules | fcfa }}</div><div class="kl">Amort. cumulés</div></div>
+      <div class="kc"><div class="kv" style="color:#185FA5">{{ pat.kpi().loyersMensuel | fcfa }}</div><div class="kl">Loyers/mois</div></div>
+      <div class="kc"><div class="kv" style="color:#009A44">{{ pat.statsAmort().biensAmortis }}</div><div class="kl">Biens entièrement amortis</div></div>
     </div>
 
     <div class="grid2" style="margin-bottom:1rem">
@@ -407,24 +408,26 @@ export class AmortissementComponent implements OnInit {
         <div class="sl">Inventaire annuel — répartition par catégorie</div>
         <table class="tbl"><thead><tr><th>Catégorie</th><th>Nbre</th><th>Valeur (FCFA)</th><th>Part</th></tr></thead>
         <tbody>
-          <tr><td class="bold">Immobilier</td><td>24</td><td class="right">1 430 000 000</td><td><div class="mb"><div style="width:72%;background:#003366"></div></div> 72%</td></tr>
-          <tr><td class="bold">Terrain</td><td>12</td><td class="right">450 000 000</td><td><div class="mb"><div style="width:22%;background:#009A44"></div></div> 22%</td></tr>
-          <tr><td class="bold">Véhicule</td><td>8</td><td class="right">78 000 000</td><td><div class="mb"><div style="width:4%;background:#185FA5"></div></div> 4%</td></tr>
-          <tr><td class="bold">Équipement</td><td>36</td><td class="right">30 000 000</td><td><div class="mb"><div style="width:2%;background:#F77F00"></div></div> 2%</td></tr>
-          <tr><td class="bold">Informatique</td><td>94</td><td class="right">8 500 000</td><td><div class="mb"><div style="width:1%;background:#C9A84C"></div></div> &lt;1%</td></tr>
-          <tr><td class="bold">Mobilier</td><td>258</td><td class="right">3 200 000</td><td><div class="mb"><div style="width:1%;background:#888780"></div></div> &lt;1%</td></tr>
+          @for (r of pat.repartitionCategorie(); track r.categorie) {
+            <tr><td class="bold">{{ r.categorie }}</td><td>{{ r.nombre }}</td><td class="right">{{ r.valeur | fcfa }}</td><td><div class="mb"><div [style.width]="r.part + '%'" style="background:#003366"></div></div> {{ r.part }}%</td></tr>
+          }
+          @empty {
+            <tr><td colspan="4" style="text-align:center;padding:1.5rem;font-style:italic;font-size:12px;color:var(--color-text-secondary)">Aucune donnée</td></tr>
+          }
         </tbody></table>
       </div>
       <div>
         <div class="sl">État du patrimoine — par statut</div>
         <table class="tbl"><thead><tr><th>Statut</th><th>Biens</th><th>Valeur</th></tr></thead>
         <tbody>
-          <tr><td class="bold">Occupé — usage communal</td><td>280</td><td class="right">1 650 000 000</td></tr>
-          <tr><td class="bold">Loué à des tiers</td><td>45</td><td class="right">210 000 000</td></tr>
-          <tr><td class="bold">Disponible</td><td>82</td><td class="right">95 000 000</td></tr>
-          <tr><td class="bold">En maintenance</td><td>25</td><td class="right">45 900 000</td></tr>
+          @for (r of pat.repartitionStatut(); track r.statut) {
+            <tr><td class="bold">{{ r.statut }}</td><td>{{ r.nombre }}</td><td class="right">{{ r.valeur | fcfa }}</td></tr>
+          }
+          @empty {
+            <tr><td colspan="3" style="text-align:center;padding:1.5rem;font-style:italic;font-size:12px;color:var(--color-text-secondary)">Aucune donnée</td></tr>
+          }
         </tbody>
-        <tfoot><tr><td>TOTAL</td><td>432</td><td class="right" style="color:#C9A84C">2 000 900 000</td></tr></tfoot>
+        <tfoot><tr><td>TOTAL</td><td>{{ pat.kpi().totalBiens }}</td><td class="right" style="color:#C9A84C">{{ pat.kpi().valeurTotale | fcfa }}</td></tr></tfoot>
         </table>
       </div>
     </div>

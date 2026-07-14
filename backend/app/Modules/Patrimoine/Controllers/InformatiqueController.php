@@ -19,7 +19,7 @@ class InformatiqueController extends Controller
             'date_acquisition' => 'nullable|date',
         ]);
 
-        $ref = 'PAT-INF-' . str_pad(Bien::where('categorie', 'informatique')->count() + 1, 3, '0', STR_PAD_LEFT);
+        $ref = Bien::nextReference('informatique', 'INF');
         $des = trim("{$v['type_materiel']} " . ($v['modele'] ?? ''));
 
         $bien = Bien::create([
