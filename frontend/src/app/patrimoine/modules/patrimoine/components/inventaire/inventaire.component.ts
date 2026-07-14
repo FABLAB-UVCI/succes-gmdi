@@ -123,7 +123,7 @@ const STAT_CHIP:  Record<string, string> = { occupe:'ci', disponible:'cv', loue:
       </div>
       <div class="fa"><button class="bp" [disabled]="saving()" (click)="enregMobilier()"><i class="ti ti-check"></i>Enregistrer</button></div>
       <div class="sl" style="margin-top:.75rem">Registre mobilier</div>
-      <table class="tbl"><thead><tr><th>Désignation</th><th>Localisation</th><th>Valeur</th><th>Affectation</th><th>Statut</th></tr></thead>
+      <table class="tbl"><thead><tr><th>Désignation</th><th>Localisation</th><th>Valeur</th><th>Affectation</th><th>État</th><th>Statut</th></tr></thead>
       <tbody>
         @for (b of biensParCategorie('mobilier'); track b.id) {
           <tr>
@@ -131,11 +131,12 @@ const STAT_CHIP:  Record<string, string> = { occupe:'ci', disponible:'cv', loue:
             <td>{{ b.localisation }}</td>
             <td class="right bold">{{ b.valeurActuelle | fcfa }}</td>
             <td style="font-size:11px">{{ b.affectation }}</td>
+            <td>{{ etatLabel(b.etat) }}</td>
             <td><span class="chip" [ngClass]="chipStatut(b.statut)">{{ b.statut }}</span></td>
           </tr>
         }
         @empty {
-          <tr><td colspan="5" style="text-align:center;padding:1.5rem;font-style:italic;font-size:12px;color:var(--color-text-secondary)">Aucun mobilier enregistré</td></tr>
+          <tr><td colspan="6" style="text-align:center;padding:1.5rem;font-style:italic;font-size:12px;color:var(--color-text-secondary)">Aucun mobilier enregistré</td></tr>
         }
       </tbody></table>
     </div>
@@ -213,8 +214,8 @@ const STAT_CHIP:  Record<string, string> = { occupe:'ci', disponible:'cv', loue:
       <div class="row4">
         <div class="fg"><div class="lbl">Affectation <span class="req">*</span></div><input [(ngModel)]="veh.affectation" placeholder="Ex: Cabinet du Maire"></div>
         <div class="fg"><div class="lbl">Valeur (FCFA)</div><input type="number" [(ngModel)]="veh.valeur" placeholder="Ex: 45000000"></div>
-        <div class="fg"><div class="lbl">Fin assurance</div><input type="date" [(ngModel)]="veh.finAssurance"></div>
-        <div class="fg"><div class="lbl">Fin visite technique</div><input type="date" [(ngModel)]="veh.finVT"></div>
+        <div class="fg"><div class="lbl">Fin assurance</div><input type="date" [(ngModel)]="veh.finAssurance" [attr.min]="dateMin" [attr.max]="dateMax"></div>
+        <div class="fg"><div class="lbl">Fin visite technique</div><input type="date" [(ngModel)]="veh.finVT" [attr.min]="dateMin" [attr.max]="dateMax"></div>
       </div>
       <div class="fa"><button class="bp" [disabled]="saving()" (click)="enregVehicule()"><i class="ti ti-check"></i>Enregistrer</button></div>
       <div class="sl" style="margin-top:.75rem">Registre des véhicules</div>
@@ -347,6 +348,9 @@ export class InventaireComponent implements OnInit {
 
   typesInfo = ['Ordinateur de bureau','Ordinateur portable','Imprimante','Serveur','Tablette','Vidéoprojecteur','Écran','Scanner'];
 
+  readonly dateMin = new Date().toISOString().slice(0, 10);
+  readonly dateMax = '2030-12-31';
+
   mob    = { designation: '', quantite: null as number|null, valeurUnitaire: null as number|null, localisation: '', dateAcquisition: '', etat: 'bon' };
   inf    = { type: '', modele: '', serie: '', affectation: '', valeur: null as number|null, dateAcquisition: '' };
   veh    = { modele: '', immatriculation: '', kilometrage: null as number|null, affectation: '', valeur: null as number|null, finAssurance: '', finVT: '' };
@@ -464,4 +468,5 @@ export class InventaireComponent implements OnInit {
   catColor(c: string): string { return CAT_COLORS[c] ?? '#888'; }
   catIcon(c: string): string  { return CAT_ICONS[c] ?? 'ti-box'; }
   chipStatut(s: string): string { return STAT_CHIP[s] ?? 'ci'; }
+  etatLabel(e: string | null | undefined): string { return { neuf: 'Neuf', bon: 'Bon', use: 'Usagé', hs: 'Hors service' }[e ?? ''] ?? '—'; }
 }

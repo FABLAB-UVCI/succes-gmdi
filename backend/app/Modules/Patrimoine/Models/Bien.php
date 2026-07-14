@@ -17,7 +17,7 @@ class Bien extends Model
     protected $fillable = [
         'reference', 'designation', 'categorie', 'localisation', 'superficie',
         'valeur_acquisition', 'valeur_actuelle', 'date_acquisition',
-        'affectation', 'statut', 'taux_amortissement', 'qr_code',
+        'affectation', 'statut', 'etat', 'taux_amortissement', 'qr_code',
     ];
 
     protected $casts = [

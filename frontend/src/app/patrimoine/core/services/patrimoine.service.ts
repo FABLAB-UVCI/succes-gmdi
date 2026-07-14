@@ -2,14 +2,16 @@ import { Injectable, signal, computed, inject } from '@angular/core';
 import { Observable, tap, map } from 'rxjs';
 import {
   Bien, Vehicule, Terrain, MouvementAffectation,
-  Entretien, Reparation, LigneAmortissement, KpiPatrimoine, StatsAmortissement
+  Entretien, Reparation, LigneAmortissement, KpiPatrimoine, StatsAmortissement,
+  Batiment, Marche, CentreCommunautaire
 } from '../models/patrimoine.models';
-import { BienFilters, BienApi, VehiculeApi, TerrainApi, MouvementApi, EntretienApi, ReparationApi, AmortissementApi } from '../models/api.models';
+import { BienFilters, BienApi, VehiculeApi, TerrainApi, MouvementApi, EntretienApi, ReparationApi, AmortissementApi, BatimentApi, MarcheApi, CentreApi } from '../models/api.models';
 import {
   BienApiService, VehiculeApiService, TerrainApiService,
   MobilierApiService, InformatiqueApiService, EquipementApiService,
   AffectationApiService, EntretienApiService, ReparationApiService,
-  AmortissementApiService, StatsPatrimoineApiService
+  AmortissementApiService, StatsPatrimoineApiService,
+  BatimentApiService, MarcheApiService, CentreApiService
 } from './patrimoine-api.service';
 import { ToastService } from './toast.service';
 
@@ -27,6 +29,9 @@ export class PatrimoineService {
   private repApi     = inject(ReparationApiService);
   private amortApi   = inject(AmortissementApiService);
   private statsApi   = inject(StatsPatrimoineApiService);
+  private batApi     = inject(BatimentApiService);
+  private marApi     = inject(MarcheApiService);
+  private cenApi     = inject(CentreApiService);
   private toast      = inject(ToastService);
 
   // ── Cache réactif ─────────────────────────────────────────────────────────
@@ -37,6 +42,9 @@ export class PatrimoineService {
   readonly entretiens   = signal<Entretien[]>([]);
   readonly reparations  = signal<Reparation[]>([]);
   readonly amortissements = signal<LigneAmortissement[]>([]);
+  readonly batiments    = signal<Batiment[]>([]);
+  readonly marches      = signal<Marche[]>([]);
+  readonly centres      = signal<CentreCommunautaire[]>([]);
 
   readonly kpi = signal<KpiPatrimoine>({ totalBiens: 0, valeurTotale: 0, loyersMensuel: 0, urgences: 0 });
   readonly statsAmort = signal<StatsAmortissement>({ valeurAcquisitionTotale: 0, valeurNetteTotale: 0, amortissementsCumules: 0, biensAmortis: 0 });
@@ -168,6 +176,65 @@ export class PatrimoineService {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
+  //  BÂTIMENTS
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  loadBatiments(): void {
+    this.batApi.getAll().pipe(
+      tap(r => this.batiments.set(r.data.map(b => this.mapBatiment(b))))
+    ).subscribe();
+  }
+
+  enregistrerBatiment(f: { nom: string; superficie?: number; valeurActuelle?: number; affectation?: string; etat?: string; derniereInspection?: string }): Observable<Batiment> {
+    return this.batApi.create({
+      nom: f.nom, superficie: f.superficie, valeur_actuelle: f.valeurActuelle,
+      affectation: f.affectation, etat: f.etat, derniere_inspection: f.derniereInspection,
+    }).pipe(
+      map(r => this.mapBatiment(r.data)),
+      tap(b => this.batiments.update(l => [b, ...l]))
+    );
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  //  MARCHÉS
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  loadMarches(): void {
+    this.marApi.getAll().pipe(
+      tap(r => this.marches.set(r.data.map(m => this.mapMarche(m))))
+    ).subscribe();
+  }
+
+  enregistrerMarche(f: { nom: string; superficie?: number; nombreBoutiques?: number; loyerMoyenBoutique?: number; statut?: string }): Observable<Marche> {
+    return this.marApi.create({
+      nom: f.nom, superficie: f.superficie, nombre_boutiques: f.nombreBoutiques,
+      loyer_moyen_boutique: f.loyerMoyenBoutique, statut: f.statut,
+    }).pipe(
+      map(r => this.mapMarche(r.data)),
+      tap(m => this.marches.update(l => [m, ...l]))
+    );
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  //  CENTRES COMMUNAUTAIRES
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  loadCentres(): void {
+    this.cenApi.getAll().pipe(
+      tap(r => this.centres.set(r.data.map(c => this.mapCentre(c))))
+    ).subscribe();
+  }
+
+  enregistrerCentre(f: { nom: string; quartier?: string; capacite?: number; services?: string; statut?: string }): Observable<CentreCommunautaire> {
+    return this.cenApi.create({
+      nom: f.nom, quartier: f.quartier, capacite: f.capacite, services: f.services, statut: f.statut,
+    }).pipe(
+      map(r => this.mapCentre(r.data)),
+      tap(c => this.centres.update(l => [c, ...l]))
+    );
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
   //  AFFECTATIONS
   // ═══════════════════════════════════════════════════════════════════════════
 
@@ -281,7 +348,19 @@ export class PatrimoineService {
   // ═══════════════════════════════════════════════════════════════════════════
 
   mapBien(b: BienApi): Bien {
-    return { id: String(b.id), reference: b.reference, designation: b.designation, categorie: b.categorie as any, localisation: b.localisation, superficie: b.superficie ?? undefined, valeurAcquisition: b.valeur_acquisition, valeurActuelle: b.valeur_actuelle, dateAcquisition: b.date_acquisition, affectation: b.affectation, statut: b.statut as any, tauxAmortissement: b.taux_amortissement, qrCode: b.qr_code };
+    return { id: String(b.id), reference: b.reference, designation: b.designation, categorie: b.categorie as any, localisation: b.localisation, superficie: b.superficie ?? undefined, valeurAcquisition: b.valeur_acquisition, valeurActuelle: b.valeur_actuelle, dateAcquisition: b.date_acquisition, affectation: b.affectation, statut: b.statut as any, etat: b.etat, tauxAmortissement: b.taux_amortissement, qrCode: b.qr_code };
+  }
+
+  mapBatiment(b: BatimentApi): Batiment {
+    return { id: String(b.id), nom: b.nom, superficie: b.superficie ?? 0, valeurActuelle: b.valeur_actuelle, affectation: b.affectation ?? '', etat: (b.etat as any) ?? 'bon', derniereInspection: b.derniere_inspection ?? '' };
+  }
+
+  mapMarche(m: MarcheApi): Marche {
+    return { id: String(m.id), nom: m.nom, superficie: m.superficie ?? 0, nombreBoutiques: m.nombre_boutiques, loyerMoyenBoutique: m.loyer_moyen_boutique, revenusMensuels: m.revenus_mensuels, statut: m.statut as any };
+  }
+
+  mapCentre(c: CentreApi): CentreCommunautaire {
+    return { id: String(c.id), nom: c.nom, quartier: c.quartier ?? '', capacite: c.capacite, services: c.services ?? '', statut: c.statut as any };
   }
 
   mapVehicule(v: VehiculeApi): Vehicule {

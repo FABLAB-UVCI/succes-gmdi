@@ -51,7 +51,7 @@ import { Bien } from '../../../../core/models/patrimoine.models';
         <div class="fg"><div class="lbl">Responsable du bien</div><input [(ngModel)]="f.responsable" placeholder="Nom du responsable"></div>
       </div>
       <div class="row2">
-        <div class="fg"><div class="lbl">Date d'effet <span class="req">*</span></div><input type="date" [(ngModel)]="f.dateEffet"></div>
+        <div class="fg"><div class="lbl">Date d'effet <span class="req">*</span></div><input type="date" [(ngModel)]="f.dateEffet" [attr.min]="dateMin" [attr.max]="dateMax"></div>
         <div class="fg"><div class="lbl">Motif</div><input [(ngModel)]="f.motif" placeholder="Ex: Renfort, réorganisation..."></div>
       </div>
       <div class="fa"><button class="bp" [disabled]="saving()" (click)="validerAffectation()"><i class="ti ti-check"></i>Valider l'affectation</button></div>
@@ -103,6 +103,9 @@ export class AffectationComponent implements OnInit {
   f = { reference: '', direction: '', responsable: '', dateEffet: '', motif: '' };
 
   directions = ['Cabinet du Maire','Direction Générale','Direction État Civil','Direction Finances','DRH','Direction Urbanisme','Services Techniques','Direction Communication','Direction Patrimoine'];
+
+  readonly dateMin = new Date().toISOString().slice(0, 10);
+  readonly dateMax = '2030-12-31';
 
   ngOnInit(): void { this.pat.loadMouvements(); }
 
@@ -162,7 +165,7 @@ export class AffectationComponent implements OnInit {
         </div>
       </div>
       <div class="row3">
-        <div class="fg"><div class="lbl">Date prévue <span class="req">*</span></div><input type="date" [(ngModel)]="ent.date"></div>
+        <div class="fg"><div class="lbl">Date prévue <span class="req">*</span></div><input type="date" [(ngModel)]="ent.date" [attr.min]="dateMin" [attr.max]="dateMax"></div>
         <div class="fg"><div class="lbl">Périodicité</div>
           <select [(ngModel)]="ent.periodicite"><option>Mensuelle</option><option>Trimestrielle</option><option>Semestrielle</option><option>Annuelle</option></select>
         </div>

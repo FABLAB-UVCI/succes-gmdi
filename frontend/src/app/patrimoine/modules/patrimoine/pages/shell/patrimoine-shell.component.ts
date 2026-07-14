@@ -86,7 +86,7 @@ export type Section = 'inventaire' | 'immobilier' | 'affectation' | 'maintenance
           <div class="phdr-icon"><i class="ti ti-building-bank"></i></div>
           <div>
             <div class="phdr-title">Patrimoine Communal</div>
-            <div class="phdr-sub">Gestion du patrimoine municipal — 2025</div>
+            <div class="phdr-sub">Gestion du patrimoine municipal — {{ anneeCourante }}</div>
           </div>
         </div>
         <div class="phdr-kpis">
@@ -262,6 +262,7 @@ export class PatrimoineShellComponent implements OnInit {
 
   activeSection = signal<Section>('inventaire');
   sidebarOpen   = signal(false);
+  readonly anneeCourante = new Date().getFullYear();
 
   visibleToasts = computed(() => Object.values(this.toast.toasts()).filter(t => t.visible));
 

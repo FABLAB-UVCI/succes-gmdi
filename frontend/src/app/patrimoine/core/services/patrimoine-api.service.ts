@@ -11,6 +11,9 @@ import {
   EntretienApi, EntretienCreateRequest,
   ReparationApi, ReparationCreateRequest,
   AmortissementApi, StatsPatrimoineApi,
+  BatimentApi, BatimentCreateRequest,
+  MarcheApi, MarcheCreateRequest,
+  CentreApi, CentreCreateRequest,
   PaginatedResponse, ApiResponse
 } from '../models/api.models';
 
@@ -230,6 +233,81 @@ export class AmortissementApiService {
 
   simuler(valeur: number, taux: number, annees: number): Observable<ApiResponse<{ cumul: number; vnc: number }>> {
     return this.http.post<ApiResponse<{ cumul: number; vnc: number }>>(`${API()}/patrimoine/amortissements/simuler`, { valeur, taux, annees });
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  Bâtiments
+// ═══════════════════════════════════════════════════════════════════════════
+@Injectable({ providedIn: 'root' })
+export class BatimentApiService {
+  private http = inject(HttpClient);
+  private base = `${API()}/patrimoine/batiments`;
+
+  getAll(): Observable<ApiResponse<BatimentApi[]>> {
+    return this.http.get<ApiResponse<BatimentApi[]>>(this.base);
+  }
+
+  create(data: BatimentCreateRequest): Observable<ApiResponse<BatimentApi>> {
+    return this.http.post<ApiResponse<BatimentApi>>(this.base, data);
+  }
+
+  update(id: number, data: Partial<BatimentCreateRequest>): Observable<ApiResponse<BatimentApi>> {
+    return this.http.put<ApiResponse<BatimentApi>>(`${this.base}/${id}`, data);
+  }
+
+  delete(id: number): Observable<ApiResponse> {
+    return this.http.delete<ApiResponse>(`${this.base}/${id}`);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  Marchés
+// ═══════════════════════════════════════════════════════════════════════════
+@Injectable({ providedIn: 'root' })
+export class MarcheApiService {
+  private http = inject(HttpClient);
+  private base = `${API()}/patrimoine/marches`;
+
+  getAll(): Observable<ApiResponse<MarcheApi[]>> {
+    return this.http.get<ApiResponse<MarcheApi[]>>(this.base);
+  }
+
+  create(data: MarcheCreateRequest): Observable<ApiResponse<MarcheApi>> {
+    return this.http.post<ApiResponse<MarcheApi>>(this.base, data);
+  }
+
+  update(id: number, data: Partial<MarcheCreateRequest>): Observable<ApiResponse<MarcheApi>> {
+    return this.http.put<ApiResponse<MarcheApi>>(`${this.base}/${id}`, data);
+  }
+
+  delete(id: number): Observable<ApiResponse> {
+    return this.http.delete<ApiResponse>(`${this.base}/${id}`);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  Centres communautaires
+// ═══════════════════════════════════════════════════════════════════════════
+@Injectable({ providedIn: 'root' })
+export class CentreApiService {
+  private http = inject(HttpClient);
+  private base = `${API()}/patrimoine/centres`;
+
+  getAll(): Observable<ApiResponse<CentreApi[]>> {
+    return this.http.get<ApiResponse<CentreApi[]>>(this.base);
+  }
+
+  create(data: CentreCreateRequest): Observable<ApiResponse<CentreApi>> {
+    return this.http.post<ApiResponse<CentreApi>>(this.base, data);
+  }
+
+  update(id: number, data: Partial<CentreCreateRequest>): Observable<ApiResponse<CentreApi>> {
+    return this.http.put<ApiResponse<CentreApi>>(`${this.base}/${id}`, data);
+  }
+
+  delete(id: number): Observable<ApiResponse> {
+    return this.http.delete<ApiResponse>(`${this.base}/${id}`);
   }
 }
 

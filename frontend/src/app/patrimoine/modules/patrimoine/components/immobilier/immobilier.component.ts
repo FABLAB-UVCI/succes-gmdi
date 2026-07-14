@@ -78,27 +78,54 @@ type Tab = 'terrains' | 'batiments' | 'marches' | 'centres';
 <!-- ── Bâtiments ──────────────────────────────────────────────────────── -->
 @if (activeTab() === 'batiments') {
   <div class="card">
-    <div class="ch"><h3><i class="ti ti-building"></i>Bâtiments communaux</h3></div>
+    <div class="ch">
+      <h3><i class="ti ti-building"></i>Bâtiments communaux</h3>
+      <button class="bs" (click)="pat.exportLocal(pat.batiments(), 'batiments')"><i class="ti ti-download"></i>Exporter</button>
+    </div>
     <div class="pb">
       <div class="kg" style="margin-bottom:.75rem">
-        <div class="kc"><div class="kv" style="color:#C9A84C">24</div><div class="kl">Bâtiments communaux</div></div>
-        <div class="kc"><div class="kv" style="color:#009A44">16</div><div class="kl">Bon état</div><div class="bar"><div style="width:67%;background:#009A44"></div></div></div>
-        <div class="kc"><div class="kv" style="color:#F77F00">6</div><div class="kl">État moyen</div></div>
-        <div class="kc"><div class="kv" style="color:#E24B4A">2</div><div class="kl">Dégradé</div></div>
+        <div class="kc"><div class="kv" style="color:#C9A84C">{{ batStats().total }}</div><div class="kl">Bâtiments communaux</div></div>
+        <div class="kc"><div class="kv" style="color:#009A44">{{ batStats().bon }}</div><div class="kl">Bon état</div><div class="bar"><div [style.width]="batStats().pct + '%'" style="background:#009A44"></div></div></div>
+        <div class="kc"><div class="kv" style="color:#F77F00">{{ batStats().moyen }}</div><div class="kl">État moyen</div></div>
+        <div class="kc"><div class="kv" style="color:#E24B4A">{{ batStats().degrade }}</div><div class="kl">Dégradé</div></div>
       </div>
+      @if (toast.get('bat')?.visible) { <div class="toast on"><i class="ti ti-check"></i>{{ toast.get('bat')?.message }}</div> }
+      <div class="sl">Enregistrer un bâtiment</div>
+      <div class="row3">
+        <div class="fg"><div class="lbl">Nom du bâtiment <span class="req">*</span></div><input [(ngModel)]="bat.nom" placeholder="Ex: Hôtel de Ville"></div>
+        <div class="fg"><div class="lbl">Superficie (m²)</div><input type="number" [(ngModel)]="bat.superficie" placeholder="Ex: 1200"></div>
+        <div class="fg"><div class="lbl">Valeur actuelle (FCFA)</div><input type="number" [(ngModel)]="bat.valeurActuelle" placeholder="Ex: 920000000"></div>
+      </div>
+      <div class="row3">
+        <div class="fg"><div class="lbl">Affectation</div><input [(ngModel)]="bat.affectation" placeholder="Ex: Administration"></div>
+        <div class="fg"><div class="lbl">État</div>
+          <select [(ngModel)]="bat.etat"><option value="bon">Bon</option><option value="moyen">Moyen</option><option value="degrade">Dégradé</option></select>
+        </div>
+        <div class="fg"><div class="lbl">Dernière inspection</div><input type="date" [(ngModel)]="bat.derniereInspection"></div>
+      </div>
+      <div class="fa"><button class="bp" [disabled]="saving()" (click)="enregistrerBatiment()"><i class="ti ti-check"></i>Enregistrer le bâtiment</button></div>
+      <div class="sl" style="margin-top:.75rem">Registre des bâtiments</div>
       <div style="overflow-x:auto">
         <table class="tbl" style="table-layout:fixed;min-width:580px">
           <thead><tr>
             <th style="width:26%">Bâtiment</th><th style="width:12%">Superficie</th>
             <th style="width:18%">Valeur actuelle (FCFA)</th><th style="width:16%">Affectation</th>
-            <th style="width:10%">État</th><th style="width:10%">Inspection</th><th style="width:8%"></th>
+            <th style="width:10%">État</th><th style="width:10%">Inspection</th>
           </tr></thead>
           <tbody>
-            <tr><td class="bold">Hôtel de Ville</td><td>1 200 m²</td><td class="right bold">920 000 000</td><td>Administration</td><td><span class="chip cv">Bon</span></td><td>10/03/2025</td><td><button class="bti bl"><i class="ti ti-eye"></i></button></td></tr>
-            <tr><td class="bold">École Primaire Cocody</td><td>800 m²</td><td class="right bold">280 000 000</td><td>Éducation</td><td><span class="chip cw">Moyen</span></td><td>20/11/2024</td><td><button class="bti bl"><i class="ti ti-eye"></i></button></td></tr>
-            <tr><td class="bold">Centre de Santé</td><td>450 m²</td><td class="right bold">180 000 000</td><td>Santé</td><td><span class="chip cv">Bon</span></td><td>15/01/2025</td><td><button class="bti bl"><i class="ti ti-eye"></i></button></td></tr>
-            <tr><td class="bold">École Maternelle Yopougon</td><td>360 m²</td><td class="right bold">95 000 000</td><td>Éducation</td><td><span class="chip cv">Bon</span></td><td>28/02/2025</td><td><button class="bti bl"><i class="ti ti-eye"></i></button></td></tr>
-            <tr><td class="bold">Centre Social Abobo</td><td>620 m²</td><td class="right bold">85 000 000</td><td>Action sociale</td><td><span class="chip ce">Dégradé</span></td><td>12/06/2024</td><td><button class="bti wn"><i class="ti ti-alert-triangle"></i></button></td></tr>
+            @for (b of pat.batiments(); track b.id) {
+              <tr>
+                <td class="bold">{{ b.nom }}</td>
+                <td>{{ b.superficie | number:'1.0-0' }} m²</td>
+                <td class="right bold">{{ b.valeurActuelle | fcfa }}</td>
+                <td>{{ b.affectation || '—' }}</td>
+                <td><span class="chip" [ngClass]="chipEtat(b.etat)">{{ etatLabel(b.etat) }}</span></td>
+                <td>{{ b.derniereInspection || '—' }}</td>
+              </tr>
+            }
+            @empty {
+              <tr><td colspan="6" style="text-align:center;padding:1.5rem;font-style:italic;font-size:12px;color:var(--color-text-secondary)">Aucun bâtiment enregistré</td></tr>
+            }
           </tbody>
         </table>
       </div>
@@ -109,20 +136,47 @@ type Tab = 'terrains' | 'batiments' | 'marches' | 'centres';
 <!-- ── Marchés ────────────────────────────────────────────────────────── -->
 @if (activeTab() === 'marches') {
   <div class="card">
-    <div class="ch"><h3><i class="ti ti-basket"></i>Marchés municipaux</h3></div>
+    <div class="ch">
+      <h3><i class="ti ti-basket"></i>Marchés municipaux</h3>
+      <button class="bs" (click)="pat.exportLocal(pat.marches(), 'marches')"><i class="ti ti-download"></i>Exporter</button>
+    </div>
     <div class="pb">
       <div class="kg" style="margin-bottom:.75rem">
-        <div class="kc"><div class="kv" style="color:#C9A84C">4</div><div class="kl">Marchés communaux</div></div>
-        <div class="kc"><div class="kv" style="color:#009A44">3</div><div class="kl">En activité</div></div>
-        <div class="kc"><div class="kv" style="color:#F77F00">1</div><div class="kl">En réhabilitation</div></div>
-        <div class="kc"><div class="kv" style="color:#003366">12 500 000</div><div class="kl">Revenus mensuels (FCFA)</div></div>
+        <div class="kc"><div class="kv" style="color:#C9A84C">{{ marStats().total }}</div><div class="kl">Marchés communaux</div></div>
+        <div class="kc"><div class="kv" style="color:#009A44">{{ marStats().actifs }}</div><div class="kl">En activité</div></div>
+        <div class="kc"><div class="kv" style="color:#F77F00">{{ marStats().rehab }}</div><div class="kl">En réhabilitation</div></div>
+        <div class="kc"><div class="kv" style="color:#003366">{{ marStats().revenus | fcfa }}</div><div class="kl">Revenus mensuels</div></div>
       </div>
+      @if (toast.get('mar')?.visible) { <div class="toast on"><i class="ti ti-check"></i>{{ toast.get('mar')?.message }}</div> }
+      <div class="sl">Enregistrer un marché</div>
+      <div class="row3">
+        <div class="fg"><div class="lbl">Nom du marché <span class="req">*</span></div><input [(ngModel)]="mar.nom" placeholder="Ex: Marché Municipal Central"></div>
+        <div class="fg"><div class="lbl">Superficie (m²)</div><input type="number" [(ngModel)]="mar.superficie" placeholder="Ex: 3500"></div>
+        <div class="fg"><div class="lbl">Nombre de boutiques</div><input type="number" [(ngModel)]="mar.nombreBoutiques" placeholder="Ex: 247"></div>
+      </div>
+      <div class="row2">
+        <div class="fg"><div class="lbl">Loyer moyen / boutique (FCFA)</div><input type="number" [(ngModel)]="mar.loyerMoyenBoutique" placeholder="Ex: 50000"></div>
+        <div class="fg"><div class="lbl">Statut</div>
+          <select [(ngModel)]="mar.statut"><option value="actif">Actif</option><option value="rehabilitation">En réhabilitation</option><option value="ferme">Fermé</option></select>
+        </div>
+      </div>
+      <div class="fa"><button class="bp" [disabled]="saving()" (click)="enregistrerMarche()"><i class="ti ti-check"></i>Enregistrer le marché</button></div>
+      <div class="sl" style="margin-top:.75rem">Registre des marchés</div>
       <table class="tbl"><thead><tr><th>Marché</th><th>Superficie</th><th>Boutiques</th><th>Loyer moyen/boutique</th><th>Revenus mensuels</th><th>Statut</th></tr></thead>
       <tbody>
-        <tr><td class="bold">Marché Municipal Central</td><td>3 500 m²</td><td>247</td><td class="right">50 000</td><td class="right bold" style="color:#009A44">12 350 000</td><td><span class="chip cv">Actif</span></td></tr>
-        <tr><td class="bold">Marché de Gros Abobo</td><td>2 800 m²</td><td>182</td><td class="right">35 000</td><td class="right bold" style="color:#009A44">6 370 000</td><td><span class="chip cv">Actif</span></td></tr>
-        <tr><td class="bold">Marché Artisanal Cocody</td><td>1 200 m²</td><td>88</td><td class="right">28 000</td><td class="right bold" style="color:#009A44">2 464 000</td><td><span class="chip cv">Actif</span></td></tr>
-        <tr><td class="bold">Marché Bétail Port-Bouët</td><td>5 000 m²</td><td>0</td><td class="right">—</td><td class="right bold" style="color:#F77F00">0</td><td><span class="chip cw">Réhabilitation</span></td></tr>
+        @for (m of pat.marches(); track m.id) {
+          <tr>
+            <td class="bold">{{ m.nom }}</td>
+            <td>{{ m.superficie | number:'1.0-0' }} m²</td>
+            <td>{{ m.nombreBoutiques }}</td>
+            <td class="right">{{ m.loyerMoyenBoutique | fcfa }}</td>
+            <td class="right bold" style="color:#009A44">{{ m.revenusMensuels | fcfa }}</td>
+            <td><span class="chip" [ngClass]="chipMarche(m.statut)">{{ m.statut }}</span></td>
+          </tr>
+        }
+        @empty {
+          <tr><td colspan="6" style="text-align:center;padding:1.5rem;font-style:italic;font-size:12px;color:var(--color-text-secondary)">Aucun marché enregistré</td></tr>
+        }
       </tbody></table>
     </div>
   </div>
@@ -131,21 +185,46 @@ type Tab = 'terrains' | 'batiments' | 'marches' | 'centres';
 <!-- ── Centres communautaires ─────────────────────────────────────────── -->
 @if (activeTab() === 'centres') {
   <div class="card">
-    <div class="ch"><h3><i class="ti ti-heart-handshake"></i>Centres communautaires</h3></div>
+    <div class="ch">
+      <h3><i class="ti ti-heart-handshake"></i>Centres communautaires</h3>
+      <button class="bs" (click)="pat.exportLocal(pat.centres(), 'centres')"><i class="ti ti-download"></i>Exporter</button>
+    </div>
     <div class="pb">
       <div class="kg" style="margin-bottom:.75rem">
-        <div class="kc"><div class="kv" style="color:#C9A84C">6</div><div class="kl">Centres communautaires</div></div>
-        <div class="kc"><div class="kv" style="color:#009A44">5</div><div class="kl">Opérationnels</div></div>
-        <div class="kc"><div class="kv" style="color:#185FA5">1 240</div><div class="kl">Capacité totale (pers.)</div></div>
-        <div class="kc"><div class="kv" style="color:#F77F00">1</div><div class="kl">En travaux</div></div>
+        <div class="kc"><div class="kv" style="color:#C9A84C">{{ cenStats().total }}</div><div class="kl">Centres communautaires</div></div>
+        <div class="kc"><div class="kv" style="color:#009A44">{{ cenStats().operationnels }}</div><div class="kl">Opérationnels</div></div>
+        <div class="kc"><div class="kv" style="color:#185FA5">{{ cenStats().capacite }}</div><div class="kl">Capacité totale (pers.)</div></div>
+        <div class="kc"><div class="kv" style="color:#F77F00">{{ cenStats().travaux }}</div><div class="kl">En travaux</div></div>
       </div>
+      @if (toast.get('cen')?.visible) { <div class="toast on"><i class="ti ti-check"></i>{{ toast.get('cen')?.message }}</div> }
+      <div class="sl">Enregistrer un centre</div>
+      <div class="row3">
+        <div class="fg"><div class="lbl">Nom du centre <span class="req">*</span></div><input [(ngModel)]="cen.nom" placeholder="Ex: Centre Culturel Municipal"></div>
+        <div class="fg"><div class="lbl">Quartier</div><input [(ngModel)]="cen.quartier" placeholder="Ex: Cocody Centre"></div>
+        <div class="fg"><div class="lbl">Capacité (personnes)</div><input type="number" [(ngModel)]="cen.capacite" placeholder="Ex: 450"></div>
+      </div>
+      <div class="row2">
+        <div class="fg"><div class="lbl">Services offerts</div><input [(ngModel)]="cen.services" placeholder="Ex: Culture, expositions, concerts"></div>
+        <div class="fg"><div class="lbl">Statut</div>
+          <select [(ngModel)]="cen.statut"><option value="operationnel">Opérationnel</option><option value="travaux">En travaux</option></select>
+        </div>
+      </div>
+      <div class="fa"><button class="bp" [disabled]="saving()" (click)="enregistrerCentre()"><i class="ti ti-check"></i>Enregistrer le centre</button></div>
+      <div class="sl" style="margin-top:.75rem">Registre des centres</div>
       <table class="tbl"><thead><tr><th>Centre</th><th>Quartier</th><th>Capacité</th><th>Services offerts</th><th>État</th></tr></thead>
       <tbody>
-        <tr><td class="bold">Centre Culturel Municipal</td><td>Cocody Centre</td><td>450</td><td>Culture, expositions, concerts</td><td><span class="chip cv">Opérationnel</span></td></tr>
-        <tr><td class="bold">Centre Social Abobo</td><td>Abobo Est</td><td>200</td><td>Aide sociale, formations</td><td><span class="chip ce">Travaux</span></td></tr>
-        <tr><td class="bold">Maison des Femmes</td><td>Yopougon</td><td>150</td><td>Alphabétisation, microfinance</td><td><span class="chip cv">Opérationnel</span></td></tr>
-        <tr><td class="bold">Centre Jeunesse</td><td>Adjamé</td><td>280</td><td>Sport, informatique, loisirs</td><td><span class="chip cv">Opérationnel</span></td></tr>
-        <tr><td class="bold">Espace Senior</td><td>Marcory</td><td>80</td><td>Activités, soins, rencontres</td><td><span class="chip cv">Opérationnel</span></td></tr>
+        @for (c of pat.centres(); track c.id) {
+          <tr>
+            <td class="bold">{{ c.nom }}</td>
+            <td>{{ c.quartier || '—' }}</td>
+            <td>{{ c.capacite }}</td>
+            <td>{{ c.services || '—' }}</td>
+            <td><span class="chip" [ngClass]="c.statut === 'operationnel' ? 'cv' : 'ce'">{{ c.statut === 'operationnel' ? 'Opérationnel' : 'Travaux' }}</span></td>
+          </tr>
+        }
+        @empty {
+          <tr><td colspan="5" style="text-align:center;padding:1.5rem;font-style:italic;font-size:12px;color:var(--color-text-secondary)">Aucun centre enregistré</td></tr>
+        }
       </tbody></table>
     </div>
   </div>
@@ -167,6 +246,9 @@ export class ImmobilierComponent implements OnInit {
   ];
 
   ter = { localisation: '', superficie: null as number|null, valeur: null as number|null, titreFoncier: '', usage: 'Réserve foncière', dateAcquisition: '' };
+  bat = { nom: '', superficie: null as number|null, valeurActuelle: null as number|null, affectation: '', etat: 'bon', derniereInspection: '' };
+  mar = { nom: '', superficie: null as number|null, nombreBoutiques: null as number|null, loyerMoyenBoutique: null as number|null, statut: 'actif' };
+  cen = { nom: '', quartier: '', capacite: null as number|null, services: '', statut: 'operationnel' };
 
   terStats = computed(() => {
     const t = this.pat.terrains();
@@ -178,7 +260,39 @@ export class ImmobilierComponent implements OnInit {
     };
   });
 
-  ngOnInit(): void { this.pat.loadTerrains(); }
+  batStats = computed(() => {
+    const b = this.pat.batiments();
+    const total = b.length;
+    const bon = b.filter(x => x.etat === 'bon').length;
+    return { total, bon, moyen: b.filter(x => x.etat === 'moyen').length, degrade: b.filter(x => x.etat === 'degrade').length, pct: total ? Math.round(bon / total * 100) : 0 };
+  });
+
+  marStats = computed(() => {
+    const m = this.pat.marches();
+    return {
+      total: m.length,
+      actifs: m.filter(x => x.statut === 'actif').length,
+      rehab: m.filter(x => x.statut === 'rehabilitation').length,
+      revenus: m.reduce((s, x) => s + (x.revenusMensuels || 0), 0),
+    };
+  });
+
+  cenStats = computed(() => {
+    const c = this.pat.centres();
+    return {
+      total: c.length,
+      operationnels: c.filter(x => x.statut === 'operationnel').length,
+      travaux: c.filter(x => x.statut === 'travaux').length,
+      capacite: c.reduce((s, x) => s + (x.capacite || 0), 0),
+    };
+  });
+
+  ngOnInit(): void {
+    this.pat.loadTerrains();
+    this.pat.loadBatiments();
+    this.pat.loadMarches();
+    this.pat.loadCentres();
+  }
 
   enregistrerTerrain(): void {
     if (!this.ter.localisation || !this.ter.superficie) { this.toast.show('ter', 'Localisation et superficie sont obligatoires'); return; }
@@ -188,4 +302,35 @@ export class ImmobilierComponent implements OnInit {
       error: () => this.saving.set(false),
     });
   }
+
+  enregistrerBatiment(): void {
+    if (!this.bat.nom) { this.toast.show('bat', 'Le nom du bâtiment est obligatoire'); return; }
+    this.saving.set(true);
+    this.pat.enregistrerBatiment({ nom: this.bat.nom, superficie: this.bat.superficie ?? undefined, valeurActuelle: this.bat.valeurActuelle ?? undefined, affectation: this.bat.affectation || undefined, etat: this.bat.etat, derniereInspection: this.bat.derniereInspection || undefined }).subscribe({
+      next: () => { this.toast.show('bat', `Bâtiment enregistré — ${this.bat.nom}`); this.saving.set(false); this.bat = { nom: '', superficie: null, valeurActuelle: null, affectation: '', etat: 'bon', derniereInspection: '' }; },
+      error: () => this.saving.set(false),
+    });
+  }
+
+  enregistrerMarche(): void {
+    if (!this.mar.nom) { this.toast.show('mar', 'Le nom du marché est obligatoire'); return; }
+    this.saving.set(true);
+    this.pat.enregistrerMarche({ nom: this.mar.nom, superficie: this.mar.superficie ?? undefined, nombreBoutiques: this.mar.nombreBoutiques ?? undefined, loyerMoyenBoutique: this.mar.loyerMoyenBoutique ?? undefined, statut: this.mar.statut }).subscribe({
+      next: () => { this.toast.show('mar', `Marché enregistré — ${this.mar.nom}`); this.saving.set(false); this.mar = { nom: '', superficie: null, nombreBoutiques: null, loyerMoyenBoutique: null, statut: 'actif' }; },
+      error: () => this.saving.set(false),
+    });
+  }
+
+  enregistrerCentre(): void {
+    if (!this.cen.nom) { this.toast.show('cen', 'Le nom du centre est obligatoire'); return; }
+    this.saving.set(true);
+    this.pat.enregistrerCentre({ nom: this.cen.nom, quartier: this.cen.quartier || undefined, capacite: this.cen.capacite ?? undefined, services: this.cen.services || undefined, statut: this.cen.statut }).subscribe({
+      next: () => { this.toast.show('cen', `Centre enregistré — ${this.cen.nom}`); this.saving.set(false); this.cen = { nom: '', quartier: '', capacite: null, services: '', statut: 'operationnel' }; },
+      error: () => this.saving.set(false),
+    });
+  }
+
+  chipEtat(e: string): string { return { bon: 'cv', moyen: 'cw', degrade: 'ce' }[e] ?? 'ci'; }
+  etatLabel(e: string): string { return { bon: 'Bon', moyen: 'Moyen', degrade: 'Dégradé' }[e] ?? e; }
+  chipMarche(s: string): string { return { actif: 'cv', rehabilitation: 'cw', ferme: 'ce' }[s] ?? 'ci'; }
 }

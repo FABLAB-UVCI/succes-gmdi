@@ -14,6 +14,7 @@ export interface Bien {
   dateAcquisition: string;
   affectation: string;
   statut: StatutBien;
+  etat?: string | null;
   tauxAmortissement: number;
   qrCode?: string;
 }
@@ -61,8 +62,18 @@ export interface Marche {
   superficie: number;
   nombreBoutiques: number;
   loyerMoyenBoutique: number;
-  revenusMenusuels: number;
+  revenusMensuels: number;
   statut: 'actif' | 'rehabilitation' | 'ferme';
+}
+
+// ── Centre communautaire ─────────────────────────────────────────────────────
+export interface CentreCommunautaire {
+  id: string;
+  nom: string;
+  quartier: string;
+  capacite: number;
+  services: string;
+  statut: 'operationnel' | 'travaux';
 }
 
 // ── Affectation ───────────────────────────────────────────────────────────────

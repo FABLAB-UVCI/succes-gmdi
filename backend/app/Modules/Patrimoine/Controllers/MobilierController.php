@@ -32,6 +32,7 @@ class MobilierController extends Controller
             'date_acquisition'   => $v['date_acquisition'] ?? now()->format('Y-m-d'),
             'affectation'        => $v['localisation'],
             'statut'             => 'disponible',
+            'etat'               => $v['etat'] ?? 'bon',
             'taux_amortissement' => 20,
             'qr_code'            => 'QR-' . $ref,
         ]);

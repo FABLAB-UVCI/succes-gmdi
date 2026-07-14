@@ -12,6 +12,9 @@ use App\Modules\Patrimoine\Controllers\EntretienController;
 use App\Modules\Patrimoine\Controllers\ReparationController;
 use App\Modules\Patrimoine\Controllers\AmortissementController;
 use App\Modules\Patrimoine\Controllers\StatsPatrimoineController;
+use App\Modules\Patrimoine\Controllers\BatimentController;
+use App\Modules\Patrimoine\Controllers\MarcheController;
+use App\Modules\Patrimoine\Controllers\CentreController;
 
 // ── Auth publique ─────────────────────────────────────────────────────────────
 // ── Routes protégées ──────────────────────────────────────────────────────────
@@ -83,6 +86,30 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('patrimoine/amortissements')->group(function () {
         Route::get('/',        [AmortissementController::class, 'index']);
         Route::post('/simuler',[AmortissementController::class, 'simuler']);
+    });
+
+    // ── Bâtiments communaux ───────────────────────────────────────────────────
+    Route::prefix('patrimoine/batiments')->group(function () {
+        Route::get('/',        [BatimentController::class, 'index']);
+        Route::post('/',       [BatimentController::class, 'store']);
+        Route::put('/{id}',    [BatimentController::class, 'update']);
+        Route::delete('/{id}', [BatimentController::class, 'destroy']);
+    });
+
+    // ── Marchés municipaux ────────────────────────────────────────────────────
+    Route::prefix('patrimoine/marches')->group(function () {
+        Route::get('/',        [MarcheController::class, 'index']);
+        Route::post('/',       [MarcheController::class, 'store']);
+        Route::put('/{id}',    [MarcheController::class, 'update']);
+        Route::delete('/{id}', [MarcheController::class, 'destroy']);
+    });
+
+    // ── Centres communautaires ────────────────────────────────────────────────
+    Route::prefix('patrimoine/centres')->group(function () {
+        Route::get('/',        [CentreController::class, 'index']);
+        Route::post('/',       [CentreController::class, 'store']);
+        Route::put('/{id}',    [CentreController::class, 'update']);
+        Route::delete('/{id}', [CentreController::class, 'destroy']);
     });
 
     // ── Statistiques & export ─────────────────────────────────────────────────

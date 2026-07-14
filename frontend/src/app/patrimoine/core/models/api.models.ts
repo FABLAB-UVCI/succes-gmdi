@@ -39,6 +39,7 @@ export interface BienApi {
   date_acquisition: string;
   affectation: string;
   statut: string;
+  etat: string | null;
   taux_amortissement: number;
   qr_code: string;
   created_at: string;
@@ -211,6 +212,66 @@ export interface AmortissementApi {
   annee_debut: number;
   amortissement_cumule: number;
   valeur_nette: number;
+}
+
+// ── Bâtiment ──────────────────────────────────────────────────────────────────
+export interface BatimentApi {
+  id: number;
+  nom: string;
+  superficie: number | null;
+  valeur_actuelle: number;
+  affectation: string | null;
+  etat: string;
+  derniere_inspection: string | null;
+  created_at: string;
+}
+
+export interface BatimentCreateRequest {
+  nom: string;
+  superficie?: number;
+  valeur_actuelle?: number;
+  affectation?: string;
+  etat?: string;
+  derniere_inspection?: string;
+}
+
+// ── Marché ────────────────────────────────────────────────────────────────────
+export interface MarcheApi {
+  id: number;
+  nom: string;
+  superficie: number | null;
+  nombre_boutiques: number;
+  loyer_moyen_boutique: number;
+  revenus_mensuels: number;
+  statut: string;
+  created_at: string;
+}
+
+export interface MarcheCreateRequest {
+  nom: string;
+  superficie?: number;
+  nombre_boutiques?: number;
+  loyer_moyen_boutique?: number;
+  statut?: string;
+}
+
+// ── Centre communautaire ─────────────────────────────────────────────────────
+export interface CentreApi {
+  id: number;
+  nom: string;
+  quartier: string | null;
+  capacite: number;
+  services: string | null;
+  statut: string;
+  created_at: string;
+}
+
+export interface CentreCreateRequest {
+  nom: string;
+  quartier?: string;
+  capacite?: number;
+  services?: string;
+  statut?: string;
 }
 
 // ── Statistiques ─────────────────────────────────────────────────────────────

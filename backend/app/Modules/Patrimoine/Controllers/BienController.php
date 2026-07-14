@@ -181,6 +181,7 @@ class BienController extends Controller
             'date_acquisition'    => $b->date_acquisition?->format('Y-m-d'),
             'affectation'         => $b->affectation,
             'statut'              => $b->statut,
+            'etat'                => $b->etat,
             'taux_amortissement'  => $b->taux_amortissement,
             'qr_code'             => $b->qr_code,
             'created_at'          => $b->created_at?->toISOString(),
