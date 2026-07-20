@@ -36,7 +36,7 @@ interface ModuleCard { titre: string; description: string; route: string; icone:
   </div>
 
   <footer class="portal-foot">
-    <span>GMDI v2.0</span><span class="sep">·</span><span>UVCI — FabLab</span>
+    <span>GMDI v1.0</span><span class="sep">·</span><span>UVCI — FabLab</span>
   </footer>
 </div>
 
