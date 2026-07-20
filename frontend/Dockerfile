@@ -10,9 +10,10 @@ RUN npm run build:prod
 
 FROM node:24-alpine AS runtime
 WORKDIR /app
-RUN npm install -g serve@14
 COPY --from=build /app/dist/gmdi-communication/browser ./browser
+COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/package.json ./package.json
 
-EXPOSE 4200
+EXPOSE 3000
 
-CMD ["sh", "-c", "serve -s browser -l ${PORT:-4200}"]
+CMD ["sh", "-c", "npx serve -s browser -l ${PORT:-3000}"]
