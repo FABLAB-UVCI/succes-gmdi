@@ -158,6 +158,70 @@ export type Section = 'inventaire' | 'immobilier' | 'affectation' | 'maintenance
       transition: all .25s;
     }
 
+    /* ── Topbar ── */
+    .top {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: linear-gradient(135deg, #1a3a1f 0%, #1a5c28 100%);
+      padding: 0 1.5rem;
+      height: 65px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.18);
+      border-bottom: 3px solid #F77F00;
+    }
+
+    .tt {
+      color: #ffffff;
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: .2px;
+    }
+
+    .ts {
+      color: rgba(255,255,255,.65);
+      font-size: 10.5px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      margin-top: 2px;
+    }
+
+    .tu {
+      color: white;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255,255,255,.1);
+      border: 1px solid rgba(255,255,255,.2);
+      padding: 6px 14px;
+      border-radius: 30px;
+    }
+
+    .av {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #F77F00, #009A44);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: bold;
+      color: white;
+      box-shadow: 0 2px 6px rgba(0,0,0,.2);
+    }
+
+    .tu-name {
+      line-height: 1.2;
+    }
+    .tu-name div:first-child {
+      font-weight: 600;
+    }
+
     /* ── Overlay ── */
     .overlay {
       position: fixed;
@@ -167,22 +231,86 @@ export type Section = 'inventaire' | 'immobilier' | 'affectation' | 'maintenance
       backdrop-filter: blur(1px);
     }
 
-    /* ── Topbar ── */
-    .top {
-      position: sticky;
-      top: 0;
-      z-index: 100;
+    /* ── Layout ── */
+    .lay {
+      display: flex;
+      position: relative;
+      min-height: calc(100vh - 65px);
     }
 
     /* ── Sidebar ── */
     .sb {
+      width: 240px;
+      background: linear-gradient(180deg, #1a3a1f 0%, #0d2414 100%);
+      padding: 20px 0 40px;
+      border-right: 1px solid rgba(255,255,255,.06);
+      flex-shrink: 0;
       transition: transform .28s cubic-bezier(.4,0,.2,1);
       z-index: 200;
       overflow-y: auto;
+      position: sticky;
+      top: 65px;
+      height: calc(100vh - 65px);
     }
 
-    /* ── Layout ── */
-    .lay { position: relative; }
+    .ss {
+      font-size: 10px;
+      color: rgba(255,255,255,.4);
+      padding: 16px 20px 6px;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+    }
+
+    .si {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 10px 16px;
+      margin: 2px 10px;
+      border-radius: 9px;
+      color: rgba(255,255,255,.65);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid transparent;
+    }
+
+    .si i {
+      font-size: 17px;
+      width: 22px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .si:hover {
+      background: rgba(255,255,255,.08);
+      color: rgba(255,255,255,.9);
+      border-color: rgba(255,255,255,.1);
+    }
+
+    .si.on {
+      background: linear-gradient(90deg, #F77F00, #e06d00);
+      color: white;
+      font-weight: 700;
+      border-color: transparent;
+      box-shadow: 0 3px 10px rgba(247,127,0,.35);
+    }
+
+    /* ── Main content ── */
+    .mn {
+      flex: 1;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      min-width: 0;
+      background: #f8fafc;
+      overflow-y: auto;
+      overflow-x: hidden;
+      height: calc(100vh - 65px);
+    }
 
     /* ── Bouton déconnexion ── */
     .btn-logout {
@@ -217,6 +345,7 @@ export type Section = 'inventaire' | 'immobilier' | 'affectation' | 'maintenance
       justify-content: space-between;
       flex-wrap: wrap;
       gap: .75rem;
+      flex-shrink: 0;
     }
     .phdr-left { display: flex; align-items: center; gap: .75rem; }
     .phdr-icon {
@@ -233,6 +362,56 @@ export type Section = 'inventaire' | 'immobilier' | 'affectation' | 'maintenance
     .phdr-kv    { display: block; font-size: 20px; font-weight: 700; line-height: 1.1; }
     .phdr-kl    { display: block; font-size: 9px; color: #9ca3af; font-weight: 600; letter-spacing: .5px; margin-top: 2px; }
 
+    /* ── Toast ── */
+    .toast-stack {
+      position: fixed;
+      top: 80px;
+      right: 20px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-width: 360px;
+      pointer-events: none;
+    }
+
+    .toast-global {
+      background: #1e293b;
+      color: #f1f5f9;
+      padding: 12px 16px;
+      border-radius: 10px;
+      box-shadow: 0 8px 24px rgba(0,0,0,.25);
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      border-left: 4px solid #3b82f6;
+      pointer-events: auto;
+      animation: slideIn .25s ease;
+    }
+
+    .toast-global.ok {
+      border-left-color: #22c55e;
+    }
+
+    .tg-title { font-weight: 600; font-size: 13px; }
+    .tg-msg   { font-size: 12px; color: rgba(255,255,255,.8); }
+
+    /* ── Animations ── */
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
     /* ── Responsive ── */
     @media (max-width: 900px) {
       .hamburger { display: flex; }
@@ -246,11 +425,14 @@ export type Section = 'inventaire' | 'immobilier' | 'affectation' | 'maintenance
       .sb.open { transform: translateX(0); }
       .tu-name    { display: none; }
       .logout-label { display: none; }
+      .top { padding: 0 1rem; }
     }
+
     @media (max-width: 600px) {
       .phdr { flex-direction: column; align-items: flex-start; }
       .phdr-kpis { width: 100%; justify-content: space-between; }
       .mn { padding: 1rem; }
+      .tu { padding: 5px 10px; }
     }
   `],
 })
