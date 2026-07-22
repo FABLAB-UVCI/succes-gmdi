@@ -39,7 +39,7 @@ import { AuthService } from '../../core/services/auth.service';
       </button>
     </div>
     <div class="login-footer">
-      <span>République de Côte d'Ivoire</span><span>·</span><span>GMDI v2.0</span><span>·</span><span>UVCI — FabLab</span>
+      <span>République de Côte d'Ivoire</span><span>·</span><span>GMDI v1.0</span><span>·</span><span>UVCI — FabLab</span>
     </div>
   </div>
 </div>
