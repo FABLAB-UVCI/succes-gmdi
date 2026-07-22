@@ -118,7 +118,7 @@ import { AuthService } from '../../../core/services/auth.service';
 
       <div class="form-footer">
         <div class="ff-badges">
-          <span class="badge orange">GMDI v2</span>
+          <span class="badge orange">GMDI v1</span>
           <span class="badge vert">Sécurisé</span>
         </div>
         <p>© {{ anneeCourante }} — Mairie de la Commune</p>
