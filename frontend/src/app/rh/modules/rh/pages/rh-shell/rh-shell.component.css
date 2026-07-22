@@ -139,9 +139,9 @@
   transition: transform .28s cubic-bezier(.4,0,.2,1);
   z-index: 200;
   overflow-y: auto;
-  position: sticky;     /* ← AJOUTE ÇA */
-  top: 65px;            /* ← AJOUTE ÇA */
-  height: calc(100vh - 65px); /* ← AJOUTE ÇA (remplace min-height) */
+  position: sticky; 
+  top: 65px;            
+  height: calc(100vh - 65px); 
 }
 
 .sb-sec {
