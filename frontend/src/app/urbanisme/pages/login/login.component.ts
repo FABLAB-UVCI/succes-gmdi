@@ -104,7 +104,7 @@ import { AuthService } from '../../core/services/auth.service';
       </div>
 
       <div class="login-footer">
-        <span>© 2025 GMDI v2.0</span>
+        <span>© 2025 GMDI v1.0</span>
         <span class="sep">·</span>
         <span>UVCI — FabLab</span>
         <span class="sep">·</span>
