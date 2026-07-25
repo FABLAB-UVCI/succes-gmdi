@@ -26,12 +26,30 @@ use App\Modules\Rh\Controllers\DepartController;
 */
 Route::prefix('auth')->group(function () {
     Route::post('login', [AuthController::class, 'login']);
+    Route::post('forgot-password', [AuthController::class, 'forgotPassword']);
+    Route::post('reset-password', [AuthController::class, 'resetPassword']);
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('logout', [AuthController::class, 'logout']);
         Route::post('refresh', [AuthController::class, 'refresh']);
         Route::get('me', [AuthController::class, 'me']);
+        Route::put('change-password', [AuthController::class, 'changePassword']);
     });
+});
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('demarches', [App\Http\Controllers\DemarcheController::class, 'index']);
+    Route::post('demarches', [App\Http\Controllers\DemarcheController::class, 'store']);
+    Route::put('demarches/{demarche}', [App\Http\Controllers\DemarcheController::class, 'update']);
+    Route::get('demarches/{demarche}/document', [App\Http\Controllers\DemarcheController::class, 'downloadDocument']);
+
+    // Notifications citoyen
+    Route::get('notifications', [App\Http\Controllers\NotificationController::class, 'index']);
+    Route::put('notifications/{notification}/read', [App\Http\Controllers\NotificationController::class, 'markRead']);
+    Route::put('notifications/read-all', [App\Http\Controllers\NotificationController::class, 'markAllRead']);
+
+    // Route globale pour le Maire / Admin
+    Route::get('admin/statistiques', [App\Http\Controllers\StatistiquesGlobalesController::class, 'index']);
 });
 
 /*
