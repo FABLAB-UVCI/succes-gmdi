@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+﻿import { Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
@@ -32,7 +32,7 @@ import { AuthService } from '../../../core/services/auth.service';
         </div>
       </div>
 
-      <h1 class="brand-title">GMDI</h1>
+      <h1 class="brand-title">E-Mairie</h1>
       <p class="brand-sub">Gestion Municipale Digitale Intégrée</p>
       <p class="brand-country">République de Côte d'Ivoire</p>
 
@@ -118,7 +118,7 @@ import { AuthService } from '../../../core/services/auth.service';
 
       <div class="form-footer">
         <div class="ff-badges">
-          <span class="badge orange">GMDI v1</span>
+          <span class="badge orange">E-Mairie v1</span>
           <span class="badge vert">Sécurisé</span>
         </div>
         <p>© {{ anneeCourante }} — Mairie de la Commune</p>
@@ -522,3 +522,4 @@ export class LoginComponent {
     });
   }
 }
+

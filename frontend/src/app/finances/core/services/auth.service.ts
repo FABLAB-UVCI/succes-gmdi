@@ -1,12 +1,12 @@
-import { Injectable, signal, computed, inject } from '@angular/core';
+﻿import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { tap } from 'rxjs/operators';
 import { environment } from '@env/environment';
 import { User, LoginRequest, LoginResponse } from '../models/auth.models';
 
-const TOKEN_KEY = 'gmdi_token';
-const USER_KEY  = 'gmdi_user';
+const TOKEN_KEY = 'E-Mairie_token';
+const USER_KEY  = 'E-Mairie_user';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -63,3 +63,4 @@ export class AuthService {
     } catch { return null; }
   }
 }
+

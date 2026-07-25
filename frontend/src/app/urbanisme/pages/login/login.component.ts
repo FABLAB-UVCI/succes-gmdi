@@ -1,4 +1,4 @@
-import { Component, signal, inject } from '@angular/core';
+﻿import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -44,7 +44,7 @@ import { AuthService } from '../../core/services/auth.service';
             <circle cx="16" cy="14" r="3" fill="#F77F00"/>
           </svg>
         </div>
-        <div class="login-title">GMDI — Urbanisme & SIG</div>
+        <div class="login-title">E-Mairie — Urbanisme & SIG</div>
         <div class="login-sub">Direction de l'Urbanisme et du Cadastre</div>
         <div class="login-divider">
           <span class="div-orange"></span>
@@ -104,7 +104,7 @@ import { AuthService } from '../../core/services/auth.service';
       </div>
 
       <div class="login-footer">
-        <span>© 2025 GMDI v1.0</span>
+        <span>© 2025 E-Mairie v1.0</span>
         <span class="sep">·</span>
         <span>UVCI — FabLab</span>
         <span class="sep">·</span>
@@ -425,3 +425,4 @@ export class LoginComponent {
     });
   }
 }
+

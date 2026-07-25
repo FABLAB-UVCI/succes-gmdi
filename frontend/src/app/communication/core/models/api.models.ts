@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────────
-//  Contrats API Laravel ↔ Angular — GMDI Module Communication
+//  Contrats API Laravel ↔ Angular — E-Mairie Module Communication
 // ─────────────────────────────────────────────────────────────────────────────
 
 export interface PaginatedResponse<T> {
@@ -12,7 +12,7 @@ export interface ApiResponse<T = null> { success: boolean; message: string; data
 // ── Auth ──────────────────────────────────────────────────────────────────────
 export interface LoginRequest  { email: string; password: string; }
 export interface LoginResponse { token: string; token_type: 'Bearer'; expires_in: number; user: UserApi; }
-export interface UserApi { id: number; name: string; email: string; role: string; permissions: string[]; }
+export interface UserApi { id: number; name: string; email: string; role: string; roles?: string[]; permissions: string[]; }
 
 // ── Actualités ────────────────────────────────────────────────────────────────
 export interface ActualiteApi {
@@ -115,3 +115,4 @@ export interface StatsCommunicationApi {
   actualites_par_type: { type: string; nb: number }[];
   sms_par_mois: { mois: string; nb: number; taux: number }[];
 }
+

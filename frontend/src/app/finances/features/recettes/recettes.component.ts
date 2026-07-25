@@ -1,4 +1,4 @@
-// src/app/features/recettes/recettes.component.ts
+﻿// src/app/features/recettes/recettes.component.ts
 import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgClass } from '@angular/common';
@@ -355,7 +355,7 @@ export class RecettesComponent implements OnInit {
   }
 
   qrData(): string {
-    return `GMDI-ENCAISSEMENT|REF:${this.enc.ref || 'N/A'}|MONTANT:${this.enc.montant || 0} FCFA|MODE:${this.enc.mode}`;
+    return `E-Mairie-ENCAISSEMENT|REF:${this.enc.ref || 'N/A'}|MONTANT:${this.enc.montant || 0} FCFA|MODE:${this.enc.mode}`;
   }
 
   validerEncaissement(): void {
@@ -379,3 +379,4 @@ export class RecettesComponent implements OnInit {
     setTimeout(() => this.toastMsg.set(''), isError ? 5000 : 3500);
   }
 }
+

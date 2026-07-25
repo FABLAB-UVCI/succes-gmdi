@@ -11,8 +11,9 @@ import { LoadingService }            from '../../../../core/services/loading.ser
 import { AuthService }               from '../../../../core/services/auth.service';
 import { ToastService }              from '../../../../core/services/toast.service';
 import { AnnoncesMaireComponent } from '../../../../../shared/components/annonces-maire/annonces-maire.component';
+import { DemandesCitoyensComponent } from '../../../../../shared/components/demandes-citoyens.component';
 
-export type Section = 'voirie' | 'eclairage' | 'eau' | 'batiments' | 'interventions' | 'maintenance';
+export type Section = 'voirie' | 'eclairage' | 'eau' | 'batiments' | 'interventions' | 'maintenance' | 'demandes-citoyens';
 
 @Component({
   selector: 'app-st-shell',
@@ -22,6 +23,7 @@ export type Section = 'voirie' | 'eclairage' | 'eau' | 'batiments' | 'interventi
     VoirieComponent, EclairageComponent, EauAssainissementComponent,
     BatimentsComponent, InterventionsComponent, MaintenanceComponent,
     AnnoncesMaireComponent,
+    DemandesCitoyensComponent,
   ],
   template: `
 <div class="root st-shell">
@@ -37,7 +39,7 @@ export type Section = 'voirie' | 'eclairage' | 'eau' | 'batiments' | 'interventi
         <span class="f-or"></span><span class="f-wh"></span><span class="f-gr"></span>
       </div>
       <div>
-        <div class="topbar-title">GMDI — Services Techniques</div>
+        <div class="topbar-title">E-Mairie — Services Techniques</div>
         <div class="topbar-sub">République de Côte d'Ivoire</div>
       </div>
     </div>
@@ -73,7 +75,7 @@ export type Section = 'voirie' | 'eclairage' | 'eau' | 'batiments' | 'interventi
       <div class="sb-logo">
         <div class="sb-logo-badge"><i class="ti ti-building-community"></i></div>
         <div>
-          <div class="sb-logo-text">GMDI</div>
+          <div class="sb-logo-text">E-Mairie</div>
           <div class="sb-logo-sub">Côte d'Ivoire</div>
         </div>
       </div>
@@ -92,6 +94,10 @@ export type Section = 'voirie' | 'eclairage' | 'eau' | 'batiments' | 'interventi
           }
         </div>
       }
+      <div class="sb-sec"><i class="ti ti-inbox"></i>Citoyens</div>
+      <div class="sb-item" [class.act]="active()==='demandes-citoyens'" (click)="navigate('demandes-citoyens')" role="button">
+        <i class="ti ti-inbox"></i>Demandes Citoyens
+      </div>
 
       <app-annonces-maire />
     </nav>
@@ -145,6 +151,9 @@ export type Section = 'voirie' | 'eclairage' | 'eau' | 'batiments' | 'interventi
       @if (active()==='batiments')    { <app-batiments /> }
       @if (active()==='interventions'){ <app-interventions /> }
       @if (active()==='maintenance')  { <app-maintenance /> }
+      @if (active()==='demandes-citoyens') {
+        <app-demandes-citoyens moduleName="services-techniques" moduleLabel="Services Techniques" />
+      }
 
     </main>
   </div>
@@ -315,3 +324,4 @@ export class StShellComponent implements OnInit {
     }
   }
 }
+

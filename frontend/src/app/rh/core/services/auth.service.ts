@@ -1,4 +1,4 @@
-import { Injectable, signal, computed } from '@angular/core';
+﻿import { Injectable, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { tap } from 'rxjs/operators';
@@ -13,8 +13,8 @@ export interface AuthUser {
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly TOKEN_KEY = 'gmdi_token';
-  private readonly USER_KEY  = 'gmdi_user';
+  private readonly TOKEN_KEY = 'E-Mairie_token';
+  private readonly USER_KEY  = 'E-Mairie_user';
 
   private _token  = signal<string | null>(localStorage.getItem(this.TOKEN_KEY));
   private _user   = signal<AuthUser | null>(this._loadUser());
@@ -67,3 +67,4 @@ export class AuthService {
     try { return raw ? JSON.parse(raw) : null; } catch { return null; }
   }
 }
+

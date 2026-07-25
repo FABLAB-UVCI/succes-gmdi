@@ -9,8 +9,9 @@ import { RapportsComponent }   from '../../components/rapports/rapports.componen
 import { RhService }           from '../../../../core/services/rh.service';
 import { AuthService }         from '../../../../core/services/auth.service';
 import { AnnoncesMaireComponent } from '../../../../../shared/components/annonces-maire/annonces-maire.component';
+import { DemandesCitoyensComponent } from '../../../../../shared/components/demandes-citoyens.component';
 
-export type Section = 'personnel' | 'carriere' | 'presence' | 'paie' | 'formation' | 'rapports';
+export type Section = 'personnel' | 'carriere' | 'presence' | 'paie' | 'formation' | 'rapports' | 'demandes-citoyens';
 
 interface NavItem { id: Section; label: string; icon: string; }
 
@@ -22,6 +23,7 @@ interface NavItem { id: Section; label: string; icon: string; }
     PersonnelComponent, CarriereComponent, PresenceComponent,
     PaieComponent, FormationComponent, RapportsComponent,
     AnnoncesMaireComponent,
+    DemandesCitoyensComponent,
   ],
   template: `
 <div class="root">
@@ -34,7 +36,7 @@ interface NavItem { id: Section; label: string; icon: string; }
       </button>
       <div class="tb-flag"><span></span><span></span><span></span></div>
       <div>
-        <div class="tb-title">GMDI — Ressources Humaines</div>
+        <div class="tb-title">E-Mairie — Ressources Humaines</div>
         <div class="tb-sub">République de Côte d'Ivoire</div>
       </div>
     </div>
@@ -61,6 +63,10 @@ interface NavItem { id: Section; label: string; icon: string; }
           <i class="ti {{ item.icon }}" aria-hidden="true"></i>{{ item.label }}
         </div>
       }
+      <div class="sb-sec">Citoyens</div>
+      <div class="sb-it" [class.act]="activeSection() === 'demandes-citoyens'" (click)="navigate('demandes-citoyens')">
+        <i class="ti ti-inbox" aria-hidden="true"></i>Demandes Citoyens
+      </div>
 
       <app-annonces-maire />
     </nav>
@@ -91,6 +97,9 @@ interface NavItem { id: Section; label: string; icon: string; }
       @if (activeSection() === 'paie')      { <app-paie />      }
       @if (activeSection() === 'formation') { <app-formation /> }
       @if (activeSection() === 'rapports')  { <app-rapports />  }
+      @if (activeSection() === 'demandes-citoyens') {
+        <app-demandes-citoyens moduleName="rh" moduleLabel="Ressources Humaines" />
+      }
     </main>
   </div>
 </div>

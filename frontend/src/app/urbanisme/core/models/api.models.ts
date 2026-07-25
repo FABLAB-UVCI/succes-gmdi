@@ -1,5 +1,5 @@
-// ─────────────────────────────────────────────────────────────────────────────
-//  Contrats API Laravel ↔ Angular — GMDI Urbanisme & SIG
+﻿// ─────────────────────────────────────────────────────────────────────────────
+//  Contrats API Laravel ↔ Angular — E-Mairie Urbanisme & SIG
 // ─────────────────────────────────────────────────────────────────────────────
 
 export interface PaginatedResponse<T> {
@@ -219,3 +219,4 @@ export interface StatsUrbanismeApi {
   equipements_par_type: { type: string; nb: number }[];
   projets_avancement: { projet: string; avancement: number; statut: string }[];
 }
+

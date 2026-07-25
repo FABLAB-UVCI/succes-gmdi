@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+﻿import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
@@ -16,7 +16,7 @@ import { AuthService } from '../../core/services/auth.service';
             <span></span><span></span><span></span>
           </div>
           <div>
-            <div class="login-title"><span>GMDI</span> Finances</div>
+            <div class="login-title"><span>E-Mairie</span> Finances</div>
             <div class="login-sub">République de Côte d'Ivoire · Gestion Municipale</div>
           </div>
         </div>
@@ -32,7 +32,7 @@ import { AuthService } from '../../core/services/auth.service';
             <label>Adresse e-mail</label>
             <input
               type="email" name="email" [(ngModel)]="email"
-              placeholder="nom@gmdi.ci" required autocomplete="username"
+              placeholder="nom@E-Mairie.ci" required autocomplete="username"
               [disabled]="chargement()"
             />
           </div>
@@ -202,3 +202,4 @@ export class LoginComponent {
     });
   }
 }
+

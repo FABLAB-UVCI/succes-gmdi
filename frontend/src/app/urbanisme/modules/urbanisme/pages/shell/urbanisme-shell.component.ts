@@ -10,8 +10,9 @@ import { LoadingService }            from '../../../../core/services/loading.ser
 import { AuthService }               from '../../../../core/services/auth.service';
 import { ToastService }              from '../../../../core/services/toast.service';
 import { AnnoncesMaireComponent } from '../../../../../shared/components/annonces-maire/annonces-maire.component';
+import { DemandesCitoyensComponent } from '../../../../../shared/components/demandes-citoyens.component';
 
-export type Section = 'foncier' | 'permis' | 'cartographie' | 'projets' | 'geolocalisation';
+export type Section = 'foncier' | 'permis' | 'cartographie' | 'projets' | 'geolocalisation' | 'demandes-citoyens';
 
 @Component({
   selector: 'app-urbanisme-shell',
@@ -21,6 +22,7 @@ export type Section = 'foncier' | 'permis' | 'cartographie' | 'projets' | 'geolo
     FoncierComponent, PermisComponent, CartographieComponent,
     ProjetsComponent, GeolocalisationComponent,
     AnnoncesMaireComponent,
+    DemandesCitoyensComponent,
   ],
   template: `
 <!-- Overlay mobile pour fermer le sidebar -->
@@ -45,7 +47,7 @@ export type Section = 'foncier' | 'permis' | 'cartographie' | 'projets' | 'geolo
       <div class="topbar-brand">
         <div class="brand-logo">🗺</div>
         <div>
-          <div class="topbar-title">GMDI — Urbanisme & SIG</div>
+          <div class="topbar-title">E-Mairie — Urbanisme & SIG</div>
           <div class="topbar-sub">Direction de l'Urbanisme · Côte d'Ivoire</div>
         </div>
       </div>
@@ -78,7 +80,7 @@ export type Section = 'foncier' | 'permis' | 'cartographie' | 'projets' | 'geolo
           <span class="f-o"></span><span class="f-w"></span><span class="f-g"></span>
         </div>
         <div class="sb-brand">
-          <div class="sb-brand-name">GMDI</div>
+          <div class="sb-brand-name">E-Mairie</div>
           <div class="sb-brand-sub">Urbanisme & SIG</div>
         </div>
         <button class="sb-close" (click)="sidebarOpen.set(false)">✕</button>
@@ -118,6 +120,14 @@ export type Section = 'foncier' | 'permis' | 'cartographie' | 'projets' | 'geolo
             <span>{{ item.label }}</span>
           </div>
         }
+
+        <div class="sb-sec">📬 Citoyens</div>
+        <div class="sb-item" [class.act]="active()==='demandes-citoyens'"
+             (click)="navigate('demandes-citoyens')" role="button" tabindex="0"
+             (keyup.enter)="navigate('demandes-citoyens')">
+          <span class="sb-icon"><i class="ti ti-inbox"></i></span>
+          <span>Demandes Citoyens</span>
+        </div>
       </div>
 
       <app-annonces-maire />
@@ -127,7 +137,7 @@ export type Section = 'foncier' | 'permis' | 'cartographie' | 'projets' | 'geolo
         <div class="sb-footer-flag">🇨🇮</div>
         <div>
           <div style="font-size:11px;font-weight:600;color:#fff">République de Côte d'Ivoire</div>
-          <div style="font-size:10px;color:rgba(255,255,255,.55)">GMDI v2.0 · UVCI FabLab</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.55)">E-Mairie v2.0 · UVCI FabLab</div>
         </div>
       </div>
     </nav>
@@ -176,6 +186,9 @@ export type Section = 'foncier' | 'permis' | 'cartographie' | 'projets' | 'geolo
         @if (active()==='cartographie')   { <app-cartographie /> }
         @if (active()==='projets')        { <app-projets /> }
         @if (active()==='geolocalisation'){ <app-geolocalisation /> }
+        @if (active()==='demandes-citoyens') {
+          <app-demandes-citoyens moduleName="urbanisme" moduleLabel="Urbanisme" />
+        }
       </div>
 
     </main>
@@ -578,3 +591,4 @@ export class UrbanismeShellComponent implements OnInit {
   @HostListener('window:keydown.escape')
   onEsc(): void { this.sidebarOpen.set(false); }
 }
+

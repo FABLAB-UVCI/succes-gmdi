@@ -1,5 +1,5 @@
-// ─────────────────────────────────────────────────────────────────────────────
-//  Contrats API Laravel ↔ Angular — GMDI Module Patrimoine
+﻿// ─────────────────────────────────────────────────────────────────────────────
+//  Contrats API Laravel ↔ Angular — E-Mairie Module Patrimoine
 // ─────────────────────────────────────────────────────────────────────────────
 
 export interface PaginatedResponse<T> {
@@ -288,3 +288,4 @@ export interface StatsPatrimoineApi {
   repartition_statut: { statut: string; nombre: number; valeur: number }[];
   depreciation_categorie: { categorie: string; valeur_brute: number; taux_moyen: number; depreciation_annuelle: number; valeur_nette: number }[];
 }
+

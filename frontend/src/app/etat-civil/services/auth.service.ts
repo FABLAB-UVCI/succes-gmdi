@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+﻿import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { tap } from 'rxjs/operators';
@@ -11,27 +11,27 @@ export class AuthService {
   currentUser = signal<{ name: string; email: string; role: string } | null>(null);
 
   constructor(private http: HttpClient, private router: Router) {
-    const stored = localStorage.getItem('gmdi_user');
+    const stored = localStorage.getItem('E-Mairie_user');
     if (stored) this.currentUser.set(JSON.parse(stored));
   }
 
   login(email: string, password: string) {
     return this.http.post<{ token: string; user: any }>(`${API}/auth/login`, { email, password }).pipe(
       tap(res => {
-        localStorage.setItem('gmdi_token', res.token);
-        localStorage.setItem('gmdi_user', JSON.stringify(res.user));
+        localStorage.setItem('E-Mairie_token', res.token);
+        localStorage.setItem('E-Mairie_user', JSON.stringify(res.user));
         this.currentUser.set(res.user);
       })
     );
   }
 
   logout() {
-    const token = localStorage.getItem('gmdi_token');
+    const token = localStorage.getItem('E-Mairie_token');
     if (token) {
       this.http.post(`${API}/auth/logout`, {}).subscribe();
     }
-    localStorage.removeItem('gmdi_token');
-    localStorage.removeItem('gmdi_user');
+    localStorage.removeItem('E-Mairie_token');
+    localStorage.removeItem('E-Mairie_user');
     this.currentUser.set(null);
     this.router.navigate(['/login']);
   }
@@ -42,10 +42,11 @@ export class AuthService {
   }
 
   isLoggedIn(): boolean {
-    return !!localStorage.getItem('gmdi_token');
+    return !!localStorage.getItem('E-Mairie_token');
   }
 
   getToken(): string | null {
-    return localStorage.getItem('gmdi_token');
+    return localStorage.getItem('E-Mairie_token');
   }
 }
+

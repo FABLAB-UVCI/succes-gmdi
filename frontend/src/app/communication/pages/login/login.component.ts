@@ -15,7 +15,7 @@ import { AuthService } from '../../core/services/auth.service';
     <div class="login-flag"><span class="flag-orange"></span><span class="flag-white"></span><span class="flag-green"></span></div>
     <div class="login-header">
       <div class="login-logo"><i class="ti ti-building-community"></i></div>
-      <div class="login-title">Plateforme GMDI</div>
+      <div class="login-title">Plateforme E-Mairie</div>
       <div class="login-sub">Gestion Municipale Digitale Intégrée — Portail d'accès</div>
     </div>
     <div class="login-body">
@@ -39,7 +39,7 @@ import { AuthService } from '../../core/services/auth.service';
       </button>
     </div>
     <div class="login-footer">
-      <span>République de Côte d'Ivoire</span><span>·</span><span>GMDI v1.0</span><span>·</span><span>UVCI — FabLab</span>
+      <span>République de Côte d'Ivoire</span><span>·</span><span>E-Mairie v1.0</span><span>·</span><span>UVCI — FabLab</span>
     </div>
   </div>
 </div>
@@ -92,15 +92,25 @@ export class LoginComponent {
   showPwd  = signal(false);
 
   constructor() {
-    this.title.setTitle('GMDI — Connexion');
+    this.title.setTitle('E-Mairie — Connexion');
   }
 
   login(): void {
     if (!this.email || !this.password) { this.error.set('Veuillez renseigner vos identifiants.'); return; }
     this.loading.set(true); this.error.set('');
     this.auth.login({ email: this.email, password: this.password }).subscribe({
-      next: () => this.router.navigate(['/accueil']),
+      next: () => {
+        const user = this.auth.currentUser();
+        if (user?.role === 'citoyen' || user?.roles?.includes('citoyen')) {
+          this.auth.logout();
+          this.error.set('Espace réservé aux professionnels. Veuillez vous connecter depuis la page d\'accueil.');
+          this.loading.set(false);
+        } else {
+          this.router.navigate(['/accueil']);
+        }
+      },
       error: (err: Error) => { this.error.set(err.message); this.loading.set(false); }
     });
   }
 }
+

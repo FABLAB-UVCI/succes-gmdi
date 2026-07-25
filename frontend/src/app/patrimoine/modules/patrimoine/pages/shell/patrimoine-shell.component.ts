@@ -13,8 +13,9 @@ import { LoadingService }    from '../../../../core/services/loading.service';
 import { AuthService }       from '../../../../core/services/auth.service';
 import { ToastService }      from '../../../../core/services/toast.service';
 import { AnnoncesMaireComponent } from '../../../../../shared/components/annonces-maire/annonces-maire.component';
+import { DemandesCitoyensComponent } from '../../../../../shared/components/demandes-citoyens.component';
 
-export type Section = 'inventaire' | 'immobilier' | 'affectation' | 'maintenance' | 'amortissement' | 'rapports';
+export type Section = 'inventaire' | 'immobilier' | 'affectation' | 'maintenance' | 'amortissement' | 'rapports' | 'demandes-citoyens';
 
 @Component({
   selector: 'app-patrimoine-shell',
@@ -24,6 +25,7 @@ export type Section = 'inventaire' | 'immobilier' | 'affectation' | 'maintenance
     InventaireComponent, ImmobilierComponent, AffectationComponent,
     MaintenanceComponent, AmortissementComponent, RapportsPatrimoineComponent,
     AnnoncesMaireComponent,
+    DemandesCitoyensComponent,
   ],
   template: `
 <div class="r">
@@ -36,7 +38,7 @@ export type Section = 'inventaire' | 'immobilier' | 'affectation' | 'maintenance
         <span></span><span></span><span></span>
       </button>
       <div>
-        <div class="tt">GMDI — Module Patrimoine Communal</div>
+        <div class="tt">E-Mairie — Module Patrimoine Communal</div>
         <div class="ts">République de Côte d'Ivoire</div>
       </div>
     </div>
@@ -74,6 +76,10 @@ export type Section = 'inventaire' | 'immobilier' | 'affectation' | 'maintenance
           <i class="ti {{ item.icon }}"></i>{{ item.label }}
         </div>
       }
+      <div class="ss">Citoyens</div>
+      <div class="si" [class.on]="activeSection() === 'demandes-citoyens'" (click)="navigate('demandes-citoyens')">
+        <i class="ti ti-inbox"></i>Demandes Citoyens
+      </div>
 
       <app-annonces-maire />
     </nav>
@@ -116,6 +122,9 @@ export type Section = 'inventaire' | 'immobilier' | 'affectation' | 'maintenance
       @if (activeSection() === 'maintenance')   { <app-maintenance />             }
       @if (activeSection() === 'amortissement') { <app-amortissement />           }
       @if (activeSection() === 'rapports')      { <app-rapports-patrimoine />     }
+      @if (activeSection() === 'demandes-citoyens') {
+        <app-demandes-citoyens moduleName="patrimoine" moduleLabel="Patrimoine" />
+      }
     </div>
   </div>
 </div>
@@ -478,3 +487,4 @@ export class PatrimoineShellComponent implements OnInit {
     if (s === 'rapports')      { this.pat.loadStats(); }
   }
 }
+

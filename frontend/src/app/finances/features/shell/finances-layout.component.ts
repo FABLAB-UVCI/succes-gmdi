@@ -10,7 +10,7 @@ import { AnnoncesMaireComponent } from '../../../shared/components/annonces-mair
   standalone: true,
   imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, AnnoncesMaireComponent],
   template: `
-    <div class="gmdi-finances">
+    <div class="E-Mairie-finances">
       <!-- ── Topbar ── -->
       <div class="topbar">
         <div class="tb-brand">
@@ -22,7 +22,7 @@ import { AnnoncesMaireComponent } from '../../../shared/components/annonces-mair
             <span></span><span></span><span></span>
           </div>
           <div>
-            <div class="tb-title"><span>GMDI</span> Finances</div>
+            <div class="tb-title"><span>E-Mairie</span> Finances</div>
             <div class="tb-sub">République de Côte d'Ivoire · Gestion Municipale</div>
           </div>
         </div>
@@ -51,7 +51,7 @@ import { AnnoncesMaireComponent } from '../../../shared/components/annonces-mair
           <div class="sb-logo">
             <div class="sb-logo-icon">💰</div>
             <div class="sb-logo-text">
-              GMDI Finances
+              E-Mairie Finances
               <small>Côte d'Ivoire</small>
             </div>
           </div>
@@ -65,6 +65,9 @@ import { AnnoncesMaireComponent } from '../../../shared/components/annonces-mair
           <a class="sb-item" routerLink="/finances/comptabilite" routerLinkActive="act" (click)="closeSidebar()"><i class="ti ti-calculator"></i>Opérations</a>
           <a class="sb-item" routerLink="/finances/tresorerie" routerLinkActive="act" (click)="closeSidebar()"><i class="ti ti-scale"></i>Trésorerie</a>
           <a class="sb-item" routerLink="/finances/rapports" routerLinkActive="act" (click)="closeSidebar()"><i class="ti ti-report-money"></i>Rapports</a>
+
+          <div class="sb-sec">Citoyens</div>
+          <a class="sb-item" routerLink="/finances/demandes" routerLinkActive="act" (click)="closeSidebar()"><i class="ti ti-inbox"></i>Demandes Citoyens</a>
 
           <app-annonces-maire />
         </nav>
@@ -205,3 +208,4 @@ export class FinancesLayoutComponent {
   toggleSidebar(): void { this.sidebarOpen.update(v => !v); }
   closeSidebar(): void  { this.sidebarOpen.set(false); }
 }
+

@@ -1,5 +1,5 @@
-// ─────────────────────────────────────────────────────────────────────────────
-//  Contrats API Laravel ↔ Angular — GMDI Module Services Techniques
+﻿// ─────────────────────────────────────────────────────────────────────────────
+//  Contrats API Laravel ↔ Angular — E-Mairie Module Services Techniques
 // ─────────────────────────────────────────────────────────────────────────────
 
 export interface PaginatedResponse<T> {
@@ -154,3 +154,4 @@ export interface StatsServicesTechniquesApi {
   demandes_par_statut: { statut: string; nb: number }[];
   maintenance: { planifiees: number; en_retard: number; effectuees_mois: number };
 }
+

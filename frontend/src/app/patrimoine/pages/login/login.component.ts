@@ -1,4 +1,4 @@
-import { Component, signal, inject } from '@angular/core';
+﻿import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -14,7 +14,7 @@ import { LoadingService } from '../../core/services/loading.service';
       <div class="login-card">
         <!-- Logo / Icon -->
         <div class="login-icon">
-          <div class="av-lg">GMDI</div>
+          <div class="av-lg">E-Mairie</div>
         </div>
         
         <!-- Title -->

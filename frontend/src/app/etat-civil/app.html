@@ -2,7 +2,7 @@
 <div class="root">
   <header class="topbar">
     <div>
-      <div class="topbar-title">GMDI — Module État Civil</div>
+      <div class="topbar-title">E-Mairie — Module État Civil</div>
       <div class="topbar-sub">République de Côte d'Ivoire</div>
     </div>
     <div class="topbar-user">
@@ -35,6 +35,10 @@
       </div>
       <div class="sb-item" (click)="verifierQR()">
         <i class="ti ti-qrcode"></i>Vérifier QR
+      </div>
+      <div class="sb-sec">Citoyens</div>
+      <div class="sb-item" [class.act]="currentSection() === 'demandes-citoyens'" (click)="showSection('demandes-citoyens')">
+        <i class="ti ti-inbox"></i>Demandes Citoyens
       </div>
     </nav>
 
@@ -149,6 +153,10 @@
           [adoptions]="db().adoptions || []"
           (imprimer)="onImprimer($event)">
         </app-recherche>
+      }
+
+      @if (currentSection() === 'demandes-citoyens') {
+        <app-demandes-citoyens moduleName="etat-civil" moduleLabel="État Civil"></app-demandes-citoyens>
       }
     </main>
   </div>

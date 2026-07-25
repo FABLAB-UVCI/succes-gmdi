@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { tap, catchError, throwError } from 'rxjs';
 import { environment } from '@env/environment';
 import { LoginRequest, LoginResponse, UserApi } from '../models/api.models';
-const TK='gmdi_token', UK='gmdi_user';
+const TK='E-Mairie_token', UK='E-Mairie_user';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private http=inject(HttpClient); private router=inject(Router);
@@ -23,6 +23,7 @@ export class AuthService {
   /** Reste connecte, revient juste au selecteur de modules. */
   backToModules():void{this.router.navigate(['/accueil']);}
   refreshToken(){return this.http.post<LoginResponse>(`${environment.apiUrl}/auth/refresh`,{}).pipe(tap(r=>{localStorage.setItem(TK,r.token);this._token.set(r.token);}));}
-  private _clear():void{localStorage.removeItem(TK);localStorage.removeItem(UK);this._token.set(null);this._user.set(null);this.router.navigate(['/login']);}
+  private _clear():void{localStorage.removeItem(TK);localStorage.removeItem(UK);this._token.set(null);this._user.set(null);this.router.navigate(['/']);}
   private _load():UserApi|null{try{const r=localStorage.getItem(UK);return r?JSON.parse(r):null;}catch{return null;}}
 }
+

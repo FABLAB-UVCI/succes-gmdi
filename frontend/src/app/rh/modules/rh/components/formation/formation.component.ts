@@ -1,4 +1,4 @@
-import { Component, signal, computed } from '@angular/core';
+﻿import { Component, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RhService } from '../../../../core/services/rh.service';
@@ -41,7 +41,7 @@ interface CritereEval {
       <div class="fr">
         <div class="fg">
           <div class="fl">Intitulé de la formation <span class="req">*</span></div>
-          <input class="fi" [(ngModel)]="fo.titre" placeholder="Ex: Formation GMDI — État Civil">
+          <input class="fi" [(ngModel)]="fo.titre" placeholder="Ex: Formation E-Mairie — État Civil">
         </div>
         <div class="fg">
           <div class="fl">Organisme formateur <span class="req">*</span></div>

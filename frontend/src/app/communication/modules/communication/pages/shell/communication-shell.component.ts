@@ -10,8 +10,9 @@ import { CommunicationService } from '../../../../core/services/communication.se
 import { LoadingService }       from '../../../../core/services/loading.service';
 import { AuthService }          from '../../../../core/services/auth.service';
 import { AnnoncesMaireComponent } from '../../../../../shared/components/annonces-maire/annonces-maire.component';
+import { DemandesCitoyensComponent } from '../../../../../shared/components/demandes-citoyens.component';
 
-export type Section = 'actualites' | 'reseaux' | 'relations' | 'documents' | 'citoyens' | 'sms';
+export type Section = 'actualites' | 'reseaux' | 'relations' | 'documents' | 'citoyens' | 'sms' | 'demandes-citoyens';
 
 @Component({
   selector: 'app-communication-shell',
@@ -21,6 +22,7 @@ export type Section = 'actualites' | 'reseaux' | 'relations' | 'documents' | 'ci
     ActualitesComponent, ReseauxComponent, RelationsComponent,
     DocumentsComponent, CitoyensComponent, SmsComponent,
     AnnoncesMaireComponent,
+    DemandesCitoyensComponent,
   ],
   template: `
 <div class="root">
@@ -33,7 +35,7 @@ export type Section = 'actualites' | 'reseaux' | 'relations' | 'documents' | 'ci
         <span></span><span></span><span></span>
       </button>
       <div>
-        <div class="topbar-title">GMDI — Communication</div>
+        <div class="topbar-title">E-Mairie — Communication</div>
         <div class="topbar-sub">République de Côte d'Ivoire</div>
       </div>
     </div>
@@ -79,6 +81,11 @@ export type Section = 'actualites' | 'reseaux' | 'relations' | 'documents' | 'ci
           }
         </div>
       }
+      <div class="sb-sec">Citoyens</div>
+      <div class="sb-item" [class.act]="active()==='demandes-citoyens'" (click)="navigate('demandes-citoyens')" role="button">
+        <span class="sb-icon-wrap"><i class="ti ti-inbox"></i></span>
+        <span class="sb-label">Demandes Citoyens</span>
+      </div>
 
       <app-annonces-maire />
     </nav>
@@ -132,6 +139,9 @@ export type Section = 'actualites' | 'reseaux' | 'relations' | 'documents' | 'ci
       @if (active()==='documents')   { <app-documents /> }
       @if (active()==='citoyens')    { <app-citoyens /> }
       @if (active()==='sms')         { <app-sms /> }
+      @if (active()==='demandes-citoyens') {
+        <app-demandes-citoyens moduleName="communication" moduleLabel="Communication" />
+      }
 
     </main>
   </div>
@@ -291,3 +301,4 @@ export class CommunicationShellComponent implements OnInit {
     this.closeSidebar();
   }
 }
+

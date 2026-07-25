@@ -2,49 +2,68 @@ import { Routes } from '@angular/router';
 import { authGuard } from './communication/core/guards/auth.guard';
 
 /**
- * Routing unifié GMDI.
- * - Un seul login (partagé) ; le token (`gmdi_token`) est commun à tous les modules.
+ * Routing unifié E-Mairie.
+ * - Un seul login (partagé) ; le token (`E-Mairie_token`) est commun à tous les modules.
  * - Chaque module est chargé en lazy sous son préfixe, protégé par authGuard.
  */
 export const routes: Routes = [
-  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  { path: '', title: 'E-Mairie — Bienvenue', loadComponent: () => import('./public-landing/public-landing.component').then(m => m.PublicLandingComponent) },
 
-  { path: 'login', loadComponent: () => import('./communication/pages/login/login.component').then(m => m.LoginComponent) },
+  { path: 'login', title: 'E-Mairie — Connexion', loadComponent: () => import('./communication/pages/login/login.component').then(m => m.LoginComponent) },
 
-  { path: 'accueil', canActivate: [authGuard], loadComponent: () => import('./portal/portal-home.component').then(m => m.PortalHomeComponent) },
+  { path: 'accueil', title: 'E-Mairie — Portail', canActivate: [authGuard], loadComponent: () => import('./portal/portal-home.component').then(m => m.PortalHomeComponent) },
+
+  // ── Portail Citoyen (sécurisé) ─────────────────────────────────────────
+  { 
+    path: 'citoyen', 
+    title: 'E-Mairie — Espace Citoyen',
+    canActivate: [authGuard], 
+    loadComponent: () => import('./citoyen/citoyen-layout.component').then(m => m.CitoyenLayoutComponent),
+    children: [
+      { path: '', loadComponent: () => import('./citoyen/citoyen-dashboard.component').then(m => m.CitoyenDashboardComponent) },
+      { path: 'demarches', title: 'E-Mairie — Mes Démarches', loadComponent: () => import('./citoyen/citoyen-demarches.component').then(m => m.CitoyenDemarchesComponent) },
+      { path: 'profil', title: 'E-Mairie — Mon Profil', loadComponent: () => import('./citoyen/citoyen-profil.component').then(m => m.CitoyenProfilComponent) },
+      { path: 'notifications', title: 'E-Mairie — Notifications', loadComponent: () => import('./citoyen/citoyen-notifications.component').then(m => m.CitoyenNotificationsComponent) },
+      { path: ':module/demande', title: 'E-Mairie — Nouvelle Demande', loadComponent: () => import('./citoyen/citoyen-demande.component').then(m => m.CitoyenDemandeComponent) }
+    ]
+  },
 
   // ── Communication ───────────────────────────────────────────────────────
-  { path: 'communication', canActivate: [authGuard], loadComponent: () => import('./communication/modules/communication/pages/shell/communication-shell.component').then(m => m.CommunicationShellComponent) },
+  { path: 'communication', title: 'E-Mairie — Communication', canActivate: [authGuard], loadComponent: () => import('./communication/modules/communication/pages/shell/communication-shell.component').then(m => m.CommunicationShellComponent) },
 
   // ── État civil ──────────────────────────────────────────────────────────
-  { path: 'etat-civil', canActivate: [authGuard], loadChildren: () => import('./etat-civil/modules/etat-civil/etat-civil.routes').then(m => m.ETAT_CIVIL_ROUTES) },
+  { path: 'etat-civil', title: 'E-Mairie — État Civil', canActivate: [authGuard], loadChildren: () => import('./etat-civil/modules/etat-civil/etat-civil.routes').then(m => m.ETAT_CIVIL_ROUTES) },
 
   // ── Finances (plusieurs vues) ─────────────────────────────────────────────
   {
-    path: 'finances', canActivate: [authGuard],
+    path: 'finances', title: 'E-Mairie — Finances', canActivate: [authGuard],
     loadComponent: () => import('./finances/features/shell/finances-layout.component').then(m => m.FinancesLayoutComponent),
     children: [
       { path: '', redirectTo: 'budget', pathMatch: 'full' },
-      { path: 'budget',       loadComponent: () => import('./finances/features/budget/budget.component').then(m => m.BudgetComponent) },
-      { path: 'recettes',     loadComponent: () => import('./finances/features/recettes/recettes.component').then(m => m.RecettesComponent) },
-      { path: 'depenses',     loadComponent: () => import('./finances/features/depenses/depenses.component').then(m => m.DepensesComponent) },
-      { path: 'comptabilite', loadComponent: () => import('./finances/features/comptabilite/comptabilite.component').then(m => m.ComptabiliteComponent) },
-      { path: 'tresorerie',   loadComponent: () => import('./finances/features/tresorerie/tresorerie.component').then(m => m.TresorerieComponent) },
-      { path: 'rapports',     loadComponent: () => import('./finances/features/rapports/rapports.component').then(m => m.RapportsComponent) },
+      { path: 'budget',       title: 'E-Mairie — Finances | Budget', loadComponent: () => import('./finances/features/budget/budget.component').then(m => m.BudgetComponent) },
+      { path: 'recettes',     title: 'E-Mairie — Finances | Recettes', loadComponent: () => import('./finances/features/recettes/recettes.component').then(m => m.RecettesComponent) },
+      { path: 'depenses',     title: 'E-Mairie — Finances | Dépenses', loadComponent: () => import('./finances/features/depenses/depenses.component').then(m => m.DepensesComponent) },
+      { path: 'comptabilite', title: 'E-Mairie — Finances | Comptabilité', loadComponent: () => import('./finances/features/comptabilite/comptabilite.component').then(m => m.ComptabiliteComponent) },
+      { path: 'tresorerie',   title: 'E-Mairie — Finances | Trésorerie', loadComponent: () => import('./finances/features/tresorerie/tresorerie.component').then(m => m.TresorerieComponent) },
+      { path: 'rapports',     title: 'E-Mairie — Finances | Rapports', loadComponent: () => import('./finances/features/rapports/rapports.component').then(m => m.RapportsComponent) },
     ]
   },
 
   // ── Patrimoine ────────────────────────────────────────────────────────────
-  { path: 'patrimoine', canActivate: [authGuard], loadComponent: () => import('./patrimoine/modules/patrimoine/pages/shell/patrimoine-shell.component').then(m => m.PatrimoineShellComponent) },
+  { path: 'patrimoine', title: 'E-Mairie — Patrimoine', canActivate: [authGuard], loadComponent: () => import('./patrimoine/modules/patrimoine/pages/shell/patrimoine-shell.component').then(m => m.PatrimoineShellComponent) },
 
   // ── Ressources humaines ─────────────────────────────────────────────────
-  { path: 'rh', canActivate: [authGuard], loadComponent: () => import('./rh/modules/rh/pages/rh-shell/rh-shell.component').then(m => m.RhShellComponent) },
+  { path: 'rh', title: 'E-Mairie — Ressources Humaines', canActivate: [authGuard], loadComponent: () => import('./rh/modules/rh/pages/rh-shell/rh-shell.component').then(m => m.RhShellComponent) },
 
   // ── Services techniques ─────────────────────────────────────────────────
-  { path: 'services-techniques', canActivate: [authGuard], loadComponent: () => import('./services-techniques/modules/services-techniques/pages/shell/st-shell.component').then(m => m.StShellComponent) },
+  { path: 'services-techniques', title: 'E-Mairie — Services Techniques', canActivate: [authGuard], loadComponent: () => import('./services-techniques/modules/services-techniques/pages/shell/st-shell.component').then(m => m.StShellComponent) },
 
   // ── Urbanisme / SIG ─────────────────────────────────────────────────────
-  { path: 'urbanisme', canActivate: [authGuard], loadComponent: () => import('./urbanisme/modules/urbanisme/pages/shell/urbanisme-shell.component').then(m => m.UrbanismeShellComponent) },
+  { path: 'urbanisme', title: 'E-Mairie — Urbanisme', canActivate: [authGuard], loadComponent: () => import('./urbanisme/modules/urbanisme/pages/shell/urbanisme-shell.component').then(m => m.UrbanismeShellComponent) },
 
-  { path: '**', redirectTo: 'login' },
+  { path: 'forgot-password', title: 'E-Mairie — Mot de passe oublié', loadComponent: () => import('./citoyen/forgot-password.component').then(m => m.ForgotPasswordComponent) },
+
+  { path: '404', title: 'E-Mairie — Page introuvable', loadComponent: () => import('./not-found.component').then(m => m.NotFoundComponent) },
+  { path: '**', loadComponent: () => import('./not-found.component').then(m => m.NotFoundComponent) },
 ];
+

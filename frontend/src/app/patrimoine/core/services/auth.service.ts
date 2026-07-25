@@ -1,11 +1,11 @@
-import { Injectable, signal, computed, inject } from '@angular/core';
+﻿import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { tap, catchError, throwError } from 'rxjs';
 import { environment } from '@env/environment';
 import { LoginRequest, LoginResponse, UserApi } from '../models/api.models';
 
-const TK = 'gmdi_token', UK = 'gmdi_user';
+const TK = 'E-Mairie_token', UK = 'E-Mairie_user';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -49,3 +49,4 @@ export class AuthService {
     try { const r = localStorage.getItem(UK); return r ? JSON.parse(r) : null; } catch { return null; }
   }
 }
+

@@ -1,4 +1,4 @@
-import { Component, signal, OnInit, inject } from '@angular/core';
+﻿import { Component, signal, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UrbanismeService } from '../../../../core/services/urbanisme.service';
@@ -84,7 +84,7 @@ type Tab = 'carte' | 'quartiers' | 'voiries' | 'reseaux';
       </div>
 
       <div style="position:absolute;bottom:8px;right:8px;font-size:10px;color:#999">
-        GMDI SIG — Commune d'Abidjan
+        E-Mairie SIG — Commune d'Abidjan
       </div>
     </div>
   </div>
@@ -304,3 +304,4 @@ export class CartographieComponent implements OnInit {
   chipHT(t: string): string      { return { HT:'ce', MT:'cp', BT:'cv' }[t] ?? 'cm'; }
   chipReseau(s: string): string  { return { operationnel:'cv', en_travaux:'cp', hors_service:'ce' }[s] ?? 'cp'; }
 }
+

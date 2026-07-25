@@ -1,8 +1,8 @@
-import { Component } from '@angular/core';
+﻿import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 /**
- * Widget "Annonces du Maire" — affiché dans la sidebar de tous les modules GMDI.
+ * Widget "Annonces du Maire" — affiché dans la sidebar de tous les modules E-Mairie.
  * Composant partagé pour éviter la duplication entre modules (voir communication-shell,
  * son implémentation d'origine).
  */
@@ -67,3 +67,4 @@ export class AnnoncesMaireComponent {
     { id: 4, titre: 'Fête nationale : coupure d\'eau programmée', date: '07 août 2026', urgent: true },
   ];
 }
+

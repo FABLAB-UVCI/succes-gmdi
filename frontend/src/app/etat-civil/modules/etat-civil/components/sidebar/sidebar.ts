@@ -29,6 +29,8 @@ export class SidebarComponent {
     { type: 'item', route: 'statistiques', label: 'Statistiques',    icon: 'ti ti-chart-bar' },
     { type: 'section', label: 'Actions' },
     { type: 'item', route: 'recherche',    label: 'Rechercher acte', icon: 'ti ti-search' },
+    { type: 'section', label: 'Citoyens' },
+    { type: 'item', route: 'demandes',     label: 'Demandes Citoyens', icon: 'ti ti-inbox' },
   ];
 
   navigate(item: MenuItem) {
