@@ -21,4 +21,4 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction --no-script
 
 EXPOSE 3000
 
-CMD ["sh", "-c", "php artisan migrate --force --isolated && (php artisan queue:work --tries=3 --sleep=3 &) && php artisan serve --host=0.0.0.0 --port=${PORT:-3000}"]
+CMD ["sh", "-c", "php artisan migrate --force && (php artisan queue:work --tries=3 --sleep=3 &) && php artisan serve --host=0.0.0.0 --port=${PORT:-3000}"]
