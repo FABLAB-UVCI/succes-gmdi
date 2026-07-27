@@ -1,2 +1,2 @@
-﻿export const environment = { production: true, apiUrl: 'https://E-Mairie-b.voisilab.app' };
+﻿export const environment = { production: true, apiUrl: 'https://e-mairie-b.voisilab.app/api' };
 
