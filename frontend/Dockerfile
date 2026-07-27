@@ -4,6 +4,12 @@
 
 FROM node:24-alpine AS build
 WORKDIR /app
+# Désactive le prompt/ping de télémétrie Angular CLI (peut bloquer indéfiniment
+# sans TTY) et augmente la limite mémoire Node pour éviter un blocage silencieux
+# sur un environnement de build aux ressources restreintes.
+ENV CI=true
+ENV NG_CLI_ANALYTICS=false
+ENV NODE_OPTIONS=--max-old-space-size=4096
 COPY package.json package-lock.json .npmrc ./
 RUN npm ci --no-audit --no-fund
 COPY . .
