@@ -31,7 +31,7 @@
               }
             ],
             "styles": [
-              "node_modules/@tabler/icons-webfont/dist/tabler-icons.min.css",
+              "src/assets/tabler-icons/tabler-icons.min.css",
               "src/styles.css",
               "src/styles/etat-civil.css",
               "src/styles/finances.scss",
