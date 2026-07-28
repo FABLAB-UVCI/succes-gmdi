@@ -6,7 +6,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '@env/environment';
 import { ApiService } from '../../../../services/api.service';
 import { PrintService } from '../../../../services/print.service';
-import { qrVerification, codeVerification, formatDateFr, openPrintWindow } from '../../pdf-utils';
+import { qrVerification, codeVerification, formatDateFr, openPrintWindow, buildFormData } from '../../pdf-utils';
 
 const LABEL_STATUT_DEMARCHE: Record<string, string> = {
   en_attente: 'En attente', en_cours: 'En cours', refuse: 'Refusé'
@@ -121,13 +121,13 @@ export class MariagesComponent implements OnInit {
       this.notify('Veuillez remplir les champs obligatoires (*)');
       return;
     }
-    this.api.createMariage({
+    this.api.createMariage(buildFormData({
       epoux_nom: f.epNom, epoux_prenom: f.epPrenom, epoux_profession: f.epProf, epoux_nationalite: f.epNat,
       epouse_nom: f.esNom, epouse_prenom: f.esPrenom, epouse_profession: f.esProf, epouse_nationalite: f.esNat,
       date_mariage: f.date, lieu_mariage: f.lieu, regime_matrimonial: f.regime,
       temoin1_nom: f.epTemoin, temoin1_profession: f.epTemoinProf,
       temoin2_nom: f.esTemoin, temoin2_profession: f.esTemoinProf
-    }).subscribe({
+    }, [f.cniEpoux, f.cniEpouse, f.cniTemoinEpoux, f.cniTemoinEpouse])).subscribe({
       next: res => {
         this.mariages.update(l => [res, ...l]);
         this.notify(`Mariage enregistré — N° ${res.numero}`);

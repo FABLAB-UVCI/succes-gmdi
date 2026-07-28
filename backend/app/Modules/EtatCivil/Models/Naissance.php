@@ -11,11 +11,12 @@ class Naissance extends Model
         'sexe', 'lieu_naissance', 'commune',
         'pere_nom', 'pere_profession', 'pere_nationalite',
         'mere_nom', 'mere_profession', 'mere_nationalite',
-        'type', 'tribunal', 'date_jugement', 'statut',
+        'type', 'tribunal', 'date_jugement', 'statut', 'pieces_jointes',
     ];
 
     protected $casts = [
         'date_naissance' => 'date',
         'date_jugement' => 'date',
+        'pieces_jointes' => 'array',
     ];
 }

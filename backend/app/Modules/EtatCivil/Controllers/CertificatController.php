@@ -39,11 +39,13 @@ class CertificatController extends Controller
             'acte_reference' => 'nullable|string',
             'demandeur_nom' => 'nullable|string',
             'motif' => 'nullable|string',
+            'files.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240',
         ]);
 
         $data['numero'] = 'CI-CC-' . date('Y') . '-C-' . str_pad(Certificat::count() + 1, 6, '0', STR_PAD_LEFT);
         $data['date_delivrance'] = now();
         $data['statut'] = 'Délivré';
+        $data['pieces_jointes'] = $this->storeUploadedFiles($request);
 
         $certificat = Certificat::create($data);
 
@@ -61,5 +63,21 @@ class CertificatController extends Controller
     {
         $certificat->delete();
         return response()->json(['message' => 'Supprimé']);
+    }
+
+    private function storeUploadedFiles(Request $request): ?array
+    {
+        if (! $request->hasFile('files')) {
+            return null;
+        }
+
+        $pieces = [];
+        foreach ($request->file('files') as $file) {
+            $filename = uniqid() . '_' . $file->getClientOriginalName();
+            $path = $file->storeAs('etat-civil/' . date('Y-m-d'), $filename, 'public');
+            $pieces[] = ['nom' => $file->getClientOriginalName(), 'url' => asset('storage/' . $path)];
+        }
+
+        return $pieces ?: null;
     }
 }

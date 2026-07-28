@@ -11,11 +11,12 @@ class Deces extends Model
     protected $fillable = [
         'numero', 'nom', 'prenom', 'date_naissance', 'date_deces',
         'heure_deces', 'lieu_deces', 'commune',
-        'cause_deces', 'declarant_nom', 'declarant_lien', 'statut',
+        'cause_deces', 'declarant_nom', 'declarant_lien', 'statut', 'pieces_jointes',
     ];
 
     protected $casts = [
         'date_naissance' => 'date',
         'date_deces' => 'date',
+        'pieces_jointes' => 'array',
     ];
 }

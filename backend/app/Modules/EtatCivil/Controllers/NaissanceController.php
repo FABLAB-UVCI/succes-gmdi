@@ -68,6 +68,7 @@ class NaissanceController extends Controller
             'type' => 'nullable|in:Déclaration,Jugement,Adoption',
             'tribunal' => 'nullable|string',
             'date_jugement' => 'nullable|date',
+            'files.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240',
         ]);
 
         $data['prenom'] = $data['prenom'] ?? '';
@@ -75,6 +76,7 @@ class NaissanceController extends Controller
         $lettre = ['Déclaration' => 'N', 'Jugement' => 'J', 'Adoption' => 'A'][$data['type']] ?? 'N';
         $data['numero'] = 'CI-CC-' . date('Y') . "-$lettre-" . str_pad(Naissance::where('type', $data['type'])->count() + 1, 6, '0', STR_PAD_LEFT);
         $data['statut'] = 'Validé';
+        $data['pieces_jointes'] = $this->storeUploadedFiles($request);
 
         $naissance = Naissance::create($data);
 
@@ -103,6 +105,22 @@ class NaissanceController extends Controller
     public function show(Naissance $naissance)
     {
         return response()->json($naissance);
+    }
+
+    private function storeUploadedFiles(Request $request): ?array
+    {
+        if (! $request->hasFile('files')) {
+            return null;
+        }
+
+        $pieces = [];
+        foreach ($request->file('files') as $file) {
+            $filename = uniqid() . '_' . $file->getClientOriginalName();
+            $path = $file->storeAs('etat-civil/' . date('Y-m-d'), $filename, 'public');
+            $pieces[] = ['nom' => $file->getClientOriginalName(), 'url' => asset('storage/' . $path)];
+        }
+
+        return $pieces ?: null;
     }
 
     public function destroy(Naissance $naissance)

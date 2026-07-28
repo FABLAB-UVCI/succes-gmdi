@@ -8,7 +8,7 @@ import { TOUTES_COMMUNES } from '../../../../communes.ci';
 import { TOUTES_TRIBUNAUX } from '../../../../tribunaux.ci';
 import { ApiService } from '../../../../services/api.service';
 import { PrintService } from '../../../../services/print.service';
-import { qrVerification, codeVerification, formatDateFr, formatHeureFr, openPrintWindow } from '../../pdf-utils';
+import { qrVerification, codeVerification, formatDateFr, formatHeureFr, openPrintWindow, buildFormData } from '../../pdf-utils';
 import { genererActeMariagePDF } from '../mariages/mariages';
 import { genererActeDecesPDF } from '../deces/deces';
 
@@ -222,7 +222,7 @@ export class NaissancesComponent implements OnInit {
       type: 'Adoption',
     };
 
-    this.api.createNaissance(payload).subscribe({
+    this.api.createNaissance(buildFormData(payload, [f.piecePereAdoptant, f.pieceMereAdoptante, f.pieceJugement])).subscribe({
       next: (res) => {
         this.naissancesDB = [res, ...this.naissancesDB];
         this.showToast.emit(`Adoption enregistrée pour ${f.enfantNom} — N° ${res.numero}`);
@@ -306,7 +306,7 @@ export class NaissancesComponent implements OnInit {
       mere_nationalite: f.mNat,
     };
 
-    this.api.createNaissance(payload).subscribe({
+    this.api.createNaissance(buildFormData(payload, [f.piecePere, f.pieceMere])).subscribe({
       next: (res) => {
         this.naissancesDB = [res, ...this.naissancesDB];
         this.showToast.emit('Naissance enregistrée avec succès — N° ' + res.numero);
@@ -367,7 +367,7 @@ export class NaissancesComponent implements OnInit {
       type: 'Jugement',
     };
 
-    this.api.createNaissance(payload).subscribe({
+    this.api.createNaissance(buildFormData(payload, [this.jugementForm.pieceIdentite])).subscribe({
       next: (res) => {
         this.naissancesDB = [res, ...this.naissancesDB];
         this.showToast.emit(`Jugement supplétif transcrit sous le N° ${res.numero}`);

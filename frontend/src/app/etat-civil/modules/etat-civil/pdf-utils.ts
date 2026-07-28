@@ -1,6 +1,20 @@
 import QRCode from 'qrcode';
 
 /**
+ * Construit un FormData à partir d'un objet de champs simples et d'une liste
+ * de fichiers (pièces d'identité, jugements...), pour que les pièces jointes
+ * atteignent réellement le backend au lieu d'être perdues côté client.
+ */
+export function buildFormData(payload: Record<string, any>, files: (File | null | undefined)[]): FormData {
+  const fd = new FormData();
+  Object.entries(payload).forEach(([key, value]) => {
+    if (value !== null && value !== undefined) fd.append(key, String(value));
+  });
+  files.filter((f): f is File => !!f).forEach(f => fd.append('files[]', f));
+  return fd;
+}
+
+/**
  * Code de vérification déterministe dérivé du numéro d'acte :
  * un même acte ré-imprimé garde le même code.
  */

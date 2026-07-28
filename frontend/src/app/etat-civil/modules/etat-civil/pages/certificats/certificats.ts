@@ -7,7 +7,7 @@ import { environment } from '@env/environment';
 import { ApiService } from '../../../../services/api.service';
 import { TOUTES_COMMUNES } from '../../../../communes.ci';
 import { PrintService } from '../../../../services/print.service';
-import { qrVerification, codeVerification, formatDateFr, openPrintWindow } from '../../pdf-utils';
+import { qrVerification, codeVerification, formatDateFr, openPrintWindow, buildFormData } from '../../pdf-utils';
 
 const LABEL_STATUT_DEMARCHE: Record<string, string> = {
   en_attente: 'En attente', en_cours: 'En cours', refuse: 'Refusé'
@@ -77,13 +77,14 @@ export class CertificatsComponent implements OnInit {
   delivrer(type: string) {
     this.submitAttempted.set(type);
     let nom = '', prenom = '', acteRef = '', typeLabel = '', dob = '', adresse = '', quartier = '', commune = '', profession = '';
-    if (type === 'Célibat') { nom = this.celibatForm.nom; prenom = this.celibatForm.prenom; acteRef = this.celibatForm.acteRef; dob = this.celibatForm.dob; profession = this.celibatForm.profession; typeLabel = 'Célibat'; }
-    else if (type === 'Résidence') { nom = this.residenceForm.nom; prenom = this.residenceForm.prenom; adresse = this.residenceForm.adresse; quartier = this.residenceForm.quartier; commune = this.residenceForm.commune; typeLabel = 'Résidence'; }
-    else if (type === 'Vie') { nom = this.vieForm.nom; prenom = this.vieForm.prenom; dob = this.vieForm.dob; typeLabel = 'Vie'; }
+    let cni: File | null = null;
+    if (type === 'Célibat') { nom = this.celibatForm.nom; prenom = this.celibatForm.prenom; acteRef = this.celibatForm.acteRef; dob = this.celibatForm.dob; profession = this.celibatForm.profession; typeLabel = 'Célibat'; cni = this.celibatForm.cni; }
+    else if (type === 'Résidence') { nom = this.residenceForm.nom; prenom = this.residenceForm.prenom; adresse = this.residenceForm.adresse; quartier = this.residenceForm.quartier; commune = this.residenceForm.commune; typeLabel = 'Résidence'; cni = this.residenceForm.cni; }
+    else if (type === 'Vie') { nom = this.vieForm.nom; prenom = this.vieForm.prenom; dob = this.vieForm.dob; typeLabel = 'Vie'; cni = this.vieForm.cni; }
 
     if (!nom) { this.notify('Nom du bénéficiaire requis (*)'); return; }
 
-    this.api.createCertificat({ type: typeLabel, beneficiaire_nom: nom, beneficiaire_prenom: prenom, acte_reference: acteRef })
+    this.api.createCertificat(buildFormData({ type: typeLabel, beneficiaire_nom: nom, beneficiaire_prenom: prenom, acte_reference: acteRef }, [cni]))
       .subscribe({
         next: res => {
           this.certificats.update(l => [res, ...l]);

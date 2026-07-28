@@ -63,12 +63,14 @@ class MariageController extends Controller
             'temoin1_profession' => 'nullable|string',
             'temoin2_nom' => 'nullable|string',
             'temoin2_profession' => 'nullable|string',
+            'files.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240',
         ]);
 
         $data['epoux_prenom']  = $data['epoux_prenom']  ?? '';
         $data['epouse_prenom'] = $data['epouse_prenom'] ?? '';
         $data['numero'] = 'CI-CC-' . date('Y') . '-M-' . str_pad(Mariage::count() + 1, 6, '0', STR_PAD_LEFT);
         $data['statut'] = 'Validé';
+        $data['pieces_jointes'] = $this->storeUploadedFiles($request);
 
         $mariage = Mariage::create($data);
 
@@ -97,5 +99,21 @@ class MariageController extends Controller
     {
         $mariage->delete();
         return response()->json(['message' => 'Supprimé']);
+    }
+
+    private function storeUploadedFiles(Request $request): ?array
+    {
+        if (! $request->hasFile('files')) {
+            return null;
+        }
+
+        $pieces = [];
+        foreach ($request->file('files') as $file) {
+            $filename = uniqid() . '_' . $file->getClientOriginalName();
+            $path = $file->storeAs('etat-civil/' . date('Y-m-d'), $filename, 'public');
+            $pieces[] = ['nom' => $file->getClientOriginalName(), 'url' => asset('storage/' . $path)];
+        }
+
+        return $pieces ?: null;
     }
 }

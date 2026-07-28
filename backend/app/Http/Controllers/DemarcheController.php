@@ -66,15 +66,29 @@ class DemarcheController extends Controller
 
         // 2. Génération de PDF selon le type d'acte validé
         $pdfTypes = [
-            "Demande d'acte de naissance" => 'pdf.acte_naissance',
-            "Demande d'acte de mariage"   => 'pdf.acte_mariage',
-            "Demande d'acte de décès"     => 'pdf.acte_deces',
+            "Demande d'acte de naissance"        => 'pdf.acte_naissance',
+            "Demande d'acte de mariage"          => 'pdf.acte_mariage',
+            "Demande d'acte de décès"            => 'pdf.acte_deces',
+            "Certificat de célibat"              => 'pdf.certificat',
+            "Certificat de résidence"            => 'pdf.certificat',
+            "Certificat de vie individuelle"     => 'pdf.certificat',
+            "Jugement supplétif"                 => 'pdf.acte_jugement',
+            "Demande d'adoption"                 => 'pdf.acte_adoption',
+        ];
+        $certifTypeLabels = [
+            "Certificat de célibat"          => 'Célibat',
+            "Certificat de résidence"        => 'Résidence',
+            "Certificat de vie individuelle" => 'Vie',
         ];
 
         if ($demarche->statut === 'valide' && isset($pdfTypes[$demarche->type_demarche])) {
             try {
                 $view     = $pdfTypes[$demarche->type_demarche];
-                $pdf      = \Barryvdh\DomPDF\Facade\Pdf::loadView($view, ['demarche' => $demarche]);
+                $viewData = ['demarche' => $demarche];
+                if (isset($certifTypeLabels[$demarche->type_demarche])) {
+                    $viewData['certifType'] = $certifTypeLabels[$demarche->type_demarche];
+                }
+                $pdf      = \Barryvdh\DomPDF\Facade\Pdf::loadView($view, $viewData);
                 $filename = 'acte_' . $demarche->reference . '.pdf';
                 $path     = 'documents_officiels/' . $filename;
                 \Illuminate\Support\Facades\Storage::disk('public')->put($path, $pdf->output());

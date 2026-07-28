@@ -6,7 +6,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '@env/environment';
 import { ApiService } from '../../../../services/api.service';
 import { PrintService } from '../../../../services/print.service';
-import { qrVerification, codeVerification, formatDateFr, openPrintWindow } from '../../pdf-utils';
+import { qrVerification, codeVerification, formatDateFr, openPrintWindow, buildFormData } from '../../pdf-utils';
 
 const LABEL_STATUT_DEMARCHE: Record<string, string> = {
   en_attente: 'En attente', en_cours: 'En cours', refuse: 'Refusé'
@@ -72,14 +72,14 @@ export class DecesComponent implements OnInit {
     this.submitAttempted.set(true);
     const f = this.decesForm;
     if (!f.nom || !f.prenom || !f.date || !f.lieu) { this.notify('Veuillez remplir les champs obligatoires (*)'); return; }
-    this.api.createDeces({
+    this.api.createDeces(buildFormData({
       nom: f.nom, prenom: f.prenom,
       date_naissance: f.dob || null,
       date_deces: f.date, heure_deces: f.heure,
       lieu_deces: f.lieu, commune: f.commune,
       cause_deces: f.cause,
       declarant_nom: f.declarant, declarant_lien: f.lien
-    }).subscribe({
+    }, [f.cniDefunt, f.certificatDeces, f.cniDeclarant])).subscribe({
       next: res => {
         this.deces.update(l => [res, ...l]);
         this.notify(`Acte de décès enregistré — N° ${res.numero}`);

@@ -13,12 +13,13 @@ class Mariage extends Model
         'epouse_nationalite', 'epouse_profession',
         'date_mariage', 'lieu_mariage', 'commune',
         'regime_matrimonial', 'temoin1_nom', 'temoin1_profession',
-        'temoin2_nom', 'temoin2_profession', 'statut',
+        'temoin2_nom', 'temoin2_profession', 'statut', 'pieces_jointes',
     ];
 
     protected $casts = [
         'date_mariage' => 'date',
         'epoux_date_naissance' => 'date',
         'epouse_date_naissance' => 'date',
+        'pieces_jointes' => 'array',
     ];
 }
