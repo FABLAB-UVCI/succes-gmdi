@@ -50,6 +50,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Route globale pour le Maire / Admin
     Route::get('admin/statistiques', [App\Http\Controllers\StatistiquesGlobalesController::class, 'index']);
+
+    // Annonces du Maire — lecture publique inter-modules (voir PublicAnnoncesController)
+    Route::prefix('public')->group(function () {
+        Route::get('annonces', [App\Http\Controllers\PublicAnnoncesController::class, 'index']);
+    });
 });
 
 /*

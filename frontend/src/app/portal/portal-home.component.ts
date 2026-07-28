@@ -29,6 +29,12 @@ interface ModuleCard { titre: string; description: string; route: string; icone:
     </div>
   </header>
 
+  @if (isMaire()) {
+    <a class="btn-maire-dashboard" routerLink="/maire">
+      <i class="ti ti-speakerphone"></i> Tableau de bord du Maire & Annonces
+    </a>
+  }
+
   @if (isMaire() && stats()) {
     <div class="dashboard-section">
       <h2 class="dash-title"><i class="ti ti-chart-pie"></i> Vue d'ensemble de la commune</h2>
@@ -260,6 +266,14 @@ interface ModuleCard { titre: string; description: string; route: string; icone:
 }
 .foot-logo { font-weight: 800; color: #003366; }
 .foot-sep { color: #F77F00; font-weight: 700; }
+.btn-maire-dashboard {
+  display: flex; align-items: center; justify-content: center; gap: .5rem;
+  max-width: 1100px; margin: 0 auto; padding: .9rem 1.5rem;
+  background: linear-gradient(90deg, #003366, #004fa3); color: #fff;
+  border-radius: 12px; text-decoration: none; font-weight: 700; font-size: .9rem;
+  box-shadow: 0 4px 14px rgba(0,51,102,.2); transition: opacity .15s ease;
+}
+.btn-maire-dashboard:hover { opacity: .9; }
 </style>
   `
 })

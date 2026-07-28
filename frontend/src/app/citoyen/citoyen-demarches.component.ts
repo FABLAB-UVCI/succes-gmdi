@@ -66,6 +66,7 @@ import { CitoyenService, Demarche } from './citoyen.service';
             <th>Statut</th>
             <th>Date création</th>
             <th>Dernière mise à jour</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -83,6 +84,13 @@ import { CitoyenService, Demarche } from './citoyen.service';
               </td>
               <td class="date-cell">{{ d.created_at | date:'dd/MM/yyyy HH:mm' }}</td>
               <td class="date-cell">{{ d.updated_at | date:'dd/MM/yyyy HH:mm' }}</td>
+              <td>
+                @if (peutImprimerExtrait(d)) {
+                  <button class="btn-print" (click)="imprimerExtrait(d)" title="Imprimer l'extrait">
+                    <i class="ti ti-printer"></i> Imprimer
+                  </button>
+                }
+              </td>
             </tr>
           }
         </tbody>
@@ -173,6 +181,13 @@ import { CitoyenService, Demarche } from './citoyen.service';
 }
 .statut-pill { display: inline-block; font-size: .73rem; font-weight: 700; padding: .2rem .65rem; border-radius: 20px; }
 .date-cell { color: #9ba8be; font-size: .78rem; white-space: nowrap; }
+.btn-print {
+  display: inline-flex; align-items: center; gap: .35rem;
+  background: #003366; color: #fff; border: none; border-radius: 8px;
+  padding: .35rem .75rem; font-size: .78rem; font-weight: 700; cursor: pointer;
+  transition: background .15s ease;
+}
+.btn-print:hover { background: #004fa3; }
 </style>
   `,
 })
@@ -216,5 +231,27 @@ export class CitoyenDemarchesComponent implements OnInit {
       'finances': 'Finances', 'services-techniques': 'ST',
     };
     return map[m] ?? m;
+  }
+
+  /**
+   * Seul l'extrait de naissance, une fois validé par l'officier d'état civil,
+   * peut être réimprimé par le citoyen — avec le même modèle que celui utilisé
+   * par le gestionnaire, pour un rendu strictement identique.
+   */
+  peutImprimerExtrait(d: Demarche): boolean {
+    return d.type_demarche === "Demande d'acte de naissance" && (d.statut === 'valide' || d.statut === 'termine');
+  }
+
+  async imprimerExtrait(d: Demarche): Promise<void> {
+    const don: any = d.donnees || {};
+    const { genererExtraitNaissancePDF } = await import('../etat-civil/modules/etat-civil/pages/naissances/naissances');
+    await genererExtraitNaissancePDF({
+      numero: d.reference, nom: don.nom, prenom: don.prenom,
+      dateNaissance: don.date_naissance, heureNaissance: don.heure_naissance, sexe: don.sexe,
+      lieuNaissance: don.lieu_naissance, commune: don.commune,
+      pereNom: don.pere_nom, mereNom: don.mere_nom,
+      pereProf: don.pere_profession, mereProf: don.mere_profession,
+      pereNat: don.pere_nationalite, mereNat: don.mere_nationalite,
+    });
   }
 }

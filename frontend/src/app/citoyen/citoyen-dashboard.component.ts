@@ -56,6 +56,11 @@ interface ModuleInfo { label: string; route: string; ico: string; color: string;
               @if (d.type_demarche) { <span class="dr-type">{{ d.type_demarche }}</span> }
             </div>
             <div class="dr-right">
+              @if (peutImprimerExtrait(d)) {
+                <button class="btn-print" (click)="imprimerExtrait(d)" title="Imprimer l'extrait">
+                  <i class="ti ti-printer"></i> Imprimer
+                </button>
+              }
               @if (d.donnees?.document_officiel) {
                 <a [href]="d.donnees.document_officiel" target="_blank" class="btn-pdf" title="Télécharger le document officiel">
                   <i class="ti ti-download"></i> PDF
@@ -177,6 +182,13 @@ interface ModuleInfo { label: string; route: string; ico: string; color: string;
   text-decoration: none; transition: all 0.2s;
 }
 .btn-pdf:hover { background: #ef4444; color: #fff; }
+.btn-print {
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  background: #003366; color: #fff; border: none;
+  padding: 0.2rem 0.6rem; border-radius: 6px; font-size: 0.75rem; font-weight: 700;
+  cursor: pointer; transition: all 0.2s;
+}
+.btn-print:hover { background: #004fa3; }
 
 /* ── Modules grid ── */
 .modules-grid {
@@ -252,5 +264,27 @@ export class CitoyenDashboardComponent implements OnInit {
   }
   labelStatut(s: string) { return this.citoyenSvc.labelForStatut(s); }
   colorForStatut(s: string) { return this.citoyenSvc.colorForStatut(s); }
+
+  /**
+   * Seul l'extrait de naissance, une fois validé par l'officier d'état civil,
+   * peut être réimprimé par le citoyen — avec le même modèle que celui utilisé
+   * par le gestionnaire, pour un rendu strictement identique.
+   */
+  peutImprimerExtrait(d: Demarche): boolean {
+    return d.type_demarche === "Demande d'acte de naissance" && (d.statut === 'valide' || d.statut === 'termine');
+  }
+
+  async imprimerExtrait(d: Demarche): Promise<void> {
+    const don: any = d.donnees || {};
+    const { genererExtraitNaissancePDF } = await import('../etat-civil/modules/etat-civil/pages/naissances/naissances');
+    await genererExtraitNaissancePDF({
+      numero: d.reference, nom: don.nom, prenom: don.prenom,
+      dateNaissance: don.date_naissance, heureNaissance: don.heure_naissance, sexe: don.sexe,
+      lieuNaissance: don.lieu_naissance, commune: don.commune,
+      pereNom: don.pere_nom, mereNom: don.mere_nom,
+      pereProf: don.pere_profession, mereProf: don.mere_profession,
+      pereNat: don.pere_nationalite, mereNat: don.mere_nationalite,
+    });
+  }
 }
 

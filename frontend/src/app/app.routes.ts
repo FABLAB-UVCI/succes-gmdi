@@ -13,6 +13,9 @@ export const routes: Routes = [
 
   { path: 'accueil', title: 'E-Mairie — Portail', canActivate: [authGuard], loadComponent: () => import('./portal/portal-home.component').then(m => m.PortalHomeComponent) },
 
+  // ── Tableau de bord du Maire ─────────────────────────────────────────────
+  { path: 'maire', title: 'E-Mairie — Maire', canActivate: [authGuard], loadComponent: () => import('./maire/maire-dashboard.component').then(m => m.MaireDashboardComponent) },
+
   // ── Portail Citoyen (sécurisé) ─────────────────────────────────────────
   { 
     path: 'citoyen', 

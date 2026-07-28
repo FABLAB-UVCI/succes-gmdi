@@ -1,10 +1,13 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../communication/core/services/auth.service';
 import { environment } from '@env/environment';
 import { DemandesCitoyensComponent } from '../shared/components/demandes-citoyens.component';
+
+interface AnnonceForm { titre: string; contenu: string; urgent: boolean; }
 
 interface ModuleStat {
   key: string; label: string; ico: string; color: string;
@@ -15,7 +18,7 @@ interface ModuleStat {
 @Component({
   selector: 'app-maire-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink, DemandesCitoyensComponent],
+  imports: [CommonModule, RouterLink, FormsModule, DemandesCitoyensComponent],
   template: `
 <div class="maire">
 
@@ -29,12 +32,37 @@ interface ModuleStat {
       </div>
     </div>
     <div class="topbar-right">
+      <button class="btn-annonce" (click)="ouvrirModalAnnonce()"><i class="ti ti-speakerphone"></i> Nouvelle annonce</button>
       <span class="mayor-name">ðŸ›ï¸ {{ user?.name ?? 'Monsieur le Maire' }}</span>
       <button class="btn-logout" (click)="auth.logout()">DÃ©connexion</button>
     </div>
   </header>
 
   <div class="maire-body">
+
+    <!-- Annonces du Maire -->
+    <section class="annonces-section">
+      <div class="section-head-row">
+        <h2 class="section-title">Mes annonces publiées</h2>
+        <button class="btn-annonce-inline" (click)="ouvrirModalAnnonce()"><i class="ti ti-plus"></i> Publier une annonce</button>
+      </div>
+      @if (mesAnnonces().length === 0) {
+        <div class="ann-empty-card">Aucune annonce publiée pour le moment. Utilisez le bouton ci-dessus pour communiquer avec tous les services.</div>
+      } @else {
+        <div class="ann-list">
+          @for (a of mesAnnonces(); track a.id) {
+            <div class="ann-row" [class.urgent]="a.urgent">
+              <div class="ann-row-head">
+                <span class="ann-row-titre">{{ a.titre }}</span>
+                @if (a.urgent) { <span class="ann-row-badge">Urgent</span> }
+              </div>
+              <p class="ann-row-contenu">{{ a.contenu }}</p>
+              <span class="ann-row-date">{{ a.date | date:'dd MMMM yyyy':'':'fr-FR' }}</span>
+            </div>
+          }
+        </div>
+      }
+    </section>
 
     <!-- KPIs globaux  -->
     <section class="kpi-section">
@@ -111,6 +139,37 @@ interface ModuleStat {
 
   </div>
 </div>
+
+@if (modalAnnonceOuvert()) {
+  <div class="ann-modal-overlay" (click)="fermerModalAnnonce()">
+    <div class="ann-modal" (click)="$event.stopPropagation()">
+      <div class="ann-modal-header">
+        <h3><i class="ti ti-speakerphone"></i> Nouvelle annonce</h3>
+        <button class="ann-modal-close" (click)="fermerModalAnnonce()"><i class="ti ti-x"></i></button>
+      </div>
+      <div class="ann-modal-body">
+        <div class="ann-fg">
+          <label>Titre <span class="req">*</span></label>
+          <input type="text" [(ngModel)]="annonceForm.titre" placeholder="Ex: Coupure d'eau programmée">
+        </div>
+        <div class="ann-fg">
+          <label>Contenu <span class="req">*</span></label>
+          <textarea rows="5" [(ngModel)]="annonceForm.contenu" placeholder="Détails de l'annonce à diffuser à tous les services..."></textarea>
+        </div>
+        <label class="ann-checkbox">
+          <input type="checkbox" [(ngModel)]="annonceForm.urgent"> Marquer comme urgente
+        </label>
+        @if (annonceError()) {
+          <p class="ann-error">{{ annonceError() }}</p>
+        }
+        <button class="ann-submit" [disabled]="publishingAnnonce()" (click)="publierAnnonce()">
+          <i class="ti ti-send"></i> {{ publishingAnnonce() ? 'Publication...' : "Publier l'annonce" }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
 
 <style>
 .maire {
@@ -217,6 +276,51 @@ interface ModuleStat {
 .alert-msg { font-weight: 700; font-size: .88rem; color: #1a1a2e; }
 .alert-sub { font-size: .75rem; color: #7a8aaa; }
 .alert-badge { font-size: .72rem; font-weight: 700; padding: .2rem .65rem; border-radius: 20px; white-space: nowrap; }
+
+/* ── Annonces du Maire ── */
+.btn-annonce {
+  padding: .5rem 1rem; border-radius: 8px;
+  background: rgba(247,127,0,.2); color: #ffb877;
+  border: 1px solid rgba(247,127,0,.35); font-size: .8rem; font-weight: 700; cursor: pointer;
+  display: flex; align-items: center; gap: .4rem; transition: background .15s ease;
+}
+.btn-annonce:hover { background: rgba(247,127,0,.4); }
+.section-head-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1.2rem; flex-wrap: wrap; }
+.section-head-row .section-title { margin: 0; }
+.btn-annonce-inline {
+  padding: .5rem 1rem; border-radius: 8px; border: none; cursor: pointer;
+  background: #F77F00; color: #fff; font-size: .82rem; font-weight: 700;
+  display: flex; align-items: center; gap: .4rem; transition: background .15s ease;
+}
+.btn-annonce-inline:hover { background: #cc6600; }
+.annonces-section { background: #fff; border-radius: 16px; padding: 1.5rem; box-shadow: 0 2px 12px rgba(0,0,0,.06); }
+.ann-empty-card { color: #7a8aaa; font-size: .85rem; padding: 1rem 0; }
+.ann-list { display: flex; flex-direction: column; gap: .8rem; }
+.ann-row { padding: 1rem; border-radius: 10px; background: #f8fafc; border: 1px solid #e2e8f0; border-left: 3px solid #009A44; }
+.ann-row.urgent { border-left-color: #e63946; background: #fff8f0; }
+.ann-row-head { display: flex; align-items: center; justify-content: space-between; gap: .5rem; margin-bottom: .3rem; }
+.ann-row-titre { font-weight: 700; color: #003366; font-size: .92rem; }
+.ann-row-badge { background: #e63946; color: #fff; font-size: .68rem; font-weight: 700; padding: .15rem .5rem; border-radius: 20px; text-transform: uppercase; }
+.ann-row-contenu { color: #334155; font-size: .84rem; margin: 0 0 .4rem; line-height: 1.5; white-space: pre-line; }
+.ann-row-date { font-size: .75rem; color: #94a3b8; }
+
+.ann-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.55); display: flex; align-items: center; justify-content: center; z-index: 2000; backdrop-filter: blur(2px); }
+.ann-modal { background: #fff; width: 500px; max-width: 92vw; border-radius: 14px; box-shadow: 0 20px 60px rgba(0,0,0,.25); overflow: hidden; max-height: 85vh; display: flex; flex-direction: column; }
+.ann-modal-header { padding: 1.1rem 1.5rem; background: linear-gradient(135deg, #003366, #004fa3); color: white; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+.ann-modal-header h3 { margin: 0; font-size: 1rem; display: flex; align-items: center; gap: 8px; }
+.ann-modal-close { background: rgba(255,255,255,.15); border: none; color: white; font-size: 1rem; cursor: pointer; width: 30px; height: 30px; border-radius: 6px; display: flex; align-items: center; justify-content: center; }
+.ann-modal-close:hover { background: rgba(255,255,255,.3); }
+.ann-modal-body { padding: 1.5rem; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem; }
+.ann-fg { display: flex; flex-direction: column; gap: .4rem; }
+.ann-fg label { font-size: .78rem; font-weight: 700; color: #475569; }
+.ann-fg .req { color: #ef4444; }
+.ann-fg input, .ann-fg textarea { padding: .6rem .8rem; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: .88rem; font-family: inherit; outline: none; }
+.ann-fg input:focus, .ann-fg textarea:focus { border-color: #F77F00; box-shadow: 0 0 0 3px rgba(247,127,0,.1); }
+.ann-checkbox { display: flex; align-items: center; gap: .5rem; font-size: .85rem; color: #334155; cursor: pointer; }
+.ann-error { color: #e63946; font-size: .82rem; margin: 0; }
+.ann-submit { padding: .8rem; background: #009A44; color: #fff; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: .4rem; }
+.ann-submit:hover:not(:disabled) { background: #007a36; }
+.ann-submit:disabled { opacity: .6; cursor: not-allowed; }
 </style>
   `,
 })
@@ -224,6 +328,12 @@ export class MaireDashboardComponent implements OnInit {
   readonly auth = inject(AuthService);
   readonly user = this.auth.currentUser();
   private http  = inject(HttpClient);
+
+  mesAnnonces = signal<{ id: number; titre: string; contenu: string; date: string; urgent: boolean }[]>([]);
+  modalAnnonceOuvert = signal(false);
+  publishingAnnonce  = signal(false);
+  annonceError       = signal('');
+  annonceForm: AnnonceForm = { titre: '', contenu: '', urgent: false };
 
   globalKpis = [
     { label: 'DÃ©marches citoyens',  value: 'â€”', ico: 'ðŸ“‹', color: '#003366', trend: 0 },
@@ -311,6 +421,52 @@ export class MaireDashboardComponent implements OnInit {
     // Ici on pourrait rÃ©cupÃ©rer les vrais KPIs via des appels API parallÃ¨les
     // Pour l'instant on affiche la structure prÃªte Ã  recevoir des donnÃ©es
     this.loadKpis();
+    this.loadAnnonces();
+  }
+
+  loadAnnonces(): void {
+    this.http.get<{ data: any[] }>(`${environment.apiUrl}/public/annonces`).subscribe({
+      next: r => this.mesAnnonces.set(r.data),
+      error: () => {},
+    });
+  }
+
+  ouvrirModalAnnonce(): void {
+    this.annonceForm = { titre: '', contenu: '', urgent: false };
+    this.annonceError.set('');
+    this.modalAnnonceOuvert.set(true);
+  }
+
+  fermerModalAnnonce(): void {
+    this.modalAnnonceOuvert.set(false);
+  }
+
+  publierAnnonce(): void {
+    if (!this.annonceForm.titre.trim() || !this.annonceForm.contenu.trim()) {
+      this.annonceError.set('Le titre et le contenu sont obligatoires.');
+      return;
+    }
+    this.publishingAnnonce.set(true);
+    this.annonceError.set('');
+
+    this.http.post(`${environment.apiUrl}/com/actualites`, {
+      type: 'annonce',
+      titre: this.annonceForm.titre.trim(),
+      contenu: this.annonceForm.contenu.trim(),
+      auteur: this.user?.name ?? 'Le Maire',
+      statut: 'publie',
+      categorie: this.annonceForm.urgent ? 'Urgent' : null,
+    }).subscribe({
+      next: () => {
+        this.publishingAnnonce.set(false);
+        this.modalAnnonceOuvert.set(false);
+        this.loadAnnonces();
+      },
+      error: (err) => {
+        this.publishingAnnonce.set(false);
+        this.annonceError.set(err?.error?.message ?? "Impossible de publier l'annonce.");
+      },
+    });
   }
 
   loadKpis(): void {
