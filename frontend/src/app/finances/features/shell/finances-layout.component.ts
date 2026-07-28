@@ -134,30 +134,15 @@ import { AnnoncesMaireComponent } from '../../../shared/components/annonces-mair
     .sidebar-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,.45);
+      background: rgba(0,40,10,.5);
       z-index: 199;
-      backdrop-filter: blur(1px);
     }
 
-    /* ── Sidebar responsive ── */
-    .layout { position: relative; }
-    .sidebar {
-      transition: transform .28s cubic-bezier(.4,0,.2,1);
-      z-index: 200;
-    }
-
-    /* ── Responsive ── */
+    /* ── Responsive (le positionnement/kente de la sidebar vit dans
+       finances.scss ; on ne gère ici que le hamburger et les éléments
+       propres à ce composant) ── */
     @media (max-width: 900px) {
       .hamburger { display: flex; }
-      .sidebar {
-        position: fixed;
-        top: 64px;
-        left: 0;
-        height: calc(100vh - 64px);
-        transform: translateX(-100%);
-        overflow-y: auto;
-      }
-      .sidebar.open { transform: translateX(0); }
       .tb-username  { display: none; }
       .logout-label { display: none; }
     }
