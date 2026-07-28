@@ -225,12 +225,8 @@ export class CitoyenDashboardComponent implements OnInit {
 
   modules: ModuleInfo[] = [
     { label: 'État civil',          desc: 'Naissance, mariage, décès',    route: '/citoyen/etat-civil/demande',          ico: 'ti ti-file-text', color: '#003366' },
-    { label: 'Communication',       desc: 'Réclamations, suggestions',     route: '/citoyen/communication/demande',       ico: 'ti ti-speakerphone', color: '#F77F00' },
-    { label: 'Urbanisme',           desc: 'Permis, parcelles',             route: '/citoyen/urbanisme/demande',           ico: 'ti ti-map-2', color: '#009A44' },
     { label: 'Services techniques', desc: 'Signalement voirie, éclairage', route: '/citoyen/services-techniques/demande', ico: 'ti ti-tool', color: '#e63946' },
-    { label: 'Patrimoine',          desc: 'Autorisation occupation',        route: '/citoyen/patrimoine/demande',          ico: 'ti ti-building-monument', color: '#7a5c3a' },
     { label: 'Finances',            desc: 'Paiements, reçus',              route: '/citoyen/finances/demande',            ico: 'ti ti-cash', color: '#F77F00' },
-    { label: 'Ressources humaines', desc: 'Demandes emploi, stages',       route: '/citoyen/rh/demande',                  ico: 'ti ti-users', color: '#4a5568' },
   ];
 
   ngOnInit(): void {
@@ -248,9 +244,8 @@ export class CitoyenDashboardComponent implements OnInit {
 
   labelModule(m: string): string {
     const map: Record<string, string> = {
-      'communication': 'Communication', 'etat-civil': 'État civil',
-      'finances': 'Finances', 'patrimoine': 'Patrimoine',
-      'rh': 'RH', 'services-techniques': 'Services Techniques', 'urbanisme': 'Urbanisme',
+      'etat-civil': 'État civil',
+      'finances': 'Finances', 'services-techniques': 'Services Techniques',
     };
     return map[m] ?? m;
   }

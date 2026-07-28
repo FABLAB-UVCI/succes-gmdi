@@ -26,13 +26,9 @@ import { CitoyenService, Demarche } from './citoyen.service';
       </select>
       <select class="filter-select" (change)="onModuleFilter($event)">
         <option value="">Tous les modules</option>
-        <option value="communication">Communication</option>
         <option value="etat-civil">État civil</option>
         <option value="finances">Finances</option>
-        <option value="patrimoine">Patrimoine</option>
-        <option value="rh">RH</option>
         <option value="services-techniques">Services Techniques</option>
-        <option value="urbanisme">Urbanisme</option>
       </select>
     </div>
   </div>
@@ -216,9 +212,8 @@ export class CitoyenDemarchesComponent implements OnInit {
 
   labelModule(m: string): string {
     const map: Record<string, string> = {
-      'communication': 'Communication', 'etat-civil': 'État civil',
-      'finances': 'Finances', 'patrimoine': 'Patrimoine',
-      'rh': 'RH', 'services-techniques': 'ST', 'urbanisme': 'Urbanisme',
+      'etat-civil': 'État civil',
+      'finances': 'Finances', 'services-techniques': 'ST',
     };
     return map[m] ?? m;
   }

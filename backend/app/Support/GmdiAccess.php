@@ -17,6 +17,20 @@ final class GmdiAccess
         'urbanisme',
     ];
 
+    /**
+     * Modules pour lesquels un citoyen peut soumettre une démarche depuis le
+     * portail citoyen. Communication, RH, urbanisme et patrimoine sont des
+     * modules internes qui ne concernent pas les citoyens et n'y sont pas
+     * exposés (pour le moment).
+     *
+     * @var list<string>
+     */
+    public const MODULES_CITOYEN = [
+        'etat-civil',
+        'finances',
+        'services-techniques',
+    ];
+
     public static function permissionForModule(string $module): string
     {
         return 'access.'.$module;

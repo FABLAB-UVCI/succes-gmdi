@@ -38,36 +38,11 @@ import { TOUTES_TRIBUNAUX } from '../etat-civil/tribunaux.ci';
             </select>
           </div>
 
-          <div class="type-selector" *ngIf="module === 'communication'">
-            <label>Type de requête :</label>
-            <select [formControl]="typeControl" (change)="onTypeChange()">
-              <option value="Réclamation">Réclamation</option>
-              <option value="Suggestion">Suggestion</option>
-              <option value="Demande d'information">Demande d'information</option>
-            </select>
-          </div>
-
-          <div class="type-selector" *ngIf="module === 'urbanisme'">
-            <label>Type de demande :</label>
-            <select [formControl]="typeControl" (change)="onTypeChange()">
-              <option value="Permis de construire">Permis de construire</option>
-              <option value="Certificat d'urbanisme">Certificat d'urbanisme</option>
-            </select>
-          </div>
-
           <div class="type-selector" *ngIf="module === 'services-techniques'">
             <label>Type de signalement :</label>
             <select [formControl]="typeControl" (change)="onTypeChange()">
               <option value="Voirie et éclairage">Voirie et éclairage</option>
               <option value="Espaces verts">Espaces verts</option>
-            </select>
-          </div>
-          
-          <div class="type-selector" *ngIf="module === 'patrimoine'">
-            <label>Type de demande :</label>
-            <select [formControl]="typeControl" (change)="onTypeChange()">
-              <option value="Occupation du domaine public">Occupation du domaine public</option>
-              <option value="Location de salle">Location de salle</option>
             </select>
           </div>
 
@@ -76,15 +51,6 @@ import { TOUTES_TRIBUNAUX } from '../etat-civil/tribunaux.ci';
             <select [formControl]="typeControl" (change)="onTypeChange()">
               <option value="Paiement de taxe municipale">Paiement de taxe municipale</option>
               <option value="Règlement de facture">Règlement de facture</option>
-            </select>
-          </div>
-
-          <div class="type-selector" *ngIf="module === 'rh'">
-            <label>Type de démarche :</label>
-            <select [formControl]="typeControl" (change)="onTypeChange()">
-              <option value="Candidature spontanée">Candidature spontanée</option>
-              <option value="Réponse à une offre">Réponse à une offre d'emploi</option>
-              <option value="Demande de stage">Demande de stage</option>
             </select>
           </div>
 
@@ -362,43 +328,6 @@ import { TOUTES_TRIBUNAUX } from '../etat-civil/tribunaux.ci';
               </div>
             </ng-container>
 
-            <!-- Champs Communication -->
-            <ng-container *ngIf="module === 'communication'">
-              <div class="fsec ivoire-border">Détails de la requête</div>
-              <div class="form-grid" style="grid-template-columns: 1fr;">
-                <div class="fg"><div class="fl">Sujet principal <span class="req">*</span></div><input type="text" class="fi" formControlName="sujet" placeholder="Titre clair de votre requête"></div>
-              </div>
-              <div class="form-grid" style="grid-template-columns: 1fr;">
-                <div class="fg"><div class="fl">Description / Message <span class="req">*</span></div><textarea class="fi" formControlName="message" rows="5" placeholder="Décrivez votre requête en détail..."></textarea></div>
-              </div>
-              <div class="form-grid" style="grid-template-columns: 1fr;">
-                <div class="fg"><div class="fl">Pièce jointe éventuelle (PDF/JPG)</div><input type="file" class="fi" (change)="onFileSelected($event)"></div>
-              </div>
-            </ng-container>
-
-            <!-- Champs Urbanisme -->
-            <ng-container *ngIf="module === 'urbanisme'">
-              <div class="fsec ivoire-border">Informations sur le terrain</div>
-              <div class="form-grid-3">
-                <div class="fg"><div class="fl">Numéro de parcelle / Lot / Ilot <span class="req">*</span></div><input type="text" class="fi" formControlName="parcelle" placeholder="Ex: Lot 124, Ilot 12"></div>
-                <div class="fg"><div class="fl">Superficie estimée (m²) <span class="req">*</span></div><input type="number" class="fi" formControlName="superficie" placeholder="Ex: 500"></div>
-                <div class="fg"><div class="fl">Usage prévu <span class="req">*</span></div>
-                  <select class="fsel" formControlName="usage">
-                    <option value="">Sélectionner...</option>
-                    <option value="Habitation">Habitation</option>
-                    <option value="Commercial">Commercial</option>
-                    <option value="Mixte">Mixte</option>
-                  </select>
-                </div>
-              </div>
-              <div class="fsec ivoire-border">Description du projet</div>
-              <div class="form-grid" style="grid-template-columns: 1fr;">
-                <div class="fg"><div class="fl">Détails de la construction <span class="req">*</span></div><textarea class="fi" formControlName="description" rows="4" placeholder="Construction d'un immeuble R+2 à usage d'habitation..."></textarea></div>
-              </div>
-              <div class="form-grid" style="grid-template-columns: 1fr;">
-                <div class="fg"><div class="fl">Plan cadastral ou plan architectural (PDF)</div><input type="file" class="fi" (change)="onFileSelected($event)" accept="application/pdf"></div>
-              </div>
-            </ng-container>
 
             <!-- Champs Services Techniques -->
             <ng-container *ngIf="module === 'services-techniques'">
@@ -426,23 +355,6 @@ import { TOUTES_TRIBUNAUX } from '../etat-civil/tribunaux.ci';
               </div>
             </ng-container>
 
-            <!-- Champs Patrimoine -->
-            <ng-container *ngIf="module === 'patrimoine'">
-              <div class="fsec ivoire-border">Détails de la réservation / occupation</div>
-              <div class="form-grid">
-                <div class="fg"><div class="fl">Espace / Salle demandée <span class="req">*</span></div><input type="text" class="fi" formControlName="espace" placeholder="Ex: Foyer des jeunes, Place de la Mairie"></div>
-                <div class="fg"><div class="fl">Date prévue <span class="req">*</span></div><input type="date" class="fi" formControlName="date_prevue"></div>
-              </div>
-              <div class="form-grid-3">
-                <div class="fg"><div class="fl">Heure de début <span class="req">*</span></div><input type="time" class="fi" formControlName="heure_debut"></div>
-                <div class="fg"><div class="fl">Heure de fin estimée <span class="req">*</span></div><input type="time" class="fi" formControlName="heure_fin"></div>
-                <div class="fg"><div class="fl">Nombre de participants</div><input type="number" class="fi" formControlName="participants" placeholder="Ex: 100"></div>
-              </div>
-              <div class="form-grid" style="grid-template-columns: 1fr;">
-                <div class="fg"><div class="fl">Motif / Événement <span class="req">*</span></div><input type="text" class="fi" formControlName="motif" placeholder="Ex: Réunion d'association, Mariage, Cérémonie..."></div>
-              </div>
-            </ng-container>
-
             <!-- Champs Finances -->
             <ng-container *ngIf="module === 'finances'">
               <div class="fsec ivoire-border">Informations de paiement</div>
@@ -460,23 +372,6 @@ import { TOUTES_TRIBUNAUX } from '../etat-civil/tribunaux.ci';
               </div>
               <div class="form-grid" style="grid-template-columns: 1fr;">
                 <div class="fg"><div class="fl">Preuve de paiement / Reçu (PDF/JPG)</div><input type="file" class="fi" (change)="onFileSelected($event)"></div>
-              </div>
-            </ng-container>
-
-            <!-- Champs RH -->
-            <ng-container *ngIf="module === 'rh'">
-              <div class="fsec ivoire-border">Profil du candidat</div>
-              <div class="form-grid">
-                <div class="fg"><div class="fl">Nom et Prénoms <span class="req">*</span></div><input type="text" class="fi" formControlName="nom_complet" placeholder="Ex: DIOMANDÉ Ali"></div>
-                <div class="fg"><div class="fl">Numéro de téléphone <span class="req">*</span></div><input type="text" class="fi" formControlName="telephone" placeholder="Ex: 0102030405"></div>
-              </div>
-              <div class="form-grid" style="grid-template-columns: 1fr;">
-                <div class="fg"><div class="fl">Poste visé ou domaine de compétence <span class="req">*</span></div><input type="text" class="fi" formControlName="poste" placeholder="Ex: Assistant administratif, Informaticien..."></div>
-              </div>
-              <div class="fsec ivoire-border">Pièces jointes</div>
-              <div class="form-grid">
-                <div class="fg"><div class="fl">Curriculum Vitae (PDF) <span class="req">*</span></div><input type="file" class="fi" (change)="onFileSelected($event)" accept="application/pdf"></div>
-                <div class="fg"><div class="fl">Lettre de motivation (PDF)</div><input type="file" class="fi" (change)="onFileSelected($event)" accept="application/pdf"></div>
               </div>
             </ng-container>
 
@@ -601,12 +496,8 @@ export class CitoyenDemandeComponent implements OnInit {
   setModuleLabel() {
     const labels: Record<string, string> = {
       'etat-civil': 'État civil',
-      'urbanisme': 'Urbanisme',
       'services-techniques': 'Services techniques',
-      'patrimoine': 'Patrimoine',
       'finances': 'Finances',
-      'rh': 'Ressources Humaines',
-      'communication': 'Communication'
     };
     this.moduleLabel = labels[this.module] || this.module;
   }
@@ -615,12 +506,8 @@ export class CitoyenDemandeComponent implements OnInit {
     // Default types per module
     let defaultType = '';
     if (this.module === 'etat-civil') defaultType = "Demande d'acte de naissance";
-    else if (this.module === 'communication') defaultType = "Réclamation";
-    else if (this.module === 'urbanisme') defaultType = "Permis de construire";
     else if (this.module === 'services-techniques') defaultType = "Voirie et éclairage";
-    else if (this.module === 'patrimoine') defaultType = "Occupation du domaine public";
     else if (this.module === 'finances') defaultType = "Paiement de taxe municipale";
-    else if (this.module === 'rh') defaultType = "Candidature spontanée";
 
     this.typeControl.setValue(defaultType);
     this.buildDynamicForm();
@@ -687,18 +574,10 @@ export class CitoyenDemandeComponent implements OnInit {
           tribunal: ['TPI Abidjan (Plateau)'], date_jugement: ['', Validators.required], type_adoption: ['Pleine']
         };
       }
-    } else if (this.module === 'communication') {
-      controls = { sujet: ['', Validators.required], message: ['', Validators.required] };
-    } else if (this.module === 'urbanisme') {
-      controls = { parcelle: ['', Validators.required], superficie: ['', Validators.required], usage: ['', Validators.required], description: ['', Validators.required] };
     } else if (this.module === 'services-techniques') {
       controls = { adresse: ['', Validators.required], repere: [''], urgence: ['', Validators.required], description: ['', Validators.required] };
-    } else if (this.module === 'patrimoine') {
-      controls = { espace: ['', Validators.required], date_prevue: ['', Validators.required], heure_debut: ['', Validators.required], heure_fin: ['', Validators.required], participants: [''], motif: ['', Validators.required] };
     } else if (this.module === 'finances') {
       controls = { reference_facture: ['', Validators.required], montant: ['', Validators.required], mode_paiement: ['', Validators.required] };
-    } else if (this.module === 'rh') {
-      controls = { nom_complet: ['', Validators.required], telephone: ['', Validators.required], poste: ['', Validators.required] };
     }
 
     this.demandeForm = this.fb.group(controls);
@@ -717,7 +596,7 @@ export class CitoyenDemandeComponent implements OnInit {
 
   needsPayment(): boolean {
     const type = this.typeControl.value;
-    if (this.module === 'urbanisme' || this.module === 'finances' || this.module === 'patrimoine') return true;
+    if (this.module === 'finances') return true;
     if (this.module === 'etat-civil' && type === "Demande d'acte de mariage") return true;
     return false;
   }
