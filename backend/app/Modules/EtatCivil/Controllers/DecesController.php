@@ -52,7 +52,7 @@ class DecesController extends Controller
             'cause_deces' => 'nullable|string',
             'declarant_nom' => 'nullable|string',
             'declarant_lien' => 'nullable|string',
-            'files.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240',
+            'files.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png,webp,heic,heif,gif|max:10240',
         ]);
 
         $data['numero'] = 'CI-CC-' . date('Y') . '-D-' . str_pad(Deces::count() + 1, 6, '0', STR_PAD_LEFT);

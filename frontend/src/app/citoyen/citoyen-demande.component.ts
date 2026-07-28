@@ -180,12 +180,12 @@ import { TOUTES_TRIBUNAUX } from '../etat-civil/tribunaux.ci';
 
               <div class="fsec ivoire-border">Documents d'identité</div>
               <div class="form-grid">
-                <div class="fg"><div class="fl">CNI / Passeport — Époux</div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png" (change)="onFileSelected($event)"></div>
-                <div class="fg"><div class="fl">CNI / Passeport — Épouse</div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png" (change)="onFileSelected($event)"></div>
+                <div class="fg"><div class="fl">CNI / Passeport — Époux</div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onFileSelected($event)"></div>
+                <div class="fg"><div class="fl">CNI / Passeport — Épouse</div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onFileSelected($event)"></div>
               </div>
               <div class="form-grid">
-                <div class="fg"><div class="fl">CNI / Passeport — Témoin de l'époux</div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png" (change)="onFileSelected($event)"></div>
-                <div class="fg"><div class="fl">CNI / Passeport — Témoin de l'épouse</div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png" (change)="onFileSelected($event)"></div>
+                <div class="fg"><div class="fl">CNI / Passeport — Témoin de l'époux</div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onFileSelected($event)"></div>
+                <div class="fg"><div class="fl">CNI / Passeport — Témoin de l'épouse</div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onFileSelected($event)"></div>
               </div>
             </ng-container>
 
@@ -214,9 +214,9 @@ import { TOUTES_TRIBUNAUX } from '../etat-civil/tribunaux.ci';
 
               <div class="fsec ivoire-border">Documents justificatifs</div>
               <div class="form-grid-3">
-                <div class="fg"><div class="fl">CNI du défunt</div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png" (change)="onFileSelected($event)"></div>
-                <div class="fg"><div class="fl">Certificat de décès (PDF)</div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png" (change)="onFileSelected($event)"></div>
-                <div class="fg"><div class="fl">CNI du déclarant</div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png" (change)="onFileSelected($event)"></div>
+                <div class="fg"><div class="fl">CNI du défunt</div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onFileSelected($event)"></div>
+                <div class="fg"><div class="fl">Certificat de décès (PDF)</div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onFileSelected($event)"></div>
+                <div class="fg"><div class="fl">CNI du déclarant</div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onFileSelected($event)"></div>
               </div>
             </ng-container>
 
@@ -236,7 +236,7 @@ import { TOUTES_TRIBUNAUX } from '../etat-civil/tribunaux.ci';
               </div>
               <div class="fsec ivoire-border">Documents justificatifs</div>
               <div class="form-grid" style="grid-template-columns: 1fr;">
-                <div class="fg"><div class="fl">CNI / Passeport du demandeur</div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png" (change)="onFileSelected($event)"></div>
+                <div class="fg"><div class="fl">CNI / Passeport du demandeur</div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onFileSelected($event)"></div>
               </div>
             </ng-container>
 
@@ -262,7 +262,7 @@ import { TOUTES_TRIBUNAUX } from '../etat-civil/tribunaux.ci';
               </div>
               <div class="fsec ivoire-border">Documents justificatifs</div>
               <div class="form-grid" style="grid-template-columns: 1fr;">
-                <div class="fg"><div class="fl">CNI / Passeport du demandeur</div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png" (change)="onFileSelected($event)"></div>
+                <div class="fg"><div class="fl">CNI / Passeport du demandeur</div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onFileSelected($event)"></div>
               </div>
             </ng-container>
 
@@ -278,7 +278,7 @@ import { TOUTES_TRIBUNAUX } from '../etat-civil/tribunaux.ci';
               </div>
               <div class="fsec ivoire-border">Documents justificatifs</div>
               <div class="form-grid" style="grid-template-columns: 1fr;">
-                <div class="fg"><div class="fl">CNI / Passeport du demandeur</div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png" (change)="onFileSelected($event)"></div>
+                <div class="fg"><div class="fl">CNI / Passeport du demandeur</div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onFileSelected($event)"></div>
               </div>
             </ng-container>
 
@@ -303,7 +303,7 @@ import { TOUTES_TRIBUNAUX } from '../etat-civil/tribunaux.ci';
               </div>
               <div class="fsec ivoire-border">Documents justificatifs</div>
               <div class="form-grid" style="grid-template-columns: 1fr;">
-                <div class="fg"><div class="fl">Document du jugement supplétif</div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png" (change)="onFileSelected($event)"></div>
+                <div class="fg"><div class="fl">Document du jugement supplétif</div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onFileSelected($event)"></div>
               </div>
             </ng-container>
 
@@ -354,8 +354,8 @@ import { TOUTES_TRIBUNAUX } from '../etat-civil/tribunaux.ci';
 
               <div class="fsec ivoire-border">Documents justificatifs</div>
               <div class="form-grid">
-                <div class="fg"><div class="fl">Pièce d'identité du père adoptant</div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png" (change)="onFileSelected($event)"></div>
-                <div class="fg"><div class="fl">Pièce d'identité de la mère adoptante</div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png" (change)="onFileSelected($event)"></div>
+                <div class="fg"><div class="fl">Pièce d'identité du père adoptant</div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onFileSelected($event)"></div>
+                <div class="fg"><div class="fl">Pièce d'identité de la mère adoptante</div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onFileSelected($event)"></div>
               </div>
               <div class="form-grid" style="grid-template-columns: 1fr;">
                 <div class="fg"><div class="fl">Document du jugement d'adoption (PDF)</div><input type="file" class="fi" accept=".pdf" (change)="onFileSelected($event)"></div>

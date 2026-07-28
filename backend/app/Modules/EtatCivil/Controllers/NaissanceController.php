@@ -68,7 +68,7 @@ class NaissanceController extends Controller
             'type' => 'nullable|in:Déclaration,Jugement,Adoption',
             'tribunal' => 'nullable|string',
             'date_jugement' => 'nullable|date',
-            'files.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240',
+            'files.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png,webp,heic,heif,gif|max:10240',
         ]);
 
         $data['prenom'] = $data['prenom'] ?? '';

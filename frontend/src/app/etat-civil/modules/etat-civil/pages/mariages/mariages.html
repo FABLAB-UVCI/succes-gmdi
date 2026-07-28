@@ -24,12 +24,12 @@
           <div class="form-grid">
             <div class="fg" style="max-width:340px">
               <div class="fl">CNI / Passeport — Futur Époux</div>
-              <input style="font-size:11px;padding:4px 6px" class="fi" type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="onBansCniEpouxSelected($event)">
+              <input style="font-size:11px;padding:4px 6px" class="fi" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onBansCniEpouxSelected($event)">
               @if (bansForm.cniEpoux) { <small style="color:green">✓ {{ bansForm.cniEpoux.name }}</small> }
             </div>
             <div class="fg" style="max-width:340px">
               <div class="fl">CNI / Passeport — Future Épouse</div>
-              <input style="font-size:11px;padding:4px 6px" class="fi" type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="onBansCniEpouseSelected($event)">
+              <input style="font-size:11px;padding:4px 6px" class="fi" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onBansCniEpouseSelected($event)">
               @if (bansForm.cniEpouse) { <small style="color:green">✓ {{ bansForm.cniEpouse.name }}</small> }
             </div>
           </div>
@@ -97,22 +97,22 @@
           <div class="form-grid">
             <div class="fg" style="max-width:340px">
               <div class="fl">CNI / Passeport — Époux</div>
-              <input style="font-size:11px;padding:4px 6px" class="fi" type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="onCniEpouxSelected($event)">
+              <input style="font-size:11px;padding:4px 6px" class="fi" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onCniEpouxSelected($event)">
               @if (mariageForm.cniEpoux) { <small style="color:green">✓ {{ mariageForm.cniEpoux.name }}</small> }
             </div>
             <div class="fg" style="max-width:340px">
               <div class="fl">CNI / Passeport — Épouse</div>
-              <input style="font-size:11px;padding:4px 6px" class="fi" type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="onCniEpouseSelected($event)">
+              <input style="font-size:11px;padding:4px 6px" class="fi" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onCniEpouseSelected($event)">
               @if (mariageForm.cniEpouse) { <small style="color:green">✓ {{ mariageForm.cniEpouse.name }}</small> }
             </div>
             <div class="fg" style="max-width:340px">
               <div class="fl">CNI / Passeport — Témoin de l'époux</div>
-              <input style="font-size:11px;padding:4px 6px" class="fi" type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="onCniTemoinEpouxSelected($event)">
+              <input style="font-size:11px;padding:4px 6px" class="fi" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onCniTemoinEpouxSelected($event)">
               @if (mariageForm.cniTemoinEpoux) { <small style="color:green">✓ {{ mariageForm.cniTemoinEpoux.name }}</small> }
             </div>
             <div class="fg" style="max-width:340px">
               <div class="fl">CNI / Passeport — Témoin de l'épouse</div>
-              <input style="font-size:11px;padding:4px 6px" class="fi" type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="onCniTemoinEpouseSelected($event)">
+              <input style="font-size:11px;padding:4px 6px" class="fi" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onCniTemoinEpouseSelected($event)">
               @if (mariageForm.cniTemoinEpouse) { <small style="color:green">✓ {{ mariageForm.cniTemoinEpouse.name }}</small> }
             </div>
           </div>

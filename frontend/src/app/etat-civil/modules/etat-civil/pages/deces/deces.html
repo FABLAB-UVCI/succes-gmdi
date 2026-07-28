@@ -39,17 +39,17 @@
           <div class="form-grid-3">
             <div class="fg">
               <div class="fl">CNI du défunt</div>
-              <input style="font-size:11px;padding:4px 6px" class="fi" type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="onCniDefuntSelected($event)">
+              <input style="font-size:11px;padding:4px 6px" class="fi" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onCniDefuntSelected($event)">
               @if (decesForm.cniDefunt) { <small style="color:green">✓ {{ decesForm.cniDefunt.name }}</small> }
             </div>
             <div class="fg">
               <div class="fl">Certificat de décès (PDF)</div>
-              <input style="font-size:11px;padding:4px 6px" class="fi" type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="onCertificatDecesSelected($event)">
+              <input style="font-size:11px;padding:4px 6px" class="fi" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onCertificatDecesSelected($event)">
               @if (decesForm.certificatDeces) { <small style="color:green">✓ {{ decesForm.certificatDeces.name }}</small> }
             </div>
             <div class="fg">
               <div class="fl">CNI du déclarant</div>
-              <input style="font-size:11px;padding:4px 6px" class="fi" type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="onCniDeclarantSelected($event)">
+              <input style="font-size:11px;padding:4px 6px" class="fi" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onCniDeclarantSelected($event)">
               @if (decesForm.cniDeclarant) { <small style="color:green">✓ {{ decesForm.cniDeclarant.name }}</small> }
             </div>
           </div>

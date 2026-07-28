@@ -63,7 +63,7 @@ class MariageController extends Controller
             'temoin1_profession' => 'nullable|string',
             'temoin2_nom' => 'nullable|string',
             'temoin2_profession' => 'nullable|string',
-            'files.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240',
+            'files.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png,webp,heic,heif,gif|max:10240',
         ]);
 
         $data['epoux_prenom']  = $data['epoux_prenom']  ?? '';

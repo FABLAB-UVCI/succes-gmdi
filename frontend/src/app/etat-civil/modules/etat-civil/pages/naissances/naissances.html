@@ -59,7 +59,7 @@
                 <div class="fg"><div class="fl">Nationalité Père</div><input class="fi" [(ngModel)]="naissanceForm.pNat" type="text"></div>
                 <div class="fg">
                     <div class="fl">Pièce d'identité du Père (CNI/Passeport)</div>
-                    <input class="fi" type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="onPereFileSelected($event)">
+                    <input class="fi" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onPereFileSelected($event)">
                     @if (naissanceForm.piecePere) {
                     <small style="color: green;">✓ Fichier chargé: {{ naissanceForm.piecePere.name }}</small>
                     }
@@ -72,7 +72,7 @@
                 <div class="fg"><div class="fl">Nationalité Mère</div><input class="fi" [(ngModel)]="naissanceForm.mNat" type="text"></div>
                 <div class="fg">
                     <div class="fl">Pièce d'identité de la Mère (CNI/Passeport)</div>
-                    <input class="fi" type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="onMereFileSelected($event)">
+                    <input class="fi" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onMereFileSelected($event)">
                     @if (naissanceForm.pieceMere) {
                     <small style="color: green;">✓ Fichier chargé: {{ naissanceForm.pieceMere.name }}</small>
                     }
@@ -167,7 +167,7 @@
                 <input 
                     class="fi" 
                     type="file" 
-                    accept=".pdf,.jpg,.jpeg,.png" 
+                    accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" 
                     (change)="onJugementFileSelected($event)">
                 @if (jugementForm.pieceIdentite) {
                     <small style="color: green;">✓ Fichier chargé: {{ jugementForm.pieceIdentite.name }}</small>
@@ -226,7 +226,7 @@
             <div class="form-grid">
                 <div class="fg" style="max-width:340px">
                 <div class="fl">CNI / Passeport — Père adoptant</div>
-                <input style="font-size:11px;padding:4px 6px" class="fi" type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="onAdoptionPereFileSelected($event)">
+                <input style="font-size:11px;padding:4px 6px" class="fi" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onAdoptionPereFileSelected($event)">
                 @if (adoptionForm.piecePereAdoptant) {
                     <small style="color: green;">✓ {{ adoptionForm.piecePereAdoptant.name }}</small>
                 }
@@ -253,7 +253,7 @@
             <div class="form-grid">
                 <div class="fg" style="max-width:340px">
                 <div class="fl">CNI / Passeport — Mère adoptante</div>
-                <input style="font-size:11px;padding:4px 6px" class="fi" type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="onAdoptionMereFileSelected($event)">
+                <input style="font-size:11px;padding:4px 6px" class="fi" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onAdoptionMereFileSelected($event)">
                 @if (adoptionForm.pieceMereAdoptante) {
                     <small style="color: green;">✓ {{ adoptionForm.pieceMereAdoptante.name }}</small>
                 }

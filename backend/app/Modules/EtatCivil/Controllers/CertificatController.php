@@ -39,7 +39,7 @@ class CertificatController extends Controller
             'acte_reference' => 'nullable|string',
             'demandeur_nom' => 'nullable|string',
             'motif' => 'nullable|string',
-            'files.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240',
+            'files.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png,webp,heic,heif,gif|max:10240',
         ]);
 
         $data['numero'] = 'CI-CC-' . date('Y') . '-C-' . str_pad(Certificat::count() + 1, 6, '0', STR_PAD_LEFT);

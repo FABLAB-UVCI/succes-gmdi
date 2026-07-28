@@ -27,7 +27,7 @@
           <div class="form-grid">
             <div class="fg" style="max-width:340px">
               <div class="fl">CNI / Passeport du demandeur</div>
-              <input style="font-size:11px;padding:4px 6px" class="fi" type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="onCniCelibatSelected($event)">
+              <input style="font-size:11px;padding:4px 6px" class="fi" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onCniCelibatSelected($event)">
               @if (celibatForm.cni) { <small style="color:green">✓ {{ celibatForm.cni.name }}</small> }
             </div>
           </div>
@@ -58,7 +58,7 @@
           <div class="form-grid">
             <div class="fg" style="max-width:340px">
               <div class="fl">CNI / Passeport du demandeur</div>
-              <input style="font-size:11px;padding:4px 6px" class="fi" type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="onCniResidenceSelected($event)">
+              <input style="font-size:11px;padding:4px 6px" class="fi" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onCniResidenceSelected($event)">
               @if (residenceForm.cni) { <small style="color:green">✓ {{ residenceForm.cni.name }}</small> }
             </div>
           </div>
@@ -80,7 +80,7 @@
           <div class="form-grid">
             <div class="fg" style="max-width:340px">
               <div class="fl">CNI / Passeport du demandeur</div>
-              <input style="font-size:11px;padding:4px 6px" class="fi" type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="onCniVieSelected($event)">
+              <input style="font-size:11px;padding:4px 6px" class="fi" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onCniVieSelected($event)">
               @if (vieForm.cni) { <small style="color:green">✓ {{ vieForm.cni.name }}</small> }
             </div>
           </div>

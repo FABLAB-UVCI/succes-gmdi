@@ -128,7 +128,7 @@ class DemarcheController extends Controller
         $v = $request->validate([
             'module' => ['required', 'string', Rule::in(GmdiAccess::MODULES)],
             'type_demarche' => 'nullable|string|max:120',
-            'files.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240',
+            'files.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png,webp,heic,heif,gif|max:10240',
         ]);
 
         $donnees = [];
