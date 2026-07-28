@@ -185,10 +185,32 @@ import { TOUTES_COMMUNES } from '../etat-civil/communes.ci';
 
             <!-- Champs État Civil : Décès -->
             <ng-container *ngIf="typeControl.value === 'Demande d\\'acte de décès'">
-              <div class="fsec">Déclaration de décès</div>
+              <div class="fsec ivoire-border">Informations du défunt</div>
               <div class="form-grid">
-                <div class="fg"><div class="fl">Nom complet du défunt <span class="req">*</span></div><input type="text" class="fi" formControlName="defunt_nom" placeholder="Ex: KONE Issa"></div>
+                <div class="fg"><div class="fl">Nom <span class="req">*</span></div><input type="text" class="fi" formControlName="defunt_nom" placeholder="Ex: KOUADIO"></div>
+                <div class="fg"><div class="fl">Prénom(s) <span class="req">*</span></div><input type="text" class="fi" formControlName="defunt_prenom" placeholder="Ex: Jean Marc"></div>
+              </div>
+              <div class="form-grid">
+                <div class="fg"><div class="fl">Date de naissance (si connue)</div><input type="date" class="fi" formControlName="defunt_date_naissance"></div>
+                <div class="fg"><div class="fl">Commune</div><input type="text" class="fi" formControlName="defunt_commune" placeholder="Ex: Cocody"></div>
+              </div>
+
+              <div class="fsec ivoire-border">Détails du décès</div>
+              <div class="form-grid-3">
                 <div class="fg"><div class="fl">Date du décès <span class="req">*</span></div><input type="date" class="fi" formControlName="date_deces"></div>
+                <div class="fg"><div class="fl">Heure</div><input type="time" class="fi" formControlName="heure_deces"></div>
+                <div class="fg"><div class="fl">Lieu du décès <span class="req">*</span></div><input type="text" class="fi" formControlName="lieu_deces" placeholder="Ex: CHU Treichville"></div>
+              </div>
+              <div class="form-grid">
+                <div class="fg"><div class="fl">Cause du décès</div><input type="text" class="fi" formControlName="cause_deces" placeholder="Ex: Insuffisance cardiaque"></div>
+                <div class="fg"><div class="fl">Déclarant (nom)</div><input type="text" class="fi" formControlName="declarant_nom"></div>
+              </div>
+
+              <div class="fsec ivoire-border">Documents justificatifs</div>
+              <div class="form-grid-3">
+                <div class="fg"><div class="fl">CNI du défunt</div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png" (change)="onFileSelected($event)"></div>
+                <div class="fg"><div class="fl">Certificat de décès (PDF)</div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png" (change)="onFileSelected($event)"></div>
+                <div class="fg"><div class="fl">CNI du déclarant</div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png" (change)="onFileSelected($event)"></div>
               </div>
             </ng-container>
 
@@ -483,7 +505,12 @@ export class CitoyenDemandeComponent implements OnInit {
           date_mariage: ['', Validators.required], lieu_mariage: [''], regime_matrimonial: ['Communauté de biens']
         };
       } else if (type === "Demande d'acte de décès") {
-        controls = { defunt_nom: ['', Validators.required], date_deces: ['', Validators.required] };
+        controls = {
+          defunt_nom: ['', Validators.required], defunt_prenom: ['', Validators.required],
+          defunt_date_naissance: [''], defunt_commune: [''],
+          date_deces: ['', Validators.required], heure_deces: [''], lieu_deces: ['', Validators.required],
+          cause_deces: [''], declarant_nom: ['']
+        };
       }
     } else if (this.module === 'communication') {
       controls = { sujet: ['', Validators.required], message: ['', Validators.required] };
