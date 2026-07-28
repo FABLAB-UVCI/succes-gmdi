@@ -141,20 +141,45 @@ import { TOUTES_COMMUNES } from '../etat-civil/communes.ci';
             <ng-container *ngIf="typeControl.value === 'Demande d\\'acte de mariage'">
               <div class="fsec ivoire-border">Informations sur l'époux</div>
               <div class="form-grid-3">
-                <div class="fg"><div class="fl">Nom complet de l'époux <span class="req">*</span></div><input type="text" class="fi" formControlName="epoux_nom" placeholder="Ex: KOUASSI Jean"></div>
-                <div class="fg"><div class="fl">Profession <span class="req">*</span></div><input type="text" class="fi" formControlName="epoux_profession"></div>
+                <div class="fg"><div class="fl">Nom <span class="req">*</span></div><input type="text" class="fi" formControlName="epoux_nom" placeholder="Ex: KOUASSI"></div>
+                <div class="fg"><div class="fl">Prénoms <span class="req">*</span></div><input type="text" class="fi" formControlName="epoux_prenom" placeholder="Ex: Jean-Marc"></div>
                 <div class="fg"><div class="fl">Nationalité <span class="req">*</span></div><input type="text" class="fi" formControlName="epoux_nationalite"></div>
+                <div class="fg"><div class="fl">Profession <span class="req">*</span></div><input type="text" class="fi" formControlName="epoux_profession"></div>
+                <div class="fg"><div class="fl">Témoin de l'époux</div><input type="text" class="fi" formControlName="epoux_temoin_nom" placeholder="Ex: KONÉ Souleymane"></div>
+                <div class="fg"><div class="fl">Profession du témoin</div><input type="text" class="fi" formControlName="epoux_temoin_profession"></div>
               </div>
 
               <div class="fsec ivoire-border">Informations sur l'épouse</div>
               <div class="form-grid-3">
-                <div class="fg"><div class="fl">Nom complet de l'épouse <span class="req">*</span></div><input type="text" class="fi" formControlName="epouse_nom" placeholder="Ex: N'GUESSAN Marie"></div>
-                <div class="fg"><div class="fl">Profession <span class="req">*</span></div><input type="text" class="fi" formControlName="epouse_profession"></div>
+                <div class="fg"><div class="fl">Nom <span class="req">*</span></div><input type="text" class="fi" formControlName="epouse_nom" placeholder="Ex: TRAORÉ"></div>
+                <div class="fg"><div class="fl">Prénoms <span class="req">*</span></div><input type="text" class="fi" formControlName="epouse_prenom" placeholder="Ex: Aminata"></div>
                 <div class="fg"><div class="fl">Nationalité <span class="req">*</span></div><input type="text" class="fi" formControlName="epouse_nationalite"></div>
+                <div class="fg"><div class="fl">Profession <span class="req">*</span></div><input type="text" class="fi" formControlName="epouse_profession"></div>
+                <div class="fg"><div class="fl">Témoin de l'épouse</div><input type="text" class="fi" formControlName="epouse_temoin_nom" placeholder="Ex: BAMBA Mariam"></div>
+                <div class="fg"><div class="fl">Profession du témoin</div><input type="text" class="fi" formControlName="epouse_temoin_profession"></div>
               </div>
+
               <div class="fsec ivoire-border">Détails du mariage</div>
-              <div class="form-grid">
+              <div class="form-grid-3">
                 <div class="fg"><div class="fl">Date du mariage <span class="req">*</span></div><input type="date" class="fi" formControlName="date_mariage"></div>
+                <div class="fg"><div class="fl">Lieu</div><input type="text" class="fi" formControlName="lieu_mariage" placeholder="Ex: Mairie de Cocody"></div>
+                <div class="fg"><div class="fl">Régime matrimonial</div>
+                  <select class="fsel" formControlName="regime_matrimonial">
+                    <option value="Communauté de biens">Communauté de biens</option>
+                    <option value="Séparation de biens">Séparation de biens</option>
+                    <option value="Polygamie">Polygamie</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="fsec ivoire-border">Documents d'identité</div>
+              <div class="form-grid">
+                <div class="fg"><div class="fl">CNI / Passeport — Époux</div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png" (change)="onFileSelected($event)"></div>
+                <div class="fg"><div class="fl">CNI / Passeport — Épouse</div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png" (change)="onFileSelected($event)"></div>
+              </div>
+              <div class="form-grid">
+                <div class="fg"><div class="fl">CNI / Passeport — Témoin de l'époux</div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png" (change)="onFileSelected($event)"></div>
+                <div class="fg"><div class="fl">CNI / Passeport — Témoin de l'épouse</div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png" (change)="onFileSelected($event)"></div>
               </div>
             </ng-container>
 
@@ -450,10 +475,12 @@ export class CitoyenDemandeComponent implements OnInit {
           mere_nom: [''], mere_profession: [''], mere_nationalite: ['Ivoirienne']
         };
       } else if (type === "Demande d'acte de mariage") {
-        controls = { 
-          epoux_nom: ['', Validators.required], epoux_profession: ['', Validators.required], epoux_nationalite: ['Ivoirienne', Validators.required],
-          epouse_nom: ['', Validators.required], epouse_profession: ['', Validators.required], epouse_nationalite: ['Ivoirienne', Validators.required],
-          date_mariage: ['', Validators.required]
+        controls = {
+          epoux_nom: ['', Validators.required], epoux_prenom: ['', Validators.required], epoux_profession: ['', Validators.required], epoux_nationalite: ['Ivoirienne', Validators.required],
+          epoux_temoin_nom: [''], epoux_temoin_profession: [''],
+          epouse_nom: ['', Validators.required], epouse_prenom: ['', Validators.required], epouse_profession: ['', Validators.required], epouse_nationalite: ['Ivoirienne', Validators.required],
+          epouse_temoin_nom: [''], epouse_temoin_profession: [''],
+          date_mariage: ['', Validators.required], lieu_mariage: [''], regime_matrimonial: ['Communauté de biens']
         };
       } else if (type === "Demande d'acte de décès") {
         controls = { defunt_nom: ['', Validators.required], date_deces: ['', Validators.required] };
