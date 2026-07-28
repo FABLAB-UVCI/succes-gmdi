@@ -278,6 +278,34 @@ export class NaissancesComponent implements OnInit {
   }
 
   submitAttemptedNaissance = signal(false);
+  editingNaissanceId: number | null = null;
+
+  modifierNaissance(item: any): void {
+    if (item._pending) return;
+    this.editingNaissanceId = item.id;
+    const pere = (item.pereNom || '').trim().split(' ');
+    const mere = (item.mereNom || '').trim().split(' ');
+    this.naissanceForm = {
+      nom: item.nom || '', prenom: item.prenom || '',
+      date: this.toIsoDate(item.dateNaissance), heure: item.heureNaissance || '',
+      sexe: item.sexe || '', lieu: item.lieu || '', commune: item.commune || '',
+      pNom: pere[0] || '', pPrenom: pere.slice(1).join(' '), pProf: item.pereProf || '', pNat: item.pereNat || '', piecePere: null,
+      mNom: mere[0] || '', mPrenom: mere.slice(1).join(' '), mProf: item.mereProf || '', mNat: item.mereNat || '', pieceMere: null,
+    };
+    this.currentTabs.update(tabs => ({ ...tabs, naissances: 'decl' }));
+    this.showToast.emit(`Modification de l'acte N° ${item.numero}`);
+  }
+
+  annulerModificationNaissance(): void {
+    this.editingNaissanceId = null;
+    this.resetForm('naissance');
+  }
+
+  private toIsoDate(dmy: string): string {
+    if (!dmy) return '';
+    const [d, m, y] = dmy.split('/');
+    return y && m && d ? `${y}-${m}-${d}` : '';
+  }
 
   enregistrerNaissance(): void {
     this.submitAttemptedNaissance.set(true);
@@ -305,6 +333,21 @@ export class NaissancesComponent implements OnInit {
       mere_profession: f.mProf,
       mere_nationalite: f.mNat,
     };
+
+    if (this.editingNaissanceId) {
+      const id = this.editingNaissanceId;
+      this.api.updateNaissance(id, buildFormData(payload, [f.piecePere, f.pieceMere])).subscribe({
+        next: (res) => {
+          this.naissancesDB = this.naissancesDB.map(n => n.id === id ? res : n);
+          this.showToast.emit('Acte modifié — N° ' + res.numero);
+          this.editingNaissanceId = null;
+          this.resetForm('naissance');
+          this.submitAttemptedNaissance.set(false);
+        },
+        error: (err) => this.showToast.emit(err?.error?.message || "Erreur lors de la modification")
+      });
+      return;
+    }
 
     this.api.createNaissance(buildFormData(payload, [f.piecePere, f.pieceMere])).subscribe({
       next: (res) => {

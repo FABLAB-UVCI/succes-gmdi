@@ -53,9 +53,16 @@
               @if (decesForm.cniDeclarant) { <small style="color:green">✓ {{ decesForm.cniDeclarant.name }}</small> }
             </div>
           </div>
-          <div class="fa">
-            <button class="btn-p" (click)="enregistrerDeces()"><i class="ti ti-printer"></i>Dresser l'acte & Imprimer</button>
-          </div>
+          @if (editingDecesId) {
+            <div class="fa">
+              <button class="btn-s" (click)="annulerModificationDeces()"><i class="ti ti-x"></i>Annuler la modification</button>
+              <button class="btn-p" (click)="enregistrerDeces()"><i class="ti ti-check"></i>Enregistrer les modifications</button>
+            </div>
+          } @else {
+            <div class="fa">
+              <button class="btn-p" (click)="enregistrerDeces()"><i class="ti ti-printer"></i>Dresser l'acte & Imprimer</button>
+            </div>
+          }
         </div>
       </div>
     }
@@ -76,11 +83,12 @@
                   <td>{{ d.dateDeces }}</td>
                   <td>{{ d.lieu }}</td>
                   <td><span class="chip" [class.cv]="!d._pending" [class.co]="d._pending">{{ d.statut }}</span></td>
-                  <td>
+                  <td style="display:flex;gap:6px">
                     @if (d._pending) {
                       <a routerLink="/etat-civil/demandes" class="btn-s" style="padding:3px 8px;font-size:11px;text-decoration:none"><i class="ti ti-eye"></i>Traiter</a>
                     } @else {
                       <button class="btn-s" style="padding:3px 8px;font-size:11px" (click)="imprimer(d)"><i class="ti ti-printer"></i>Imprimer</button>
+                      <button class="btn-s" style="padding:3px 8px;font-size:11px" (click)="modifierDeces(d)"><i class="ti ti-pencil"></i>Modifier</button>
                     }
                   </td>
                 </tr>

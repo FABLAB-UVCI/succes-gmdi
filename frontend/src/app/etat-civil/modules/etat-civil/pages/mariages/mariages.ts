@@ -114,6 +114,41 @@ export class MariagesComponent implements OnInit {
     });
   }
 
+  editingMariageId: number | null = null;
+
+  modifierMariage(item: any): void {
+    if (item._pending) return;
+    this.editingMariageId = item.id;
+    const epoux = (item.epoux || '').trim().split(' ');
+    const epouse = (item.epouse || '').trim().split(' ');
+    this.mariageForm = {
+      epNom: epoux[0] || '', epPrenom: epoux.slice(1).join(' '), epNat: item.epouxNat || 'Ivoirienne', epProf: item.epouxProf || '',
+      epTemoin: item.temoin1 || '', epTemoinProf: item.temoin1Prof || '',
+      esNom: epouse[0] || '', esPrenom: epouse.slice(1).join(' '), esNat: item.epouseNat || 'Ivoirienne', esProf: item.epouseProf || '',
+      esTemoin: item.temoin2 || '', esTemoinProf: item.temoin2Prof || '',
+      date: this.toIsoDate(item.dateMariage), lieu: item.lieu || '', regime: item.regime || 'Communauté de biens',
+      cniEpoux: null, cniEpouse: null, cniTemoinEpoux: null, cniTemoinEpouse: null,
+    };
+    this.currentTab.set('celebration');
+    this.notify(`Modification du mariage N° ${item.numero}`);
+  }
+
+  annulerModificationMariage(): void {
+    this.editingMariageId = null;
+    this.mariageForm = {
+      epNom: '', epPrenom: '', epNat: 'Ivoirienne', epProf: '', epTemoin: '', epTemoinProf: '',
+      esNom: '', esPrenom: '', esNat: 'Ivoirienne', esProf: '', esTemoin: '', esTemoinProf: '',
+      date: '', lieu: '', regime: 'Communauté de biens', cniEpoux: null, cniEpouse: null,
+      cniTemoinEpoux: null, cniTemoinEpouse: null
+    };
+  }
+
+  private toIsoDate(dmy: string): string {
+    if (!dmy) return '';
+    const [d, m, y] = dmy.split('/');
+    return y && m && d ? `${y}-${m}-${d}` : '';
+  }
+
   enregistrerMariage() {
     this.submitAttemptedMariage.set(true);
     const f = this.mariageForm;
@@ -121,13 +156,31 @@ export class MariagesComponent implements OnInit {
       this.notify('Veuillez remplir les champs obligatoires (*)');
       return;
     }
-    this.api.createMariage(buildFormData({
+    const payload = {
       epoux_nom: f.epNom, epoux_prenom: f.epPrenom, epoux_profession: f.epProf, epoux_nationalite: f.epNat,
       epouse_nom: f.esNom, epouse_prenom: f.esPrenom, epouse_profession: f.esProf, epouse_nationalite: f.esNat,
       date_mariage: f.date, lieu_mariage: f.lieu, regime_matrimonial: f.regime,
       temoin1_nom: f.epTemoin, temoin1_profession: f.epTemoinProf,
       temoin2_nom: f.esTemoin, temoin2_profession: f.esTemoinProf
-    }, [f.cniEpoux, f.cniEpouse, f.cniTemoinEpoux, f.cniTemoinEpouse])).subscribe({
+    };
+    const files = [f.cniEpoux, f.cniEpouse, f.cniTemoinEpoux, f.cniTemoinEpouse];
+
+    if (this.editingMariageId) {
+      const id = this.editingMariageId;
+      this.api.updateMariage(id, buildFormData(payload, files)).subscribe({
+        next: res => {
+          this.mariages.update(l => l.map(m => m.id === id ? res : m));
+          this.notify(`Mariage modifié — N° ${res.numero}`);
+          this.editingMariageId = null;
+          this.annulerModificationMariage();
+          this.submitAttemptedMariage.set(false);
+        },
+        error: (err) => this.notify(err?.error?.message || "Erreur lors de la modification")
+      });
+      return;
+    }
+
+    this.api.createMariage(buildFormData(payload, files)).subscribe({
       next: res => {
         this.mariages.update(l => [res, ...l]);
         this.notify(`Mariage enregistré — N° ${res.numero}`);
@@ -139,12 +192,7 @@ export class MariagesComponent implements OnInit {
           temoin1: f.epTemoin, temoin1Prof: f.epTemoinProf,
           temoin2: f.esTemoin, temoin2Prof: f.esTemoinProf
         });
-        this.mariageForm = {
-          epNom: '', epPrenom: '', epNat: 'Ivoirienne', epProf: '', epTemoin: '', epTemoinProf: '',
-          esNom: '', esPrenom: '', esNat: 'Ivoirienne', esProf: '', esTemoin: '', esTemoinProf: '',
-          date: '', lieu: '', regime: 'Communauté de biens', cniEpoux: null, cniEpouse: null,
-          cniTemoinEpoux: null, cniTemoinEpouse: null
-        };
+        this.annulerModificationMariage();
         this.submitAttemptedMariage.set(false);
       },
       error: (err) => this.notify(err?.error?.message || "Erreur lors de l'enregistrement")

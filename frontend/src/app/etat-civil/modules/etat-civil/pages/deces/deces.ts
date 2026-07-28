@@ -68,18 +68,61 @@ export class DecesComponent implements OnInit {
 
   submitAttempted = signal(false);
 
+  editingDecesId: number | null = null;
+
+  modifierDeces(item: any): void {
+    if (item._pending) return;
+    this.editingDecesId = item.id;
+    this.decesForm = {
+      nom: item.nom || '', prenom: item.prenom || '', dob: this.toIsoDate(item.dateNaissance),
+      date: this.toIsoDate(item.dateDeces), heure: item.heureDeces || '', lieu: item.lieu || '', commune: item.commune || '',
+      cause: item.cause || '', declarant: item.declarant || '', lien: item.lien || '',
+      cniDefunt: null, certificatDeces: null, cniDeclarant: null,
+    };
+    this.currentTab.set('decl');
+    this.notify(`Modification de l'acte N° ${item.numero}`);
+  }
+
+  annulerModificationDeces(): void {
+    this.editingDecesId = null;
+    this.decesForm = { nom: '', prenom: '', dob: '', date: '', heure: '', lieu: '', commune: '', cause: '', declarant: '', lien: '', cniDefunt: null, certificatDeces: null, cniDeclarant: null };
+  }
+
+  private toIsoDate(dmy: string): string {
+    if (!dmy) return '';
+    const [d, m, y] = dmy.split('/');
+    return y && m && d ? `${y}-${m}-${d}` : '';
+  }
+
   enregistrerDeces() {
     this.submitAttempted.set(true);
     const f = this.decesForm;
     if (!f.nom || !f.prenom || !f.date || !f.lieu) { this.notify('Veuillez remplir les champs obligatoires (*)'); return; }
-    this.api.createDeces(buildFormData({
+    const payload = {
       nom: f.nom, prenom: f.prenom,
       date_naissance: f.dob || null,
       date_deces: f.date, heure_deces: f.heure,
       lieu_deces: f.lieu, commune: f.commune,
       cause_deces: f.cause,
       declarant_nom: f.declarant, declarant_lien: f.lien
-    }, [f.cniDefunt, f.certificatDeces, f.cniDeclarant])).subscribe({
+    };
+    const files = [f.cniDefunt, f.certificatDeces, f.cniDeclarant];
+
+    if (this.editingDecesId) {
+      const id = this.editingDecesId;
+      this.api.updateDeces(id, buildFormData(payload, files)).subscribe({
+        next: res => {
+          this.deces.update(l => l.map(d => d.id === id ? res : d));
+          this.notify(`Acte de décès modifié — N° ${res.numero}`);
+          this.annulerModificationDeces();
+          this.submitAttempted.set(false);
+        },
+        error: (err) => this.notify(err?.error?.message || "Erreur lors de la modification")
+      });
+      return;
+    }
+
+    this.api.createDeces(buildFormData(payload, files)).subscribe({
       next: res => {
         this.deces.update(l => [res, ...l]);
         this.notify(`Acte de décès enregistré — N° ${res.numero}`);
@@ -90,7 +133,7 @@ export class DecesComponent implements OnInit {
           lieuDeces: f.lieu, commune: f.commune,
           causeDeces: f.cause, declarant: f.declarant, lien: f.lien
         });
-        this.decesForm = { nom: '', prenom: '', dob: '', date: '', heure: '', lieu: '', commune: '', cause: '', declarant: '', lien: '', cniDefunt: null, certificatDeces: null, cniDeclarant: null };
+        this.annulerModificationDeces();
         this.submitAttempted.set(false);
       },
       error: (err) => this.notify(err?.error?.message || "Erreur lors de l'enregistrement")

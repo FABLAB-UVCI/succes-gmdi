@@ -116,7 +116,14 @@
               @if (mariageForm.cniTemoinEpouse) { <small style="color:green">✓ {{ mariageForm.cniTemoinEpouse.name }}</small> }
             </div>
           </div>
-          <div class="fa"><button class="btn-p" (click)="enregistrerMariage()"><i class="ti ti-printer"></i>Enregistrer & Imprimer</button></div>
+          @if (editingMariageId) {
+            <div class="fa">
+              <button class="btn-s" (click)="annulerModificationMariage()"><i class="ti ti-x"></i>Annuler la modification</button>
+              <button class="btn-p" (click)="enregistrerMariage()"><i class="ti ti-check"></i>Enregistrer les modifications</button>
+            </div>
+          } @else {
+            <div class="fa"><button class="btn-p" (click)="enregistrerMariage()"><i class="ti ti-printer"></i>Enregistrer & Imprimer</button></div>
+          }
         </div>
       </div>
     }
@@ -135,11 +142,12 @@
                   <td>{{ m.dateMariage }}</td>
                   <td>{{ m.regime }}</td>
                   <td><span class="chip" [class.cv]="!m._pending" [class.co]="m._pending">{{ m.statut }}</span></td>
-                  <td>
+                  <td style="display:flex;gap:6px">
                     @if (m._pending) {
                       <a routerLink="/etat-civil/demandes" class="btn-s" style="padding:3px 8px;font-size:11px;text-decoration:none"><i class="ti ti-eye"></i>Traiter</a>
                     } @else {
                       <button class="btn-s" style="padding:3px 8px;font-size:11px" (click)="imprimer(m)"><i class="ti ti-printer"></i>Imprimer</button>
+                      <button class="btn-s" style="padding:3px 8px;font-size:11px" (click)="modifierMariage(m)"><i class="ti ti-pencil"></i>Modifier</button>
                     }
                   </td>
                 </tr>

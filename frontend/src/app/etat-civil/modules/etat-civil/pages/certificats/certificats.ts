@@ -73,6 +73,33 @@ export class CertificatsComponent implements OnInit {
   onCniVieSelected(e: Event) { this.vieForm.cni = (e.target as HTMLInputElement).files?.[0] ?? null; }
 
   submitAttempted = signal<string | null>(null);
+  editingCertificatId: number | null = null;
+
+  modifierCertificat(item: any): void {
+    if (item._pending) return;
+    this.editingCertificatId = item.id;
+    const parts = (item.beneficiaire || '').trim().split(' ');
+    const nom = parts[0] ?? '';
+    const prenom = parts.slice(1).join(' ');
+    if (item.type === 'Résidence') {
+      this.residenceForm = { nom, prenom, adresse: '', quartier: '', commune: '', cni: null };
+      this.currentTab.set('residence');
+    } else if (item.type === 'Vie') {
+      this.vieForm = { nom, prenom, dob: '', cni: null };
+      this.currentTab.set('vie');
+    } else {
+      this.celibatForm = { nom, prenom, dob: '', profession: '', acteRef: '', cni: null };
+      this.currentTab.set('celibat');
+    }
+    this.notify(`Modification du certificat N° ${item.numero} (les champs non enregistrés en base restent à ressaisir)`);
+  }
+
+  annulerModificationCertificat(): void {
+    this.editingCertificatId = null;
+    this.celibatForm = { nom: '', prenom: '', dob: '', profession: '', acteRef: '', cni: null };
+    this.residenceForm = { nom: '', prenom: '', adresse: '', quartier: '', commune: '', cni: null };
+    this.vieForm = { nom: '', prenom: '', dob: '', cni: null };
+  }
 
   delivrer(type: string) {
     this.submitAttempted.set(type);
@@ -83,6 +110,20 @@ export class CertificatsComponent implements OnInit {
     else if (type === 'Vie') { nom = this.vieForm.nom; prenom = this.vieForm.prenom; dob = this.vieForm.dob; typeLabel = 'Vie'; cni = this.vieForm.cni; }
 
     if (!nom) { this.notify('Nom du bénéficiaire requis (*)'); return; }
+
+    if (this.editingCertificatId) {
+      const id = this.editingCertificatId;
+      this.api.updateCertificat(id, buildFormData({ type: typeLabel, beneficiaire_nom: nom, beneficiaire_prenom: prenom, acte_reference: acteRef }, [cni])).subscribe({
+        next: res => {
+          this.certificats.update(l => l.map(c => c.id === id ? res : c));
+          this.notify(`Certificat de ${typeLabel} modifié — N° ${res.numero}`);
+          this.annulerModificationCertificat();
+          this.submitAttempted.set(null);
+        },
+        error: (err) => this.notify(err?.error?.message || "Erreur lors de la modification")
+      });
+      return;
+    }
 
     this.api.createCertificat(buildFormData({ type: typeLabel, beneficiaire_nom: nom, beneficiaire_prenom: prenom, acte_reference: acteRef }, [cni]))
       .subscribe({

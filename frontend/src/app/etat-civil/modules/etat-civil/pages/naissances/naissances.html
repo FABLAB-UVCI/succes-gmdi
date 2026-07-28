@@ -79,7 +79,14 @@
                 </div>
             </div>
             
-            <div class="fa"><button class="btn-s" (click)="resetForm('naissance')"><i class="ti ti-x"></i>Effacer</button><button class="btn-p" (click)="enregistrerNaissance()"><i class="ti ti-check"></i>Valider et générer l'acte</button></div>
+            @if (editingNaissanceId) {
+                <div class="fa">
+                    <button class="btn-s" (click)="annulerModificationNaissance()"><i class="ti ti-x"></i>Annuler la modification</button>
+                    <button class="btn-p" (click)="enregistrerNaissance()"><i class="ti ti-check"></i>Enregistrer les modifications</button>
+                </div>
+            } @else {
+                <div class="fa"><button class="btn-s" (click)="resetForm('naissance')"><i class="ti ti-x"></i>Effacer</button><button class="btn-p" (click)="enregistrerNaissance()"><i class="ti ti-check"></i>Valider et générer l'acte</button></div>
+            }
         </div>
         </div>
     }
@@ -104,11 +111,12 @@
                     <td>{{ item.dateNaissance }}</td>
                     <td>{{ item.lieu }}</td>
                     <td><span class="chip" [class.cv]="!item._pending" [class.co]="item._pending">{{ item.statut }}</span></td>
-                    <td>
+                    <td style="display:flex;gap:6px">
                         @if (item._pending) {
                             <a routerLink="/etat-civil/demandes" class="btn-s" style="padding:3px 8px;font-size:11px;text-decoration:none"><i class="ti ti-eye"></i>Traiter</a>
                         } @else {
                             <button class="btn-s" style="padding:3px 8px;font-size:11px" (click)="imprimer('Naissance', item.numero)"><i class="ti ti-printer"></i>Imprimer</button>
+                            <button class="btn-s" style="padding:3px 8px;font-size:11px" (click)="modifierNaissance(item)"><i class="ti ti-pencil"></i>Modifier</button>
                         }
                     </td>
                 </tr>

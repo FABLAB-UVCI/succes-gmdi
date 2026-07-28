@@ -31,7 +31,14 @@
               @if (celibatForm.cni) { <small style="color:green">✓ {{ celibatForm.cni.name }}</small> }
             </div>
           </div>
-          <div class="fa"><button class="btn-p" (click)="delivrer('Célibat')"><i class="ti ti-printer"></i>Établir & Imprimer</button></div>
+          @if (editingCertificatId) {
+            <div class="fa">
+              <button class="btn-s" (click)="annulerModificationCertificat()"><i class="ti ti-x"></i>Annuler la modification</button>
+              <button class="btn-p" (click)="delivrer('Célibat')"><i class="ti ti-check"></i>Enregistrer les modifications</button>
+            </div>
+          } @else {
+            <div class="fa"><button class="btn-p" (click)="delivrer('Célibat')"><i class="ti ti-printer"></i>Établir & Imprimer</button></div>
+          }
         </div>
       </div>
     }
@@ -62,7 +69,14 @@
               @if (residenceForm.cni) { <small style="color:green">✓ {{ residenceForm.cni.name }}</small> }
             </div>
           </div>
-          <div class="fa"><button class="btn-p" (click)="delivrer('Résidence')"><i class="ti ti-printer"></i>Établir & Imprimer</button></div>
+          @if (editingCertificatId) {
+            <div class="fa">
+              <button class="btn-s" (click)="annulerModificationCertificat()"><i class="ti ti-x"></i>Annuler la modification</button>
+              <button class="btn-p" (click)="delivrer('Résidence')"><i class="ti ti-check"></i>Enregistrer les modifications</button>
+            </div>
+          } @else {
+            <div class="fa"><button class="btn-p" (click)="delivrer('Résidence')"><i class="ti ti-printer"></i>Établir & Imprimer</button></div>
+          }
         </div>
       </div>
     }
@@ -84,7 +98,14 @@
               @if (vieForm.cni) { <small style="color:green">✓ {{ vieForm.cni.name }}</small> }
             </div>
           </div>
-          <div class="fa"><button class="btn-p" (click)="delivrer('Vie')"><i class="ti ti-printer"></i>Établir & Imprimer</button></div>
+          @if (editingCertificatId) {
+            <div class="fa">
+              <button class="btn-s" (click)="annulerModificationCertificat()"><i class="ti ti-x"></i>Annuler la modification</button>
+              <button class="btn-p" (click)="delivrer('Vie')"><i class="ti ti-check"></i>Enregistrer les modifications</button>
+            </div>
+          } @else {
+            <div class="fa"><button class="btn-p" (click)="delivrer('Vie')"><i class="ti ti-printer"></i>Établir & Imprimer</button></div>
+          }
         </div>
       </div>
     }
@@ -102,11 +123,12 @@
                   <td>{{ c.beneficiaire }}</td>
                   <td>{{ c.dateDelivrance }}</td>
                   <td><span class="chip" [class.cv]="!c._pending" [class.co]="c._pending">{{ c.statut }}</span></td>
-                  <td>
+                  <td style="display:flex;gap:6px">
                     @if (c._pending) {
                       <a routerLink="/etat-civil/demandes" class="btn-s" style="padding:3px 8px;font-size:11px;text-decoration:none"><i class="ti ti-eye"></i>Traiter</a>
                     } @else {
                       <button class="btn-s" style="padding:3px 8px;font-size:11px" (click)="imprimer(c)"><i class="ti ti-printer"></i>Imprimer</button>
+                      <button class="btn-s" style="padding:3px 8px;font-size:11px" (click)="modifierCertificat(c)"><i class="ti ti-pencil"></i>Modifier</button>
                     }
                   </td>
                 </tr>

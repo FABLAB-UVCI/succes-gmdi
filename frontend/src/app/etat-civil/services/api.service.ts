@@ -16,6 +16,10 @@ export class ApiService {
   createNaissance(data: any) {
     return this.http.post<any>(`${API}/naissances`, data);
   }
+  updateNaissance(id: number, data: any) {
+    if (data instanceof FormData) { data.append('_method', 'PUT'); return this.http.post<any>(`${API}/naissances/${id}`, data); }
+    return this.http.put<any>(`${API}/naissances/${id}`, data);
+  }
   deleteNaissance(id: number) {
     return this.http.delete(`${API}/naissances/${id}`);
   }
@@ -28,6 +32,10 @@ export class ApiService {
   createMariage(data: any) {
     return this.http.post<any>(`${API}/mariages`, data);
   }
+  updateMariage(id: number, data: any) {
+    if (data instanceof FormData) { data.append('_method', 'PUT'); return this.http.post<any>(`${API}/mariages/${id}`, data); }
+    return this.http.put<any>(`${API}/mariages/${id}`, data);
+  }
   deleteMariage(id: number) {
     return this.http.delete(`${API}/mariages/${id}`);
   }
@@ -39,6 +47,10 @@ export class ApiService {
   }
   createDeces(data: any) {
     return this.http.post<any>(`${API}/deces`, data);
+  }
+  updateDeces(id: number, data: any) {
+    if (data instanceof FormData) { data.append('_method', 'PUT'); return this.http.post<any>(`${API}/deces/${id}`, data); }
+    return this.http.put<any>(`${API}/deces/${id}`, data);
   }
   deleteDeces(id: number) {
     return this.http.delete(`${API}/deces/${id}`);
@@ -63,6 +75,10 @@ export class ApiService {
   }
   createCertificat(data: any) {
     return this.http.post<any>(`${API}/certificats`, data);
+  }
+  updateCertificat(id: number, data: any) {
+    if (data instanceof FormData) { data.append('_method', 'PUT'); return this.http.post<any>(`${API}/certificats/${id}`, data); }
+    return this.http.put<any>(`${API}/certificats/${id}`, data);
   }
   deleteCertificat(id: number) {
     return this.http.delete(`${API}/certificats/${id}`);
