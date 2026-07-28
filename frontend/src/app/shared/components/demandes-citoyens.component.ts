@@ -2,7 +2,9 @@ import { Component, inject, signal, OnInit, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
 import { environment } from '@env/environment';
+import { ApiService as EtatCivilApiService } from '../../etat-civil/services/api.service';
 
 export interface Demarche {
   id: number;
@@ -251,10 +253,21 @@ export class DemandesCitoyensComponent implements OnInit {
     this.selectedDemarche.set(null);
   }
 
-  updateStatut(nouveauStatut: string) {
+  private etatCivilApi = inject(EtatCivilApiService);
+
+  async updateStatut(nouveauStatut: string) {
     const d = this.selectedDemarche();
     if (!d) return;
     this.updating.set(true);
+
+    if (nouveauStatut === 'valide' && this.moduleName === 'etat-civil') {
+      try {
+        await this.genererActeOuCertificat(d);
+      } catch (e) {
+        console.error("Impossible de dresser l'acte / certificat officiel :", e);
+      }
+    }
+
     this.http.put(`${this.base}/demarches/${d.id}`, { statut: nouveauStatut }).subscribe({
       next: () => {
         this.updating.set(false);
@@ -263,6 +276,77 @@ export class DemandesCitoyensComponent implements OnInit {
       },
       error: () => this.updating.set(false)
     });
+  }
+
+  /**
+   * Enregistre la démarche citoyenne dans le registre officiel correspondant
+   * puis imprime l'acte/certificat avec le même modèle que celui utilisé
+   * par les agents d'état civil, pour garder un rendu identique.
+   */
+  private async genererActeOuCertificat(d: Demarche): Promise<void> {
+    const type = d.type_demarche || '';
+    const don: any = d.donnees || {};
+    const api = this.etatCivilApi;
+
+    if (type === "Demande d'acte de naissance") {
+      const res: any = await firstValueFrom(api.createNaissance({
+        nom: don.nom, prenom: don.prenom, date_naissance: don.date_naissance, heure_naissance: don.heure_naissance,
+        sexe: don.sexe, lieu_naissance: don.lieu_naissance, commune: don.commune,
+        pere_nom: don.pere_nom, pere_profession: don.pere_profession, pere_nationalite: don.pere_nationalite,
+        mere_nom: don.mere_nom, mere_profession: don.mere_profession, mere_nationalite: don.mere_nationalite,
+      }));
+      const { genererExtraitNaissancePDF } = await import('../../etat-civil/modules/etat-civil/pages/naissances/naissances');
+      await genererExtraitNaissancePDF({
+        numero: res.numero, nom: don.nom, prenom: don.prenom,
+        dateNaissance: don.date_naissance, heureNaissance: don.heure_naissance, sexe: don.sexe,
+        lieuNaissance: don.lieu_naissance, commune: don.commune,
+        pereNom: don.pere_nom, mereNom: don.mere_nom,
+        pereProf: don.pere_profession, mereProf: don.mere_profession,
+        pereNat: don.pere_nationalite, mereNat: don.mere_nationalite,
+      });
+    } else if (type === "Demande d'acte de mariage") {
+      const res: any = await firstValueFrom(api.createMariage({
+        epoux_nom: don.epoux_nom, epoux_prenom: don.epoux_prenom, epoux_profession: don.epoux_profession, epoux_nationalite: don.epoux_nationalite,
+        epouse_nom: don.epouse_nom, epouse_prenom: don.epouse_prenom, epouse_profession: don.epouse_profession, epouse_nationalite: don.epouse_nationalite,
+        date_mariage: don.date_mariage, lieu_mariage: don.lieu_mariage, regime_matrimonial: don.regime_matrimonial,
+        temoin1_nom: don.epoux_temoin_nom, temoin1_profession: don.epoux_temoin_profession,
+        temoin2_nom: don.epouse_temoin_nom, temoin2_profession: don.epouse_temoin_profession,
+      }));
+      const { genererActeMariagePDF } = await import('../../etat-civil/modules/etat-civil/pages/mariages/mariages');
+      await genererActeMariagePDF({
+        numero: res.numero,
+        epoux: `${don.epoux_nom ?? ''} ${don.epoux_prenom ?? ''}`.trim(),
+        epouse: `${don.epouse_nom ?? ''} ${don.epouse_prenom ?? ''}`.trim(),
+        dateMariage: don.date_mariage, lieu: don.lieu_mariage, regime: don.regime_matrimonial,
+        epouxProf: don.epoux_profession, epouxNat: don.epoux_nationalite,
+        epouseProf: don.epouse_profession, epouseNat: don.epouse_nationalite,
+        temoin1: don.epoux_temoin_nom, temoin1Prof: don.epoux_temoin_profession,
+        temoin2: don.epouse_temoin_nom, temoin2Prof: don.epouse_temoin_profession,
+      });
+    } else if (type === "Demande d'acte de décès") {
+      const res: any = await firstValueFrom(api.createDeces({
+        nom: don.defunt_nom, prenom: don.defunt_prenom, date_naissance: don.defunt_date_naissance,
+        date_deces: don.date_deces, heure_deces: don.heure_deces, lieu_deces: don.lieu_deces,
+        commune: don.defunt_commune, cause_deces: don.cause_deces, declarant_nom: don.declarant_nom,
+      }));
+      const { genererActeDecesPDF } = await import('../../etat-civil/modules/etat-civil/pages/deces/deces');
+      await genererActeDecesPDF({
+        numero: res.numero, nom: don.defunt_nom, prenom: don.defunt_prenom, dob: don.defunt_date_naissance,
+        dateDeces: don.date_deces, heureDeces: don.heure_deces, lieuDeces: don.lieu_deces,
+        commune: don.defunt_commune, causeDeces: don.cause_deces, declarant: don.declarant_nom,
+      });
+    } else if (type === 'Certificat de célibat' || type === 'Certificat de résidence' || type === 'Certificat de vie individuelle') {
+      const typeLabel = type === 'Certificat de célibat' ? 'Célibat' : type === 'Certificat de résidence' ? 'Résidence' : 'Vie';
+      const res: any = await firstValueFrom(api.createCertificat({
+        type: typeLabel, beneficiaire_nom: don.nom, beneficiaire_prenom: don.prenom, acte_reference: don.acte_reference,
+      }));
+      const { genererCertificatPDF } = await import('../../etat-civil/modules/etat-civil/pages/certificats/certificats');
+      await genererCertificatPDF(typeLabel, {
+        numero: res.numero, nom: don.nom, prenom: don.prenom, dob: don.date_naissance,
+        acteRef: don.acte_reference, adresse: don.adresse, quartier: don.quartier, commune: don.commune,
+        profession: don.profession, dateDelivrance: res.dateDelivrance,
+      });
+    }
   }
 
   labelStatut(s: string): string {

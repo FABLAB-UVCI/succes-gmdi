@@ -29,6 +29,9 @@ import { TOUTES_COMMUNES } from '../etat-civil/communes.ci';
               <option value="Demande d'acte de naissance">Déclaration / Acte de naissance</option>
               <option value="Demande d'acte de mariage">Déclaration / Acte de mariage</option>
               <option value="Demande d'acte de décès">Déclaration / Acte de décès</option>
+              <option value="Certificat de célibat">Certificat de célibat</option>
+              <option value="Certificat de résidence">Certificat de résidence</option>
+              <option value="Certificat de vie individuelle">Certificat de vie individuelle</option>
             </select>
           </div>
 
@@ -211,6 +214,68 @@ import { TOUTES_COMMUNES } from '../etat-civil/communes.ci';
                 <div class="fg"><div class="fl">CNI du défunt</div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png" (change)="onFileSelected($event)"></div>
                 <div class="fg"><div class="fl">Certificat de décès (PDF)</div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png" (change)="onFileSelected($event)"></div>
                 <div class="fg"><div class="fl">CNI du déclarant</div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png" (change)="onFileSelected($event)"></div>
+              </div>
+            </ng-container>
+
+            <!-- Champs État Civil : Certificat de célibat -->
+            <ng-container *ngIf="typeControl.value === 'Certificat de célibat'">
+              <div class="fsec ivoire-border">Informations du demandeur</div>
+              <div class="form-grid">
+                <div class="fg"><div class="fl">Nom <span class="req">*</span></div><input type="text" class="fi" formControlName="nom" placeholder="Ex: KONAN"></div>
+                <div class="fg"><div class="fl">Prénom(s)</div><input type="text" class="fi" formControlName="prenom" placeholder="Ex: Kouassi"></div>
+              </div>
+              <div class="form-grid">
+                <div class="fg"><div class="fl">Date de naissance</div><input type="date" class="fi" formControlName="date_naissance"></div>
+                <div class="fg"><div class="fl">Profession</div><input type="text" class="fi" formControlName="profession" placeholder="Ex: Commerçant"></div>
+              </div>
+              <div class="form-grid" style="grid-template-columns: 1fr;">
+                <div class="fg"><div class="fl">Référence acte de naissance</div><input type="text" class="fi" formControlName="acte_reference" placeholder="Ex: CI-CC-2000-N-001234"></div>
+              </div>
+              <div class="fsec ivoire-border">Documents justificatifs</div>
+              <div class="form-grid" style="grid-template-columns: 1fr;">
+                <div class="fg"><div class="fl">CNI / Passeport du demandeur</div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png" (change)="onFileSelected($event)"></div>
+              </div>
+            </ng-container>
+
+            <!-- Champs État Civil : Certificat de résidence -->
+            <ng-container *ngIf="typeControl.value === 'Certificat de résidence'">
+              <div class="fsec ivoire-border">Informations du demandeur</div>
+              <div class="form-grid">
+                <div class="fg"><div class="fl">Nom <span class="req">*</span></div><input type="text" class="fi" formControlName="nom" placeholder="Ex: TRAORÉ"></div>
+                <div class="fg"><div class="fl">Prénom(s)</div><input type="text" class="fi" formControlName="prenom" placeholder="Ex: Aminata"></div>
+              </div>
+              <div class="form-grid-3">
+                <div class="fg"><div class="fl">Adresse complète</div><input type="text" class="fi" formControlName="adresse" placeholder="Ex: 12 Rue des Jardins, Cocody"></div>
+                <div class="fg"><div class="fl">Quartier</div><input type="text" class="fi" formControlName="quartier" placeholder="Ex: Angré 8e Tranche"></div>
+                <div class="fg">
+                  <div class="fl">Commune</div>
+                  <select class="fsel" formControlName="commune">
+                    <option value="" disabled>-- Sélectionnez une commune --</option>
+                    @for (commune of communesList; track commune) {
+                      <option [value]="commune">{{ commune }}</option>
+                    }
+                  </select>
+                </div>
+              </div>
+              <div class="fsec ivoire-border">Documents justificatifs</div>
+              <div class="form-grid" style="grid-template-columns: 1fr;">
+                <div class="fg"><div class="fl">CNI / Passeport du demandeur</div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png" (change)="onFileSelected($event)"></div>
+              </div>
+            </ng-container>
+
+            <!-- Champs État Civil : Certificat de vie individuelle -->
+            <ng-container *ngIf="typeControl.value === 'Certificat de vie individuelle'">
+              <div class="fsec ivoire-border">Informations du demandeur</div>
+              <div class="form-grid">
+                <div class="fg"><div class="fl">Nom <span class="req">*</span></div><input type="text" class="fi" formControlName="nom" placeholder="Ex: KOUADIO"></div>
+                <div class="fg"><div class="fl">Prénom(s)</div><input type="text" class="fi" formControlName="prenom" placeholder="Ex: Jean"></div>
+              </div>
+              <div class="form-grid" style="grid-template-columns: 1fr;">
+                <div class="fg"><div class="fl">Date de naissance</div><input type="date" class="fi" formControlName="date_naissance"></div>
+              </div>
+              <div class="fsec ivoire-border">Documents justificatifs</div>
+              <div class="form-grid" style="grid-template-columns: 1fr;">
+                <div class="fg"><div class="fl">CNI / Passeport du demandeur</div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png" (change)="onFileSelected($event)"></div>
               </div>
             </ng-container>
 
@@ -510,6 +575,20 @@ export class CitoyenDemandeComponent implements OnInit {
           defunt_date_naissance: [''], defunt_commune: [''],
           date_deces: ['', Validators.required], heure_deces: [''], lieu_deces: ['', Validators.required],
           cause_deces: [''], declarant_nom: ['']
+        };
+      } else if (type === 'Certificat de célibat') {
+        controls = {
+          nom: ['', Validators.required], prenom: [''],
+          date_naissance: [''], profession: [''], acte_reference: ['']
+        };
+      } else if (type === 'Certificat de résidence') {
+        controls = {
+          nom: ['', Validators.required], prenom: [''],
+          adresse: [''], quartier: [''], commune: ['']
+        };
+      } else if (type === 'Certificat de vie individuelle') {
+        controls = {
+          nom: ['', Validators.required], prenom: [''], date_naissance: ['']
         };
       }
     } else if (this.module === 'communication') {
