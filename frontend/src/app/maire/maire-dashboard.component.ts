@@ -28,13 +28,13 @@ interface ModuleStat {
       <span class="flag-strip"><span class="fo"></span><span class="fw"></span><span class="fv"></span></span>
       <div>
         <h1 class="topbar-title">Tableau de bord du Maire</h1>
-        <p class="topbar-sub">Plateforme E-Mairie â€” Vue consolidÃ©e</p>
+        <p class="topbar-sub">Plateforme E-Mairie — Vue consolidée</p>
       </div>
     </div>
     <div class="topbar-right">
       <button class="btn-annonce" (click)="ouvrirModalAnnonce()"><i class="ti ti-speakerphone"></i> Nouvelle annonce</button>
-      <span class="mayor-name">ðŸ›ï¸ {{ user?.name ?? 'Monsieur le Maire' }}</span>
-      <button class="btn-logout" (click)="auth.logout()">DÃ©connexion</button>
+      <span class="mayor-name">🏛️ {{ user?.name ?? 'Monsieur le Maire' }}</span>
+      <button class="btn-logout" (click)="auth.logout()">Déconnexion</button>
     </div>
   </header>
 
@@ -66,7 +66,7 @@ interface ModuleStat {
 
     <!-- KPIs globaux  -->
     <section class="kpi-section">
-      <h2 class="section-title">ðŸ“Š Indicateurs globaux</h2>
+      <h2 class="section-title">📊 Indicateurs globaux</h2>
       <div class="kpi-grid">
         @for (k of globalKpis; track k.label) {
           <div class="kpi-card" [style.border-top-color]="k.color">
@@ -76,7 +76,7 @@ interface ModuleStat {
               <span class="kpi-lbl">{{ k.label }}</span>
             </div>
             <span class="kpi-trend" [class.up]="k.trend > 0" [class.neutral]="k.trend === 0">
-              {{ k.trend > 0 ? 'â†‘' : k.trend < 0 ? 'â†“' : 'â€”' }}
+              {{ k.trend > 0 ? '↑' : k.trend < 0 ? '↓' : '—' }}
             </span>
           </div>
         }
@@ -85,7 +85,7 @@ interface ModuleStat {
 
     <!--  Modules -->
     <section>
-      <h2 class="section-title">ðŸ—‚ï¸ AccÃ¨s aux modules â€” Supervision</h2>
+      <h2 class="section-title">🗂️ Accès aux modules — Supervision</h2>
       <div class="modules-grid">
         @for (m of modules; track m.key) {
           <div class="module-card" [style.--mc]="m.color">
@@ -105,7 +105,7 @@ interface ModuleStat {
               }
             </div>
             <a class="module-btn" [routerLink]="[m.route]">
-              AccÃ©der au module <span>â†’</span>
+              Accéder au module <span>→</span>
               Accéder au module <span>→</span>
             </a>
           </div>
@@ -178,7 +178,7 @@ interface ModuleStat {
   font-family: 'Inter', system-ui, sans-serif;
 }
 
-/* â”€â”€ Topbar â”€â”€ */
+/* ── Topbar ── */
 .maire-topbar {
   background: linear-gradient(135deg, #003366 0%, #00245c 100%);
   padding: 1.2rem 2.5rem;
@@ -203,7 +203,7 @@ interface ModuleStat {
 .maire-body { max-width: 1280px; margin: 0 auto; padding: 2rem 2rem; display: flex; flex-direction: column; gap: 2.5rem; }
 .section-title { font-size: 1.05rem; font-weight: 800; color: #003366; margin: 0 0 1.2rem; }
 
-/* â”€â”€ KPI globaux â”€â”€ */
+/* ── KPI globaux ── */
 .kpi-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -224,7 +224,7 @@ interface ModuleStat {
 .kpi-trend { font-size: 1rem; font-weight: 700; color: #c8d0de; }
 .kpi-trend.up { color: #009A44; }
 
-/* â”€â”€ Modules grid â”€â”€ */
+/* ── Modules grid ── */
 .modules-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
@@ -262,7 +262,7 @@ interface ModuleStat {
 }
 .module-btn:hover { opacity: .88; }
 
-/* â”€â”€ Alertes â”€â”€ */
+/* ── Alertes ── */
 .alerts-section { background: #fff; border-radius: 16px; padding: 1.5rem; box-shadow: 0 2px 12px rgba(0,0,0,.06); }
 .alerts-list { display: flex; flex-direction: column; gap: .7rem; }
 .alert-item {
@@ -336,90 +336,90 @@ export class MaireDashboardComponent implements OnInit {
   annonceForm: AnnonceForm = { titre: '', contenu: '', urgent: false };
 
   globalKpis = [
-    { label: 'DÃ©marches citoyens',  value: 'â€”', ico: 'ðŸ“‹', color: '#003366', trend: 0 },
-    { label: 'Actes Ã‰tat civil',    value: 'â€”', ico: 'ðŸ“„', color: '#009A44', trend: 1 },
-    { label: 'Recettes (FCFA)',     value: 'â€”', ico: 'ðŸ’°', color: '#F77F00', trend: 1 },
-    { label: 'Agents actifs',       value: 'â€”', ico: 'ðŸ‘¥', color: '#7a5c3a', trend: 0 },
-    { label: 'Permis Urbanisme',    value: 'â€”', ico: 'ðŸ—ºï¸', color: '#004fa3', trend: 1 },
-    { label: 'Interventions ST',    value: 'â€”', ico: 'ðŸ”§', color: '#e63946', trend: -1 },
+    { label: 'Démarches citoyens',  value: '—', ico: '📋', color: '#003366', trend: 0 },
+    { label: 'Actes État civil',    value: '—', ico: '📄', color: '#009A44', trend: 1 },
+    { label: 'Recettes (FCFA)',     value: '—', ico: '💰', color: '#F77F00', trend: 1 },
+    { label: 'Agents actifs',       value: '—', ico: '👥', color: '#7a5c3a', trend: 0 },
+    { label: 'Permis Urbanisme',    value: '—', ico: '🗺️', color: '#004fa3', trend: 1 },
+    { label: 'Interventions ST',    value: '—', ico: '🔧', color: '#e63946', trend: -1 },
   ];
 
   modules: ModuleStat[] = [
     {
-      key: 'communication', label: 'Communication', ico: 'ðŸ“£', color: '#F77F00',
-      route: '/communication', description: 'ActualitÃ©s, rÃ©clamations, partenaires, SMS',
+      key: 'communication', label: 'Communication', ico: '📣', color: '#F77F00',
+      route: '/communication', description: 'Actualités, réclamations, partenaires, SMS',
       kpis: [
-        { label: 'Publications', value: 'â€”' },
-        { label: 'RÃ©clamations ouvertes', value: 'â€”' },
-        { label: 'Partenaires actifs', value: 'â€”' },
+        { label: 'Publications', value: '—' },
+        { label: 'Réclamations ouvertes', value: '—' },
+        { label: 'Partenaires actifs', value: '—' },
       ],
     },
     {
-      key: 'etat-civil', label: 'Ã‰tat civil', ico: 'ðŸ“„', color: '#003366',
-      route: '/etat-civil', description: 'Naissances, mariages, dÃ©cÃ¨s, certificats',
+      key: 'etat-civil', label: 'État civil', ico: '📄', color: '#003366',
+      route: '/etat-civil', description: 'Naissances, mariages, décès, certificats',
       kpis: [
-        { label: 'Naissances', value: 'â€”' },
-        { label: 'Mariages', value: 'â€”' },
-        { label: 'Certificats', value: 'â€”' },
+        { label: 'Naissances', value: '—' },
+        { label: 'Mariages', value: '—' },
+        { label: 'Certificats', value: '—' },
       ],
     },
     {
-      key: 'finances', label: 'Finances', ico: 'ðŸ’°', color: '#F77F00',
-      route: '/finances', description: 'Budget, recettes, dÃ©penses, trÃ©sorerie',
+      key: 'finances', label: 'Finances', ico: '💰', color: '#F77F00',
+      route: '/finances', description: 'Budget, recettes, dépenses, trésorerie',
       kpis: [
-        { label: 'Budget', value: 'â€”', unit: ' FCFA' },
-        { label: 'Recettes', value: 'â€”', unit: ' FCFA' },
-        { label: 'DÃ©penses', value: 'â€”', unit: ' FCFA' },
+        { label: 'Budget', value: '—', unit: ' FCFA' },
+        { label: 'Recettes', value: '—', unit: ' FCFA' },
+        { label: 'Dépenses', value: '—', unit: ' FCFA' },
       ],
     },
     {
-      key: 'patrimoine', label: 'Patrimoine', ico: 'ðŸ›ï¸', color: '#7a5c3a',
-      route: '/patrimoine', description: 'Biens immobiliers, vÃ©hicules, terrains',
+      key: 'patrimoine', label: 'Patrimoine', ico: '🏛️', color: '#7a5c3a',
+      route: '/patrimoine', description: 'Biens immobiliers, véhicules, terrains',
       kpis: [
-        { label: 'Parcelles', value: 'â€”' },
-        { label: 'Biens immo.', value: 'â€”' },
-        { label: 'VÃ©hicules', value: 'â€”' },
+        { label: 'Parcelles', value: '—' },
+        { label: 'Biens immo.', value: '—' },
+        { label: 'Véhicules', value: '—' },
       ],
     },
     {
-      key: 'rh', label: 'Ressources humaines', ico: 'ðŸ‘¥', color: '#009A44',
-      route: '/rh', description: 'Agents, congÃ©s, formations, recrutements',
+      key: 'rh', label: 'Ressources humaines', ico: '👥', color: '#009A44',
+      route: '/rh', description: 'Agents, congés, formations, recrutements',
       kpis: [
-        { label: 'Agents actifs', value: 'â€”' },
-        { label: 'CongÃ©s en cours', value: 'â€”' },
-        { label: 'Recrutements', value: 'â€”' },
+        { label: 'Agents actifs', value: '—' },
+        { label: 'Congés en cours', value: '—' },
+        { label: 'Recrutements', value: '—' },
       ],
     },
     {
-      key: 'services-techniques', label: 'Services techniques', ico: 'ðŸ”§', color: '#e63946',
-      route: '/services-techniques', description: 'Voirie, Ã©clairage, bÃ¢timents, drainage',
+      key: 'services-techniques', label: 'Services techniques', ico: '🔧', color: '#e63946',
+      route: '/services-techniques', description: 'Voirie, éclairage, bâtiments, drainage',
       kpis: [
-        { label: 'Interventions', value: 'â€”' },
-        { label: 'Pannes signalÃ©es', value: 'â€”' },
-        { label: 'Chantiers actifs', value: 'â€”' },
+        { label: 'Interventions', value: '—' },
+        { label: 'Pannes signalées', value: '—' },
+        { label: 'Chantiers actifs', value: '—' },
       ],
     },
     {
-      key: 'urbanisme', label: 'Urbanisme / SIG', ico: 'ðŸ—ºï¸', color: '#004fa3',
+      key: 'urbanisme', label: 'Urbanisme / SIG', ico: '🗺️', color: '#004fa3',
       route: '/urbanisme', description: 'Parcelles, permis, lotissements, cartographie',
       kpis: [
-        { label: 'Parcelles', value: 'â€”' },
-        { label: 'Permis actifs', value: 'â€”' },
-        { label: 'Lotissements', value: 'â€”' },
+        { label: 'Parcelles', value: '—' },
+        { label: 'Permis actifs', value: '—' },
+        { label: 'Lotissements', value: '—' },
       ],
     },
   ];
 
   alerts = [
-    { ico: 'âš ï¸', message: 'Dossiers en attente de validation', detail: '3 dossiers Ã‰tat civil nÃ©cessitent votre attention', level: 'warning', tag: 'Ã‰tat civil' },
-    { ico: 'ðŸ“¢', message: 'Rapport mensuel disponible', detail: 'Le rapport Finances de juillet est prÃªt', level: 'info', tag: 'Finances' },
-    { ico: 'ðŸ”§', message: 'Pannes Ã©clairage signalÃ©es', detail: '5 pannes en attente de maintenance', level: 'warning', tag: 'Services techniques' },
-    { ico: 'ðŸ‘¥', message: 'Recrutements en cours', detail: '2 postes ouverts au stade de validation', level: 'info', tag: 'RH' },
+    { ico: '⚠️', message: 'Dossiers en attente de validation', detail: '3 dossiers État civil nécessitent votre attention', level: 'warning', tag: 'État civil' },
+    { ico: '📢', message: 'Rapport mensuel disponible', detail: 'Le rapport Finances de juillet est prêt', level: 'info', tag: 'Finances' },
+    { ico: '🔧', message: 'Pannes éclairage signalées', detail: '5 pannes en attente de maintenance', level: 'warning', tag: 'Services techniques' },
+    { ico: '👥', message: 'Recrutements en cours', detail: '2 postes ouverts au stade de validation', level: 'info', tag: 'RH' },
   ];
 
   ngOnInit(): void {
-    // Ici on pourrait rÃ©cupÃ©rer les vrais KPIs via des appels API parallÃ¨les
-    // Pour l'instant on affiche la structure prÃªte Ã  recevoir des donnÃ©es
+    // Ici on pourrait récupérer les vrais KPIs via des appels API parallèles
+    // Pour l'instant on affiche la structure prête à recevoir des données
     this.loadKpis();
     this.loadAnnonces();
   }
@@ -470,14 +470,14 @@ export class MaireDashboardComponent implements OnInit {
   }
 
   loadKpis(): void {
-    // Chargement des statistiques Ã‰tat civil (exemple rÃ©el)
+    // Chargement des statistiques État civil (exemple réel)
     this.http.get<any>(`${environment.apiUrl}/etat-civil/statistiques`).subscribe({
       next: stats => {
         if (stats) {
-          this.updateModuleKpi('etat-civil', 0, stats.naissances ?? 'â€”');
-          this.updateModuleKpi('etat-civil', 1, stats.mariages ?? 'â€”');
-          this.updateModuleKpi('etat-civil', 2, stats.certificats ?? 'â€”');
-          this.globalKpis[1].value = String(stats.naissances ?? 'â€”');
+          this.updateModuleKpi('etat-civil', 0, stats.naissances ?? '—');
+          this.updateModuleKpi('etat-civil', 1, stats.mariages ?? '—');
+          this.updateModuleKpi('etat-civil', 2, stats.certificats ?? '—');
+          this.globalKpis[1].value = String(stats.naissances ?? '—');
         }
       },
       error: () => {},

@@ -29,12 +29,6 @@ interface ModuleCard { titre: string; description: string; route: string; icone:
     </div>
   </header>
 
-  @if (isMaire()) {
-    <a class="btn-maire-dashboard" routerLink="/maire">
-      <i class="ti ti-speakerphone"></i> Tableau de bord du Maire & Annonces
-    </a>
-  }
-
   @if (isMaire() && stats()) {
     <div class="dashboard-section">
       <h2 class="dash-title"><i class="ti ti-chart-pie"></i> Vue d'ensemble de la commune</h2>
@@ -88,6 +82,15 @@ interface ModuleCard { titre: string; description: string; route: string; icone:
 
   <h2 class="section-title"><i class="ti ti-apps"></i> Modules de gestion</h2>
   <div class="grid">
+    @if (isMaire()) {
+      <a class="card card-maire" routerLink="/maire">
+        <span class="card-accent"></span>
+        <span class="maire-badge">Espace Maire</span>
+        <span class="ico">🏛️</span>
+        <span class="titre">Tableau de bord du Maire</span>
+        <span class="desc">Vue consolidée, indicateurs & annonces municipales</span>
+      </a>
+    }
     @for (m of visibleModules; track m.route) {
       <a class="card" [class.card-orange]="$index % 2 === 0" [class.card-vert]="$index % 2 !== 0" [routerLink]="['/', m.route]">
         <span class="card-accent"></span>
@@ -266,14 +269,21 @@ interface ModuleCard { titre: string; description: string; route: string; icone:
 }
 .foot-logo { font-weight: 800; color: #003366; }
 .foot-sep { color: #F77F00; font-weight: 700; }
-.btn-maire-dashboard {
-  display: flex; align-items: center; justify-content: center; gap: .5rem;
-  max-width: 1100px; margin: 0 auto; padding: .9rem 1.5rem;
-  background: linear-gradient(90deg, #003366, #004fa3); color: #fff;
-  border-radius: 12px; text-decoration: none; font-weight: 700; font-size: .9rem;
-  box-shadow: 0 4px 14px rgba(0,51,102,.2); transition: opacity .15s ease;
+.card-maire {
+  background: linear-gradient(135deg, #003366 0%, #00245c 55%, #F77F00 130%);
+  border: 1px solid #003366;
+  color: #fff;
 }
-.btn-maire-dashboard:hover { opacity: .9; }
+.card-maire .card-accent { background: linear-gradient(90deg, #F77F00, #fff, #009A44); height: 5px; }
+.card-maire .titre { color: #fff; }
+.card-maire .desc { color: rgba(255,255,255,.8); }
+.card-maire:hover { transform: translateY(-4px); border-color: #F77F00; box-shadow: 0 12px 28px rgba(0,51,102,.35); }
+.maire-badge {
+  position: absolute; top: 12px; right: 12px;
+  background: rgba(255,255,255,.18); color: #ffdca8;
+  font-size: .65rem; font-weight: 800; letter-spacing: .4px; text-transform: uppercase;
+  padding: .25rem .6rem; border-radius: 20px; border: 1px solid rgba(255,255,255,.35);
+}
 </style>
   `
 })
