@@ -61,10 +61,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // --- État civil ---
     Route::prefix('etat-civil')->group(function () {
-        Route::apiResource('naissances', NaissanceController::class)->only(['index', 'store', 'show', 'destroy']);
-        Route::apiResource('mariages', MariageController::class)->only(['index', 'store', 'destroy']);
-        Route::apiResource('deces', DecesController::class)->only(['index', 'store', 'destroy']);
-        Route::apiResource('certificats', CertificatController::class)->only(['index', 'store', 'destroy']);
+        Route::apiResource('naissances', NaissanceController::class)->only(['index', 'store', 'show', 'update', 'destroy']);
+        Route::apiResource('mariages', MariageController::class)->only(['index', 'store', 'update', 'destroy']);
+        Route::apiResource('deces', DecesController::class)->only(['index', 'store', 'update', 'destroy']);
+        Route::apiResource('certificats', CertificatController::class)->only(['index', 'store', 'update', 'destroy']);
         Route::apiResource('publications-bans', PublicationBansController::class)->only(['index', 'store', 'destroy']);
         Route::get('statistiques', [StatistiquesController::class, 'index']);
     });

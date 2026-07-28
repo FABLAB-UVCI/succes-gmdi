@@ -55,11 +55,13 @@ class DecesController extends Controller
             'files.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png,webp,heic,heif,gif|max:10240',
         ]);
 
-        $data['numero'] = 'CI-CC-' . date('Y') . '-D-' . str_pad(Deces::count() + 1, 6, '0', STR_PAD_LEFT);
         $data['statut'] = 'Validé';
         $data['pieces_jointes'] = $this->storeUploadedFiles($request);
 
-        $deces = Deces::create($data);
+        $deces = $this->createWithUniqueNumero(function () use ($data) {
+            $data['numero'] = 'CI-CC-' . date('Y') . '-D-' . str_pad(Deces::count() + 1, 6, '0', STR_PAD_LEFT);
+            return Deces::create($data);
+        });
 
         return response()->json([
             'id' => $deces->id,
@@ -70,10 +72,54 @@ class DecesController extends Controller
         ], 201);
     }
 
+    public function update(Request $request, Deces $deces)
+    {
+        $data = $request->validate([
+            'nom' => 'required|string',
+            'prenom' => 'required|string',
+            'date_naissance' => 'nullable|date',
+            'date_deces' => 'required|date',
+            'heure_deces' => 'nullable|string',
+            'lieu_deces' => 'nullable|string',
+            'commune' => 'nullable|string',
+            'cause_deces' => 'nullable|string',
+            'declarant_nom' => 'nullable|string',
+            'declarant_lien' => 'nullable|string',
+            'files.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png,webp,heic,heif,gif|max:10240',
+        ]);
+
+        if ($nouvelles = $this->storeUploadedFiles($request)) {
+            $data['pieces_jointes'] = array_merge($deces->pieces_jointes ?? [], $nouvelles);
+        }
+
+        $deces->update($data);
+
+        return response()->json([
+            'id' => $deces->id,
+            'numero' => $deces->numero,
+            'nomComplet' => $deces->nom . ' ' . $deces->prenom,
+            'dateDeces' => $deces->date_deces?->format('d/m/Y'),
+            'statut' => $deces->statut,
+        ]);
+    }
+
     public function destroy(Deces $deces)
     {
         $deces->delete();
         return response()->json(['message' => 'Supprimé']);
+    }
+
+    private function createWithUniqueNumero(\Closure $attempt, int $maxAttempts = 5)
+    {
+        for ($i = 0; $i < $maxAttempts; $i++) {
+            try {
+                return $attempt();
+            } catch (\Illuminate\Database\QueryException $e) {
+                if ($i >= $maxAttempts - 1 || !str_contains(strtolower($e->getMessage()), 'unique')) {
+                    throw $e;
+                }
+            }
+        }
     }
 
     private function storeUploadedFiles(Request $request): ?array

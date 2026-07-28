@@ -73,12 +73,14 @@ class NaissanceController extends Controller
 
         $data['prenom'] = $data['prenom'] ?? '';
         $data['type'] = $data['type'] ?? 'Déclaration';
-        $lettre = ['Déclaration' => 'N', 'Jugement' => 'J', 'Adoption' => 'A'][$data['type']] ?? 'N';
-        $data['numero'] = 'CI-CC-' . date('Y') . "-$lettre-" . str_pad(Naissance::where('type', $data['type'])->count() + 1, 6, '0', STR_PAD_LEFT);
         $data['statut'] = 'Validé';
         $data['pieces_jointes'] = $this->storeUploadedFiles($request);
 
-        $naissance = Naissance::create($data);
+        $naissance = $this->createWithUniqueNumero(function () use ($data) {
+            $lettre = ['Déclaration' => 'N', 'Jugement' => 'J', 'Adoption' => 'A'][$data['type']] ?? 'N';
+            $data['numero'] = 'CI-CC-' . date('Y') . "-$lettre-" . str_pad(Naissance::where('type', $data['type'])->count() + 1, 6, '0', STR_PAD_LEFT);
+            return Naissance::create($data);
+        });
 
         return response()->json([
             'id' => $naissance->id,
@@ -105,6 +107,73 @@ class NaissanceController extends Controller
     public function show(Naissance $naissance)
     {
         return response()->json($naissance);
+    }
+
+    public function update(Request $request, Naissance $naissance)
+    {
+        $data = $request->validate([
+            'nom' => 'required|string',
+            'prenom' => 'nullable|string',
+            'date_naissance' => 'required|date',
+            'heure_naissance' => 'nullable|string',
+            'sexe' => 'nullable|in:Masculin,Féminin',
+            'lieu_naissance' => 'nullable|string',
+            'commune' => 'nullable|string',
+            'pere_nom' => 'nullable|string',
+            'pere_profession' => 'nullable|string',
+            'pere_nationalite' => 'nullable|string',
+            'mere_nom' => 'nullable|string',
+            'mere_profession' => 'nullable|string',
+            'mere_nationalite' => 'nullable|string',
+            'tribunal' => 'nullable|string',
+            'date_jugement' => 'nullable|date',
+            'files.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png,webp,heic,heif,gif|max:10240',
+        ]);
+
+        $data['prenom'] = $data['prenom'] ?? '';
+        if ($nouvelles = $this->storeUploadedFiles($request)) {
+            $data['pieces_jointes'] = array_merge($naissance->pieces_jointes ?? [], $nouvelles);
+        }
+
+        $naissance->update($data);
+
+        return response()->json([
+            'id' => $naissance->id,
+            'numero' => $naissance->numero,
+            'nomComplet' => trim($naissance->nom . ' ' . $naissance->prenom),
+            'nom' => $naissance->nom,
+            'prenom' => $naissance->prenom,
+            'dateNaissance' => $naissance->date_naissance?->format('d/m/Y'),
+            'heureNaissance' => $naissance->heure_naissance,
+            'lieu' => $naissance->lieu_naissance,
+            'commune' => $naissance->commune,
+            'sexe' => $naissance->sexe,
+            'pereNom' => $naissance->pere_nom,
+            'pereProf' => $naissance->pere_profession,
+            'pereNat' => $naissance->pere_nationalite,
+            'mereNom' => $naissance->mere_nom,
+            'mereProf' => $naissance->mere_profession,
+            'mereNat' => $naissance->mere_nationalite,
+            'type' => $naissance->type,
+            'statut' => $naissance->statut,
+        ]);
+    }
+
+    /**
+     * Réessaie la création en cas de collision de numéro d'acte (créations
+     * concurrentes), plutôt que de laisser remonter une erreur SQL brute.
+     */
+    private function createWithUniqueNumero(\Closure $attempt, int $maxAttempts = 5)
+    {
+        for ($i = 0; $i < $maxAttempts; $i++) {
+            try {
+                return $attempt();
+            } catch (\Illuminate\Database\QueryException $e) {
+                if ($i >= $maxAttempts - 1 || !str_contains(strtolower($e->getMessage()), 'unique')) {
+                    throw $e;
+                }
+            }
+        }
     }
 
     private function storeUploadedFiles(Request $request): ?array
