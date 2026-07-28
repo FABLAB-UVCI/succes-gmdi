@@ -346,6 +346,36 @@ export class DemandesCitoyensComponent implements OnInit {
         acteRef: don.acte_reference, adresse: don.adresse, quartier: don.quartier, commune: don.commune,
         profession: don.profession, dateDelivrance: res.dateDelivrance,
       });
+    } else if (type === 'Jugement supplétif') {
+      const res: any = await firstValueFrom(api.createNaissance({
+        nom: don.nom, prenom: '', date_naissance: don.date_naissance, lieu_naissance: don.lieu,
+        tribunal: don.tribunal, date_jugement: don.date_jugement, type: 'Jugement',
+      }));
+      const { genererExtraitNaissancePDF } = await import('../../etat-civil/modules/etat-civil/pages/naissances/naissances');
+      await genererExtraitNaissancePDF({
+        numero: res.numero, nom: don.nom, prenom: '',
+        dateNaissance: don.date_naissance, heureNaissance: '', sexe: '',
+        lieuNaissance: don.lieu, commune: '', pereNom: '', mereNom: '',
+      });
+    } else if (type === "Demande d'adoption") {
+      const parts = (don.enfant_nom ?? '').trim().split(' ');
+      const enfantNom = parts[0] ?? '';
+      const enfantPrenom = parts.slice(1).join(' ');
+      const res: any = await firstValueFrom(api.createNaissance({
+        nom: enfantNom, prenom: enfantPrenom, date_naissance: don.enfant_date_naissance, lieu_naissance: don.enfant_lieu_naissance,
+        pere_nom: don.pere_nom, pere_profession: don.pere_profession, pere_nationalite: don.pere_nationalite,
+        mere_nom: don.mere_nom, mere_profession: don.mere_profession, mere_nationalite: don.mere_nationalite,
+        tribunal: don.tribunal, date_jugement: don.date_jugement, type: 'Adoption',
+      }));
+      const { genererActeAdoptionPDF } = await import('../../etat-civil/modules/etat-civil/pages/naissances/naissances');
+      await genererActeAdoptionPDF({
+        numero: res.numero, nom: enfantNom, prenom: enfantPrenom,
+        dateNaissance: don.enfant_date_naissance, lieuNaissance: don.enfant_lieu_naissance, commune: '',
+        pereNom: don.pere_nom, mereNom: don.mere_nom,
+        pereProf: don.pere_profession, mereProf: don.mere_profession,
+        pereNat: don.pere_nationalite, mereNat: don.mere_nationalite,
+        tribunal: don.tribunal, dateJugement: don.date_jugement,
+      });
     }
   }
 

@@ -69,17 +69,23 @@
               <tr><th>N° Acte</th><th>Nom complet</th><th>Date Décès</th><th>Lieu</th><th>Statut</th><th>Actions</th></tr>
             </thead>
             <tbody>
-              @for (d of deces(); track d.id) {
+              @for (d of displayDeces(); track d.id) {
                 <tr>
                   <td style="font-family:monospace;font-size:11px">{{ d.numero }}</td>
                   <td><strong>{{ d.nomComplet }}</strong></td>
                   <td>{{ d.dateDeces }}</td>
                   <td>{{ d.lieu }}</td>
-                  <td><span class="chip cv">{{ d.statut }}</span></td>
-                  <td><button class="btn-s" style="padding:3px 8px;font-size:11px" (click)="imprimer(d)"><i class="ti ti-printer"></i>Imprimer</button></td>
+                  <td><span class="chip" [class.cv]="!d._pending" [class.co]="d._pending">{{ d.statut }}</span></td>
+                  <td>
+                    @if (d._pending) {
+                      <a routerLink="/etat-civil/demandes" class="btn-s" style="padding:3px 8px;font-size:11px;text-decoration:none"><i class="ti ti-eye"></i>Traiter</a>
+                    } @else {
+                      <button class="btn-s" style="padding:3px 8px;font-size:11px" (click)="imprimer(d)"><i class="ti ti-printer"></i>Imprimer</button>
+                    }
+                  </td>
                 </tr>
               }
-              @if (deces().length === 0) {
+              @if (displayDeces().length === 0) {
                 <tr><td colspan="6" style="text-align:center;color:#aaa;padding:2rem">Aucun acte enregistré</td></tr>
               }
             </tbody>

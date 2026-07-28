@@ -103,8 +103,14 @@
                     <td><span class="chip" [class.cv]="item.type === 'Déclaration'" [class.co]="item.type === 'Jugement'" [class.cp]="item.type === 'Adoption'">{{ item.type || 'Déclaration' }}</span></td>
                     <td>{{ item.dateNaissance }}</td>
                     <td>{{ item.lieu }}</td>
-                    <td><span class="chip cv">{{ item.statut }}</span></td>
-                    <td><button class="btn-s" style="padding:3px 8px;font-size:11px" (click)="imprimer('Naissance', item.numero)"><i class="ti ti-printer"></i>Imprimer</button></td>
+                    <td><span class="chip" [class.cv]="!item._pending" [class.co]="item._pending">{{ item.statut }}</span></td>
+                    <td>
+                        @if (item._pending) {
+                            <a routerLink="/etat-civil/demandes" class="btn-s" style="padding:3px 8px;font-size:11px;text-decoration:none"><i class="ti ti-eye"></i>Traiter</a>
+                        } @else {
+                            <button class="btn-s" style="padding:3px 8px;font-size:11px" (click)="imprimer('Naissance', item.numero)"><i class="ti ti-printer"></i>Imprimer</button>
+                        }
+                    </td>
                 </tr>
                 }
             </tbody>

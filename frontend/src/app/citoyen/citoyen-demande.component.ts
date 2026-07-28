@@ -5,6 +5,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { CitoyenService, Demarche } from './citoyen.service';
 import { ToastService } from '../communication/core/services/toast.service';
 import { TOUTES_COMMUNES } from '../etat-civil/communes.ci';
+import { TOUTES_TRIBUNAUX } from '../etat-civil/tribunaux.ci';
 
 @Component({
   selector: 'app-citoyen-demande',
@@ -32,6 +33,8 @@ import { TOUTES_COMMUNES } from '../etat-civil/communes.ci';
               <option value="Certificat de célibat">Certificat de célibat</option>
               <option value="Certificat de résidence">Certificat de résidence</option>
               <option value="Certificat de vie individuelle">Certificat de vie individuelle</option>
+              <option value="Jugement supplétif">Jugement supplétif (naissance)</option>
+              <option value="Demande d'adoption">Demande d'adoption</option>
             </select>
           </div>
 
@@ -279,6 +282,86 @@ import { TOUTES_COMMUNES } from '../etat-civil/communes.ci';
               </div>
             </ng-container>
 
+            <!-- Champs État Civil : Jugement supplétif -->
+            <ng-container *ngIf="typeControl.value === 'Jugement supplétif'">
+              <div class="fsec ivoire-border">Transcription de jugement supplétif</div>
+              <div class="form-grid">
+                <div class="fg"><div class="fl">Nom et prénoms <span class="req">*</span></div><input type="text" class="fi" formControlName="nom" placeholder="Ex: KONAN Yao"></div>
+                <div class="fg"><div class="fl">Lieu de naissance</div><input type="text" class="fi" formControlName="lieu" placeholder="Ex: Cocody, Abidjan"></div>
+              </div>
+              <div class="form-grid-3">
+                <div class="fg"><div class="fl">Date de naissance <span class="req">*</span></div><input type="date" class="fi" formControlName="date_naissance"></div>
+                <div class="fg">
+                  <div class="fl">Tribunal</div>
+                  <select class="fsel" formControlName="tribunal">
+                    @for (tribunal of tribunauxList; track tribunal) {
+                      <option [value]="tribunal">{{ tribunal }}</option>
+                    }
+                  </select>
+                </div>
+                <div class="fg"><div class="fl">Date du jugement</div><input type="date" class="fi" formControlName="date_jugement"></div>
+              </div>
+              <div class="fsec ivoire-border">Documents justificatifs</div>
+              <div class="form-grid" style="grid-template-columns: 1fr;">
+                <div class="fg"><div class="fl">Document du jugement supplétif</div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png" (change)="onFileSelected($event)"></div>
+              </div>
+            </ng-container>
+
+            <!-- Champs État Civil : Adoption -->
+            <ng-container *ngIf="typeControl.value === 'Demande d\\'adoption'">
+              <div class="fsec ivoire-border">Informations de l'enfant</div>
+              <div class="form-grid">
+                <div class="fg"><div class="fl">Nom et prénoms de l'enfant <span class="req">*</span></div><input type="text" class="fi" formControlName="enfant_nom" placeholder="Ex: KOUADIO Ange"></div>
+                <div class="fg"><div class="fl">Date de naissance</div><input type="date" class="fi" formControlName="enfant_date_naissance"></div>
+              </div>
+              <div class="form-grid" style="grid-template-columns: 1fr;">
+                <div class="fg"><div class="fl">Lieu de naissance</div><input type="text" class="fi" formControlName="enfant_lieu_naissance" placeholder="Ex: CHU de Cocody"></div>
+              </div>
+
+              <div class="fsec ivoire-border">Père adoptant</div>
+              <div class="form-grid-3">
+                <div class="fg"><div class="fl">Nom et prénoms <span class="req">*</span></div><input type="text" class="fi" formControlName="pere_nom" placeholder="Ex: KOUADIO Jean"></div>
+                <div class="fg"><div class="fl">Profession</div><input type="text" class="fi" formControlName="pere_profession" placeholder="Ex: Enseignant"></div>
+                <div class="fg"><div class="fl">Nationalité</div><input type="text" class="fi" formControlName="pere_nationalite"></div>
+              </div>
+
+              <div class="fsec ivoire-border">Mère adoptante</div>
+              <div class="form-grid-3">
+                <div class="fg"><div class="fl">Nom et prénoms <span class="req">*</span></div><input type="text" class="fi" formControlName="mere_nom" placeholder="Ex: KOUADIO Marie"></div>
+                <div class="fg"><div class="fl">Profession</div><input type="text" class="fi" formControlName="mere_profession" placeholder="Ex: Médecin"></div>
+                <div class="fg"><div class="fl">Nationalité</div><input type="text" class="fi" formControlName="mere_nationalite"></div>
+              </div>
+
+              <div class="fsec ivoire-border">Détails du jugement d'adoption</div>
+              <div class="form-grid-3">
+                <div class="fg">
+                  <div class="fl">Tribunal</div>
+                  <select class="fsel" formControlName="tribunal">
+                    @for (tribunal of tribunauxList; track tribunal) {
+                      <option [value]="tribunal">{{ tribunal }}</option>
+                    }
+                  </select>
+                </div>
+                <div class="fg"><div class="fl">Date du jugement d'adoption <span class="req">*</span></div><input type="date" class="fi" formControlName="date_jugement"></div>
+                <div class="fg"><div class="fl">Type d'adoption</div>
+                  <select class="fsel" formControlName="type_adoption">
+                    <option value="Pleine">Adoption pleine</option>
+                    <option value="Simple">Adoption simple</option>
+                    <option value="Internationale">Adoption internationale</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="fsec ivoire-border">Documents justificatifs</div>
+              <div class="form-grid">
+                <div class="fg"><div class="fl">Pièce d'identité du père adoptant</div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png" (change)="onFileSelected($event)"></div>
+                <div class="fg"><div class="fl">Pièce d'identité de la mère adoptante</div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png" (change)="onFileSelected($event)"></div>
+              </div>
+              <div class="form-grid" style="grid-template-columns: 1fr;">
+                <div class="fg"><div class="fl">Document du jugement d'adoption (PDF)</div><input type="file" class="fi" accept=".pdf" (change)="onFileSelected($event)"></div>
+              </div>
+            </ng-container>
+
             <!-- Champs Communication -->
             <ng-container *ngIf="module === 'communication'">
               <div class="fsec ivoire-border">Détails de la requête</div>
@@ -499,6 +582,7 @@ export class CitoyenDemandeComponent implements OnInit {
   module: string = '';
   moduleLabel: string = '';
   communesList = TOUTES_COMMUNES;
+  tribunauxList = TOUTES_TRIBUNAUX;
   loading = signal(false);
   mesDemarches = signal<Demarche[]>([]);
 
@@ -589,6 +673,18 @@ export class CitoyenDemandeComponent implements OnInit {
       } else if (type === 'Certificat de vie individuelle') {
         controls = {
           nom: ['', Validators.required], prenom: [''], date_naissance: ['']
+        };
+      } else if (type === 'Jugement supplétif') {
+        controls = {
+          nom: ['', Validators.required], lieu: [''],
+          date_naissance: ['', Validators.required], tribunal: ['TPI Abidjan (Plateau)'], date_jugement: ['']
+        };
+      } else if (type === "Demande d'adoption") {
+        controls = {
+          enfant_nom: ['', Validators.required], enfant_date_naissance: [''], enfant_lieu_naissance: [''],
+          pere_nom: ['', Validators.required], pere_profession: [''], pere_nationalite: ['Ivoirienne'],
+          mere_nom: ['', Validators.required], mere_profession: [''], mere_nationalite: ['Ivoirienne'],
+          tribunal: ['TPI Abidjan (Plateau)'], date_jugement: ['', Validators.required], type_adoption: ['Pleine']
         };
       }
     } else if (this.module === 'communication') {

@@ -95,17 +95,23 @@
           <table>
             <thead><tr><th>N° Certificat</th><th>Type</th><th>Bénéficiaire</th><th>Date Délivrance</th><th>Statut</th><th>Actions</th></tr></thead>
             <tbody>
-              @for (c of certificats(); track c.id) {
+              @for (c of displayCertificats(); track c.id) {
                 <tr>
                   <td style="font-family:monospace;font-size:11px">{{ c.numero }}</td>
                   <td><strong>{{ c.type }}</strong></td>
                   <td>{{ c.beneficiaire }}</td>
                   <td>{{ c.dateDelivrance }}</td>
-                  <td><span class="chip cv">{{ c.statut }}</span></td>
-                  <td><button class="btn-s" style="padding:3px 8px;font-size:11px" (click)="imprimer(c)"><i class="ti ti-printer"></i>Imprimer</button></td>
+                  <td><span class="chip" [class.cv]="!c._pending" [class.co]="c._pending">{{ c.statut }}</span></td>
+                  <td>
+                    @if (c._pending) {
+                      <a routerLink="/etat-civil/demandes" class="btn-s" style="padding:3px 8px;font-size:11px;text-decoration:none"><i class="ti ti-eye"></i>Traiter</a>
+                    } @else {
+                      <button class="btn-s" style="padding:3px 8px;font-size:11px" (click)="imprimer(c)"><i class="ti ti-printer"></i>Imprimer</button>
+                    }
+                  </td>
                 </tr>
               }
-              @if (certificats().length === 0) {
+              @if (displayCertificats().length === 0) {
                 <tr><td colspan="6" style="text-align:center;color:#aaa;padding:2rem">Aucun certificat délivré</td></tr>
               }
             </tbody>

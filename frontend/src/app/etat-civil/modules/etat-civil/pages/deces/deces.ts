@@ -1,14 +1,21 @@
 import { Component, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '@env/environment';
 import { ApiService } from '../../../../services/api.service';
 import { PrintService } from '../../../../services/print.service';
 import { qrVerification, codeVerification, formatDateFr, openPrintWindow } from '../../pdf-utils';
 
+const LABEL_STATUT_DEMARCHE: Record<string, string> = {
+  en_attente: 'En attente', en_cours: 'En cours', refuse: 'Refusé'
+};
+
 @Component({
   selector: 'app-deces',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './deces.html',
   styleUrls: ['./deces.css']
 })
@@ -17,13 +24,35 @@ export class DecesComponent implements OnInit {
   toastMsg = signal('');
   showToast = signal(false);
   deces = signal<any[]>([]);
+  demandesEnAttente = signal<any[]>([]);
 
   decesForm: { nom: string; prenom: string; dob: string; date: string; heure: string; lieu: string; commune: string; cause: string; declarant: string; lien: string; cniDefunt: File | null; certificatDeces: File | null; cniDeclarant: File | null } = { nom: '', prenom: '', dob: '', date: '', heure: '', lieu: '', commune: '', cause: '', declarant: '', lien: '', cniDefunt: null, certificatDeces: null, cniDeclarant: null };
 
-  constructor(private api: ApiService, private printService: PrintService) {}
+  constructor(private api: ApiService, private printService: PrintService, private http: HttpClient) {}
 
   ngOnInit() {
     this.api.getDeces().subscribe({ next: d => this.deces.set(d), error: () => {} });
+    this.http.get<{ data: any[] }>(`${environment.apiUrl}/demarches?module=etat-civil`).subscribe({
+      next: (res) => {
+        const pending = (res.data || [])
+          .filter(d => d.type_demarche === "Demande d'acte de décès" && d.statut !== 'valide' && d.statut !== 'refuse')
+          .map(d => {
+            const don = d.donnees || {};
+            return {
+              id: `demarche-${d.id}`, numero: d.reference,
+              nomComplet: `${don.defunt_nom || ''} ${don.defunt_prenom || ''}`.trim(),
+              dateDeces: don.date_deces || '', lieu: don.lieu_deces || '',
+              statut: LABEL_STATUT_DEMARCHE[d.statut] || d.statut, _pending: true
+            };
+          });
+        this.demandesEnAttente.set(pending);
+      },
+      error: () => {}
+    });
+  }
+
+  displayDeces() {
+    return [...this.demandesEnAttente(), ...this.deces()];
   }
 
   switchTab(tab: string) { this.currentTab.set(tab); }

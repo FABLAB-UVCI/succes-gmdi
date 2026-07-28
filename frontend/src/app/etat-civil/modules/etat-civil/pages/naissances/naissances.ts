@@ -1,17 +1,26 @@
 import { Component, Input, Output, EventEmitter, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '@env/environment';
 import { TOUTES_COMMUNES } from '../../../../communes.ci';
+import { TOUTES_TRIBUNAUX } from '../../../../tribunaux.ci';
 import { ApiService } from '../../../../services/api.service';
 import { PrintService } from '../../../../services/print.service';
 import { qrVerification, codeVerification, formatDateFr, formatHeureFr, openPrintWindow } from '../../pdf-utils';
 import { genererActeMariagePDF } from '../mariages/mariages';
 import { genererActeDecesPDF } from '../deces/deces';
 
+const LABEL_STATUT_DEMARCHE: Record<string, string> = {
+  en_attente: 'En attente', en_cours: 'En cours', refuse: 'Refusé'
+};
+const TYPES_NAISSANCE_DEMARCHE = ["Demande d'acte de naissance", 'Jugement supplétif', "Demande d'adoption"];
+
 @Component({
   selector: 'app-naissances',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './naissances.html',
   styleUrls: ['./naissances.css']
 })
@@ -22,14 +31,40 @@ export class NaissancesComponent implements OnInit {
   @Output() showToast = new EventEmitter<string>();
 
   naissancesDB: any[] = [];
+  demandesEnAttente: any[] = [];
 
-  constructor(private api: ApiService, private printService: PrintService) { }
+  constructor(private api: ApiService, private printService: PrintService, private http: HttpClient) { }
 
   ngOnInit() {
     this.api.getNaissances().subscribe({
       next: (data) => this.naissancesDB = data,
       error: () => { }
     });
+    this.http.get<{ data: any[] }>(`${environment.apiUrl}/demarches?module=etat-civil`).subscribe({
+      next: (res) => {
+        this.demandesEnAttente = (res.data || [])
+          .filter(d => TYPES_NAISSANCE_DEMARCHE.includes(d.type_demarche) && d.statut !== 'valide' && d.statut !== 'refuse')
+          .map(d => this.mapDemarcheNaissance(d));
+      },
+      error: () => { }
+    });
+  }
+
+  private mapDemarcheNaissance(d: any): any {
+    const don = d.donnees || {};
+    const type = d.type_demarche;
+    let nomComplet = '', dateNaissance = '', lieu = '', typeLabel = 'Déclaration';
+    if (type === 'Jugement supplétif') {
+      nomComplet = don.nom || ''; dateNaissance = don.date_naissance || ''; lieu = don.lieu || ''; typeLabel = 'Jugement';
+    } else if (type === "Demande d'adoption") {
+      nomComplet = don.enfant_nom || ''; dateNaissance = don.enfant_date_naissance || ''; lieu = don.enfant_lieu_naissance || ''; typeLabel = 'Adoption';
+    } else {
+      nomComplet = `${don.nom || ''} ${don.prenom || ''}`.trim(); dateNaissance = don.date_naissance || ''; lieu = don.lieu_naissance || '';
+    }
+    return {
+      id: `demarche-${d.id}`, numero: d.reference, nomComplet, type: typeLabel,
+      dateNaissance, lieu, statut: LABEL_STATUT_DEMARCHE[d.statut] || d.statut, _pending: true
+    };
   }
 
   currentSection = signal('naissances');
@@ -65,32 +100,7 @@ export class NaissancesComponent implements OnInit {
   };
 
   // Liste des tribunaux
-  tribunauxList = [
-    'TPI Abengourou',
-    'TPI Abidjan (Plateau)',
-    'TPI Abidjan-Yopougon',
-    'TPI Aboisso',
-    'TPI Bondoukou',
-    'TPI Bouaké',
-    'TPI Bouna',
-    'TPI Boundiali',
-    'TPI Daloa',
-    'TPI Dimbokro',
-    'TPI Divo',
-    'TPI Ferkessédougou',
-    'TPI Gagnoa',
-    'TPI Guiglo',
-    'TPI Katiola',
-    'TPI Korhogo',
-    'TPI Man',
-    'TPI Odienné',
-    'TPI San-Pédro',
-    'TPI Sassandra',
-    'TPI Séguéla',
-    'TPI Soubré',
-    'TPI Touba',
-    'TPI Toumodi'
-  ];
+  tribunauxList = TOUTES_TRIBUNAUX;
 
   jugementForm = {
     nom: '',
@@ -257,7 +267,8 @@ export class NaissancesComponent implements OnInit {
   }
 
   filteredNaissances() {
-    const source = this.naissancesDB.length ? this.naissancesDB : this.dbNaissances;
+    const officiel = this.naissancesDB.length ? this.naissancesDB : this.dbNaissances;
+    const source = [...this.demandesEnAttente, ...officiel];
     if (!this.searchQuery.trim()) return source;
     const search = this.searchQuery.toLowerCase();
     return source.filter(item =>

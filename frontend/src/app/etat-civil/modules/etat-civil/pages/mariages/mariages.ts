@@ -1,14 +1,21 @@
 import { Component, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '@env/environment';
 import { ApiService } from '../../../../services/api.service';
 import { PrintService } from '../../../../services/print.service';
 import { qrVerification, codeVerification, formatDateFr, openPrintWindow } from '../../pdf-utils';
 
+const LABEL_STATUT_DEMARCHE: Record<string, string> = {
+  en_attente: 'En attente', en_cours: 'En cours', refuse: 'Refusé'
+};
+
 @Component({
   selector: 'app-mariages',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './mariages.html',
   styleUrls: ['./mariages.css']
 })
@@ -18,6 +25,7 @@ export class MariagesComponent implements OnInit {
   showToast = signal(false);
   mariages = signal<any[]>([]);
   bansDB = signal<any[]>([]);
+  demandesEnAttente = signal<any[]>([]);
 
   bansForm: { epoux: string; epouse: string; pub: string; mar: string; cniEpoux: File | null; cniEpouse: File | null } =
     { epoux: '', epouse: '', pub: '', mar: '', cniEpoux: null, cniEpouse: null };
@@ -33,11 +41,33 @@ export class MariagesComponent implements OnInit {
     cniTemoinEpoux: null, cniTemoinEpouse: null
   };
 
-  constructor(private api: ApiService, private printService: PrintService) {}
+  constructor(private api: ApiService, private printService: PrintService, private http: HttpClient) {}
 
   ngOnInit() {
     this.api.getMariages().subscribe({ next: d => this.mariages.set(d), error: () => {} });
     this.api.getPublicationsBans().subscribe({ next: d => this.bansDB.set(d), error: () => {} });
+    this.http.get<{ data: any[] }>(`${environment.apiUrl}/demarches?module=etat-civil`).subscribe({
+      next: (res) => {
+        const pending = (res.data || [])
+          .filter(d => d.type_demarche === "Demande d'acte de mariage" && d.statut !== 'valide' && d.statut !== 'refuse')
+          .map(d => {
+            const don = d.donnees || {};
+            return {
+              id: `demarche-${d.id}`, numero: d.reference,
+              epoux: `${don.epoux_nom || ''} ${don.epoux_prenom || ''}`.trim(),
+              epouse: `${don.epouse_nom || ''} ${don.epouse_prenom || ''}`.trim(),
+              dateMariage: don.date_mariage || '', regime: don.regime_matrimonial || '',
+              statut: LABEL_STATUT_DEMARCHE[d.statut] || d.statut, _pending: true
+            };
+          });
+        this.demandesEnAttente.set(pending);
+      },
+      error: () => {}
+    });
+  }
+
+  displayMariages() {
+    return [...this.demandesEnAttente(), ...this.mariages()];
   }
 
   switchTab(tab: string) { this.currentTab.set(tab); }

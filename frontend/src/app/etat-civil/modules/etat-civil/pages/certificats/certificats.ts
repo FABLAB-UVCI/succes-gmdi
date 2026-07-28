@@ -1,15 +1,25 @@
 import { Component, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '@env/environment';
 import { ApiService } from '../../../../services/api.service';
 import { TOUTES_COMMUNES } from '../../../../communes.ci';
 import { PrintService } from '../../../../services/print.service';
 import { qrVerification, codeVerification, formatDateFr, openPrintWindow } from '../../pdf-utils';
 
+const LABEL_STATUT_DEMARCHE: Record<string, string> = {
+  en_attente: 'En attente', en_cours: 'En cours', refuse: 'Refusé'
+};
+const TYPE_LABEL_PAR_DEMANDE: Record<string, string> = {
+  'Certificat de célibat': 'Célibat', 'Certificat de résidence': 'Résidence', 'Certificat de vie individuelle': 'Vie'
+};
+
 @Component({
   selector: 'app-certificats',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './certificats.html',
   styleUrls: ['./certificats.css']
 })
@@ -18,16 +28,37 @@ export class CertificatsComponent implements OnInit {
   toastMsg = signal('');
   showToast = signal(false);
   certificats = signal<any[]>([]);
+  demandesEnAttente = signal<any[]>([]);
 
   communesList = TOUTES_COMMUNES;
   celibatForm: { nom: string; prenom: string; dob: string; profession: string; acteRef: string; cni: File | null } = { nom: '', prenom: '', dob: '', profession: '', acteRef: '', cni: null };
   residenceForm: { nom: string; prenom: string; adresse: string; quartier: string; commune: string; cni: File | null } = { nom: '', prenom: '', adresse: '', quartier: '', commune: '', cni: null };
   vieForm: { nom: string; prenom: string; dob: string; cni: File | null } = { nom: '', prenom: '', dob: '', cni: null };
 
-  constructor(private api: ApiService, private printService: PrintService) {}
+  constructor(private api: ApiService, private printService: PrintService, private http: HttpClient) {}
 
   ngOnInit() {
     this.api.getCertificats().subscribe({ next: d => this.certificats.set(d), error: () => {} });
+    this.http.get<{ data: any[] }>(`${environment.apiUrl}/demarches?module=etat-civil`).subscribe({
+      next: (res) => {
+        const pending = (res.data || [])
+          .filter(d => TYPE_LABEL_PAR_DEMANDE[d.type_demarche] && d.statut !== 'valide' && d.statut !== 'refuse')
+          .map(d => {
+            const don = d.donnees || {};
+            return {
+              id: `demarche-${d.id}`, numero: d.reference, type: TYPE_LABEL_PAR_DEMANDE[d.type_demarche],
+              beneficiaire: `${don.nom || ''} ${don.prenom || ''}`.trim(), dateDelivrance: '',
+              statut: LABEL_STATUT_DEMARCHE[d.statut] || d.statut, _pending: true
+            };
+          });
+        this.demandesEnAttente.set(pending);
+      },
+      error: () => {}
+    });
+  }
+
+  displayCertificats() {
+    return [...this.demandesEnAttente(), ...this.certificats()];
   }
 
   switchTab(tab: string) { this.currentTab.set(tab); }
