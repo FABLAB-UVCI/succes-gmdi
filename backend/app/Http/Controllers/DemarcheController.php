@@ -51,10 +51,19 @@ class DemarcheController extends Controller
 
         $v = $request->validate([
             'statut' => ['required', 'string', \Illuminate\Validation\Rule::in(Demarche::STATUTS)],
+            'commentaire' => ['nullable', 'string', 'max:1000'],
+            'extra_donnees' => ['nullable', 'array'],
         ]);
+
+        $donnees = $demarche->donnees ?? [];
+        if (!empty($v['extra_donnees'])) {
+            $donnees = array_merge($donnees, $v['extra_donnees']);
+        }
 
         $demarche->update([
             'statut' => $v['statut'],
+            'donnees' => $donnees,
+            'commentaire_gestionnaire' => $v['commentaire'] ?? $demarche->commentaire_gestionnaire,
         ]);
 
         // 1. Envoi de l'e-mail au citoyen
@@ -74,6 +83,8 @@ class DemarcheController extends Controller
             "Certificat de vie individuelle"     => 'pdf.certificat',
             "Jugement supplétif"                 => 'pdf.acte_jugement',
             "Demande d'adoption"                 => 'pdf.acte_adoption',
+            "Paiement de taxe municipale"         => 'pdf.recu_paiement',
+            "Règlement de facture"                => 'pdf.recu_paiement',
         ];
         $certifTypeLabels = [
             "Certificat de célibat"          => 'Célibat',
@@ -179,6 +190,9 @@ class DemarcheController extends Controller
             'type_demarche' => $d->type_demarche,
             'statut' => $d->statut,
             'donnees' => $d->donnees,
+            'commentaire_gestionnaire' => $d->commentaire_gestionnaire,
+            'demandeur' => $d->user?->name,
+            'demandeur_telephone' => $d->user?->telephone ?? null,
             'created_at' => $d->created_at?->toIso8601String(),
             'updated_at' => $d->updated_at?->toIso8601String(),
         ];

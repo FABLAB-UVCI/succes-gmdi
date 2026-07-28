@@ -9,6 +9,7 @@ use App\Modules\Communication\Models\CampagneSms;
 use App\Modules\Communication\Models\Reclamation;
 use App\Modules\Communication\Models\Partenaire;
 use App\Modules\Communication\Models\Document;
+use App\Modules\Communication\Models\Abonnement;
 
 class StatsController extends Controller
 {
@@ -22,6 +23,8 @@ class StatsController extends Controller
                 'reclamations_ouvertes' => Reclamation::where('statut','en_traitement')->count(),
                 'partenaires_actifs'    => Partenaire::where('statut','actif')->count(),
                 'documents_archives'    => Document::count() + 1248,
+                'abonnes_communication_actifs' => Abonnement::where('statut', 'actif')->count(),
+                'abonnements_en_attente'       => Abonnement::where('statut', 'en_attente')->count(),
             ],
             'actualites_par_type' => Actualite::selectRaw('type, COUNT(*) as nb')->groupBy('type')->get()->map(fn($r)=>['type'=>$r->type,'nb'=>(int)$r->nb]),
             'sms_par_mois'        => CampagneSms::select('date_envoi', 'taux_livraison')->get()

@@ -1,10 +1,13 @@
-import { Component, inject, signal, OnInit, Input } from '@angular/core';
+import { Component, inject, signal, computed, OnInit, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '@env/environment';
 import { ApiService as EtatCivilApiService } from '../../etat-civil/services/api.service';
+import { FinancesService } from '../../finances/core/services/finances.service';
+import { DemandeApiService } from '../../services-techniques/core/services/services-techniques-api.service';
 
 export interface Demarche {
   id: number;
@@ -13,6 +16,9 @@ export interface Demarche {
   type_demarche: string | null;
   statut: string;
   donnees?: any;
+  commentaire_gestionnaire?: string | null;
+  demandeur?: string | null;
+  demandeur_telephone?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -20,20 +26,31 @@ export interface Demarche {
 @Component({
   selector: 'app-demandes-citoyens',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   template: `
     <div class="demandes-wrapper">
       <div class="d-header">
         <h2><i class="ti ti-inbox"></i> Demandes Citoyens — {{ moduleLabel }}</h2>
-        <button class="btn-refresh" (click)="load()"><i class="ti ti-refresh"></i> Rafraichir</button>
+        <div class="d-header-actions">
+          <select class="filtre-select" [ngModel]="filtreStatut()" (ngModelChange)="filtreStatut.set($event)">
+            <option value="en_attente">En attente</option>
+            <option value="en_cours">En cours</option>
+            <option value="a_completer">À compléter / Affecté</option>
+            <option value="valide">Validé</option>
+            <option value="refuse">Refusé</option>
+            <option value="termine">Terminé</option>
+            <option value="tous">Tous les statuts</option>
+          </select>
+          <button class="btn-refresh" (click)="load()"><i class="ti ti-refresh"></i> Rafraichir</button>
+        </div>
       </div>
 
       @if (loading()) {
         <div class="loading">Chargement des demandes...</div>
-      } @else if (demarches().length === 0) {
+      } @else if (demarchesFiltrees().length === 0) {
         <div class="empty">
           <i class="ti ti-inbox-off" style="font-size:2.5rem;color:#94a3b8"></i>
-          <p>Aucune demande citoyenne pour le moment.</p>
+          <p>Aucune demande citoyenne pour ce filtre.</p>
         </div>
       } @else {
         <table class="d-table">
@@ -41,16 +58,18 @@ export interface Demarche {
             <tr>
               <th>Reference</th>
               <th>Date</th>
+              <th>Demandeur</th>
               <th>Type de demande</th>
               <th>Statut</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            @for (d of demarches(); track d.id) {
+            @for (d of demarchesFiltrees(); track d.id) {
               <tr>
                 <td class="ref-cell">{{ d.reference }}</td>
                 <td>{{ d.updated_at | date:'dd/MM/yyyy HH:mm' }}</td>
+                <td>{{ d.demandeur || '—' }}</td>
                 <td>{{ d.type_demarche || 'Demande generale' }}</td>
                 <td>
                   <span class="badge" [ngClass]="d.statut">
@@ -93,7 +112,27 @@ export interface Demarche {
                     </span>
                   </div>
                 </div>
+                @if (selectedDemarche()?.demandeur) {
+                  <div class="ig-item">
+                    <div class="ig-label">Demandeur</div>
+                    <div class="ig-val">{{ selectedDemarche()?.demandeur }}</div>
+                  </div>
+                }
               </div>
+
+              @if (selectedDemarche()?.donnees?.recette_reference || selectedDemarche()?.donnees?.intervention_ref) {
+                <div class="donnees-box" style="border-color:#009A44;background:#f0fdf4;">
+                  <h4><i class="ti ti-link"></i> Suivi métier lié :</h4>
+                  <div class="donnees-grid">
+                    @if (selectedDemarche()?.donnees?.recette_reference) {
+                      <div class="donnee-item"><span class="donnee-key">Registre des paiements</span><span class="donnee-val">{{ selectedDemarche()?.donnees?.recette_reference }}</span></div>
+                    }
+                    @if (selectedDemarche()?.donnees?.intervention_ref) {
+                      <div class="donnee-item"><span class="donnee-key">Registre des interventions</span><span class="donnee-val">{{ selectedDemarche()?.donnees?.intervention_ref }}</span></div>
+                    }
+                  </div>
+                </div>
+              }
 
               @if (selectedDemarche()?.donnees) {
                 <div class="donnees-box">
@@ -127,16 +166,26 @@ export interface Demarche {
 
               @if (!readonly) {
                 <div class="actions-traitement">
+                  <label class="commentaire-label" for="commentaire-gest"><i class="ti ti-message-circle"></i> Commentaire (optionnel) :</label>
+                  <textarea id="commentaire-gest" class="commentaire-input" rows="2" [ngModel]="commentaire()" (ngModelChange)="commentaire.set($event)"
+                            placeholder="Ex: Pièce manquante, délai supplémentaire, précision utile au citoyen..."></textarea>
+
                   <p><i class="ti ti-settings"></i> Mettre a jour le statut :</p>
                   <div class="btn-group">
                     <button class="btn-statut en_cours" (click)="updateStatut('en_cours')"
                             [disabled]="selectedDemarche()?.statut === 'en_cours'">
-                      <i class="ti ti-clock"></i> En cours
+                      <i class="ti ti-clock"></i> {{ moduleName === 'services-techniques' ? 'Prendre en charge' : 'En cours' }}
                     </button>
                     <button class="btn-statut valide" (click)="updateStatut('valide')"
                             [disabled]="selectedDemarche()?.statut === 'valide'">
-                      <i class="ti ti-check"></i> Valider
+                      <i class="ti ti-check"></i> {{ moduleName === 'services-techniques' ? 'Résolu' : 'Valider' }}
                     </button>
+                    @if (moduleName === 'services-techniques') {
+                      <button class="btn-statut termine" (click)="updateStatut('termine')"
+                              [disabled]="selectedDemarche()?.statut === 'termine'">
+                        <i class="ti ti-checkbox"></i> Clôturer
+                      </button>
+                    }
                     <button class="btn-statut refuse" (click)="updateStatut('refuse')"
                             [disabled]="selectedDemarche()?.statut === 'refuse'">
                       <i class="ti ti-x"></i> Refuser
@@ -158,8 +207,10 @@ export interface Demarche {
   styles: [`
     @keyframes spin { to { transform: rotate(360deg); } }
     .demandes-wrapper { padding: 1.5rem; background: #fff; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,.05); }
-    .d-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 2px solid #f1f5f9; }
+    .d-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 2px solid #f1f5f9; flex-wrap: wrap; gap: 0.8rem; }
     .d-header h2 { margin: 0; font-size: 1.1rem; color: #003366; display: flex; align-items: center; gap: 8px; }
+    .d-header-actions { display: flex; align-items: center; gap: 0.6rem; }
+    .filtre-select { padding: 7px 12px; border-radius: 8px; border: 1px solid #e2e8f0; color: #334155; font-size: 0.85rem; font-weight: 600; background: #fff; }
     .btn-refresh { background: #f0f4f8; border: 1px solid #e2e8f0; padding: 7px 14px; border-radius: 8px; cursor: pointer; color: #003366; display: flex; align-items: center; gap: 6px; font-weight: 600; font-size: 0.85rem; transition: all .15s; }
     .btn-refresh:hover { background: #003366; color: #fff; }
     .loading { padding: 3rem; text-align: center; color: #64748b; font-style: italic; }
@@ -196,11 +247,15 @@ export interface Demarche {
     .donnee-val { color: #0f172a; font-size: 0.88rem; }
     .actions-traitement { border-top: 1px solid #f1f5f9; padding-top: 1.2rem; }
     .actions-traitement p { margin: 0 0 12px 0; font-weight: 700; color: #334155; font-size: 0.9rem; display: flex; align-items: center; gap: 6px; }
+    .commentaire-label { display: flex; align-items: center; gap: 6px; font-size: 0.82rem; font-weight: 700; color: #475569; margin-bottom: 6px; }
+    .commentaire-input { width: 100%; box-sizing: border-box; border: 1.5px solid #e2e8f0; border-radius: 8px; padding: 8px 10px; font-family: inherit; font-size: 0.85rem; resize: vertical; margin-bottom: 1rem; }
+    .commentaire-input:focus { outline: none; border-color: #F77F00; }
     .btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
     .btn-statut { padding: 9px 18px; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; color: white; display: flex; align-items: center; gap: 6px; font-size: 0.88rem; transition: all .15s; }
     .btn-statut:disabled { opacity: .5; cursor: not-allowed; }
     .btn-statut.en_cours { background: #0056b3; }
     .btn-statut.valide { background: #009A44; }
+    .btn-statut.termine { background: #6b21a8; }
     .btn-statut.refuse { background: #dc3545; }
     .btn-statut:not(:disabled):hover { filter: brightness(1.1); transform: translateY(-1px); }
     .btn-download { background: #003366; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.75rem; font-weight: 600; display: flex; align-items: center; gap: 5px; text-decoration: none; transition: background .15s; }
@@ -220,6 +275,14 @@ export class DemandesCitoyensComponent implements OnInit {
   loading          = signal(true);
   updating         = signal(false);
   selectedDemarche = signal<Demarche | null>(null);
+  filtreStatut     = signal('en_attente');
+  commentaire      = signal('');
+
+  demarchesFiltrees = computed(() => {
+    const f = this.filtreStatut();
+    if (f === 'tous') return this.demarches();
+    return this.demarches().filter(d => d.statut === f);
+  });
 
   ngOnInit() {
     this.route.data.subscribe(data => {
@@ -247,18 +310,24 @@ export class DemandesCitoyensComponent implements OnInit {
 
   voir(d: Demarche) {
     this.selectedDemarche.set(d);
+    this.commentaire.set('');
   }
 
   fermer() {
     this.selectedDemarche.set(null);
+    this.commentaire.set('');
   }
 
-  private etatCivilApi = inject(EtatCivilApiService);
+  private etatCivilApi   = inject(EtatCivilApiService);
+  private financesApi    = inject(FinancesService);
+  private demandeStApi   = inject(DemandeApiService);
 
   async updateStatut(nouveauStatut: string) {
     const d = this.selectedDemarche();
     if (!d) return;
     this.updating.set(true);
+
+    const extraDonnees: Record<string, any> = {};
 
     if (nouveauStatut === 'valide' && this.moduleName === 'etat-civil') {
       try {
@@ -268,7 +337,49 @@ export class DemandesCitoyensComponent implements OnInit {
       }
     }
 
-    this.http.put(`${this.base}/demarches/${d.id}`, { statut: nouveauStatut }).subscribe({
+    // Promotion vers le registre des paiements (Recette) dès validation d'un paiement citoyen
+    if (nouveauStatut === 'valide' && this.moduleName === 'finances' && !d.donnees?.recette_reference) {
+      try {
+        const recette: any = await firstValueFrom(this.financesApi.ajouterRecette({
+          contribuable: d.demandeur || 'Citoyen',
+          adresse: undefined,
+          serviceEmetteur: 'Portail citoyen',
+          operateur: undefined,
+          numeroTransaction: undefined,
+          typeTaxe: d.donnees?.type_taxe || d.type_demarche || 'Paiement citoyen',
+          montant: Number(d.donnees?.montant) || 0,
+          dateEcheance: new Date().toISOString().slice(0, 10),
+          modePaiement: this.mapModePaiement(d.donnees?.mode_paiement),
+          statut: 'valide',
+        } as any));
+        extraDonnees['recette_reference'] = recette.reference;
+      } catch (e) {
+        console.error("Impossible de créer la recette dans le registre des paiements :", e);
+      }
+    }
+
+    // Promotion vers le registre des interventions (DemandeIntervention) à la prise en charge
+    if (nouveauStatut === 'en_cours' && this.moduleName === 'services-techniques' && !d.donnees?.intervention_ref) {
+      try {
+        const res: any = await firstValueFrom(this.demandeStApi.create({
+          type_service: d.donnees?.type_incident || d.type_demarche || 'Signalement citoyen',
+          description: d.donnees?.description || 'Signalement transmis via le portail citoyen.',
+          localisation: [d.donnees?.quartier, d.donnees?.localisation || d.donnees?.adresse].filter(Boolean).join(' — ') || 'Non renseignée',
+          demandeur: d.demandeur || 'Citoyen',
+          telephone: d.demandeur_telephone || undefined,
+          priorite: this.mapPriorite(d.donnees?.urgence),
+        }));
+        extraDonnees['intervention_ref'] = res?.data?.reference;
+      } catch (e) {
+        console.error("Impossible de créer la demande d'intervention :", e);
+      }
+    }
+
+    const payload: Record<string, any> = { statut: nouveauStatut };
+    if (this.commentaire().trim()) payload['commentaire'] = this.commentaire().trim();
+    if (Object.keys(extraDonnees).length) payload['extra_donnees'] = extraDonnees;
+
+    this.http.put(`${this.base}/demarches/${d.id}`, payload).subscribe({
       next: () => {
         this.updating.set(false);
         this.fermer();
@@ -276,6 +387,21 @@ export class DemandesCitoyensComponent implements OnInit {
       },
       error: () => this.updating.set(false)
     });
+  }
+
+  private mapModePaiement(modePaiement?: string): 'especes' | 'virement' | 'mobile_money' | 'cheque' {
+    const m = (modePaiement || '').toLowerCase();
+    if (m.includes('espèce') || m.includes('espece') || m.includes('cash') || m.includes('guichet')) return 'especes';
+    if (m.includes('virement')) return 'virement';
+    if (m.includes('carte')) return 'cheque';
+    return 'mobile_money';
+  }
+
+  private mapPriorite(urgence?: string): 'normale' | 'haute' | 'urgente' {
+    const u = (urgence || '').toLowerCase();
+    if (u.includes('élevé') || u.includes('eleve') || u.includes('urgent')) return 'urgente';
+    if (u.includes('moyen')) return 'haute';
+    return 'normale';
   }
 
   /**

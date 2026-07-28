@@ -24,6 +24,7 @@ class Demarche extends Model
         'type_demarche',
         'statut',
         'donnees',
+        'commentaire_gestionnaire',
     ];
 
     protected $casts = [

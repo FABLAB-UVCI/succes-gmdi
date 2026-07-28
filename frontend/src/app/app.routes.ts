@@ -24,6 +24,9 @@ export const routes: Routes = [
       { path: 'demarches', title: 'E-Mairie — Mes Démarches', loadComponent: () => import('./citoyen/citoyen-demarches.component').then(m => m.CitoyenDemarchesComponent) },
       { path: 'profil', title: 'E-Mairie — Mon Profil', loadComponent: () => import('./citoyen/citoyen-profil.component').then(m => m.CitoyenProfilComponent) },
       { path: 'notifications', title: 'E-Mairie — Notifications', loadComponent: () => import('./citoyen/citoyen-notifications.component').then(m => m.CitoyenNotificationsComponent) },
+      { path: 'finances/paiements', title: 'E-Mairie — Paiement des taxes', loadComponent: () => import('./citoyen/citoyen-paiements.component').then(m => m.CitoyenPaiementsComponent) },
+      { path: 'services-techniques/signalement', title: 'E-Mairie — Signaler un incident', loadComponent: () => import('./citoyen/citoyen-signalement.component').then(m => m.CitoyenSignalementComponent) },
+      { path: 'communication', title: 'E-Mairie — Communication', loadComponent: () => import('./citoyen/citoyen-communication.component').then(m => m.CitoyenCommunicationComponent) },
       { path: ':module/demande', title: 'E-Mairie — Nouvelle Demande', loadComponent: () => import('./citoyen/citoyen-demande.component').then(m => m.CitoyenDemandeComponent) }
     ]
   },
@@ -46,6 +49,7 @@ export const routes: Routes = [
       { path: 'comptabilite', title: 'E-Mairie — Finances | Comptabilité', loadComponent: () => import('./finances/features/comptabilite/comptabilite.component').then(m => m.ComptabiliteComponent) },
       { path: 'tresorerie',   title: 'E-Mairie — Finances | Trésorerie', loadComponent: () => import('./finances/features/tresorerie/tresorerie.component').then(m => m.TresorerieComponent) },
       { path: 'rapports',     title: 'E-Mairie — Finances | Rapports', loadComponent: () => import('./finances/features/rapports/rapports.component').then(m => m.RapportsComponent) },
+      { path: 'demandes',     title: 'E-Mairie — Finances | Demandes Citoyens', loadComponent: () => import('./finances/features/demandes/demandes.component').then(m => m.DemandesComponent) },
     ]
   },
 

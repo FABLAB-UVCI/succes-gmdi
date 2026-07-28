@@ -6,13 +6,14 @@ import { RelationsComponent }   from '../../components/relations/relations.compo
 import { DocumentsComponent }   from '../../components/documents/documents.component';
 import { CitoyensComponent }    from '../../components/citoyens/citoyens.component';
 import { SmsComponent }         from '../../components/sms/sms.component';
+import { AbonnementsComponent } from '../../components/abonnements/abonnements.component';
 import { CommunicationService } from '../../../../core/services/communication.service';
 import { LoadingService }       from '../../../../core/services/loading.service';
 import { AuthService }          from '../../../../core/services/auth.service';
 import { AnnoncesMaireComponent } from '../../../../../shared/components/annonces-maire/annonces-maire.component';
 import { DemandesCitoyensComponent } from '../../../../../shared/components/demandes-citoyens.component';
 
-export type Section = 'actualites' | 'reseaux' | 'relations' | 'documents' | 'citoyens' | 'sms' | 'demandes-citoyens';
+export type Section = 'actualites' | 'reseaux' | 'relations' | 'documents' | 'citoyens' | 'sms' | 'demandes-citoyens' | 'abonnements';
 
 @Component({
   selector: 'app-communication-shell',
@@ -23,6 +24,7 @@ export type Section = 'actualites' | 'reseaux' | 'relations' | 'documents' | 'ci
     DocumentsComponent, CitoyensComponent, SmsComponent,
     AnnoncesMaireComponent,
     DemandesCitoyensComponent,
+    AbonnementsComponent,
   ],
   template: `
 <div class="root">
@@ -86,6 +88,10 @@ export type Section = 'actualites' | 'reseaux' | 'relations' | 'documents' | 'ci
         <span class="sb-icon-wrap"><i class="ti ti-inbox"></i></span>
         <span class="sb-label">Demandes Citoyens</span>
       </div>
+      <div class="sb-item" [class.act]="active()==='abonnements'" (click)="navigate('abonnements')" role="button">
+        <span class="sb-icon-wrap"><i class="ti ti-users-group"></i></span>
+        <span class="sb-label">Abonnements</span>
+      </div>
 
       <app-annonces-maire />
     </nav>
@@ -142,6 +148,7 @@ export type Section = 'actualites' | 'reseaux' | 'relations' | 'documents' | 'ci
       @if (active()==='demandes-citoyens') {
         <app-demandes-citoyens moduleName="communication" moduleLabel="Communication" />
       }
+      @if (active()==='abonnements') { <app-abonnements /> }
 
     </main>
   </div>

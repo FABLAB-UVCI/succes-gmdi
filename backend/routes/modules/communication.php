@@ -8,6 +8,7 @@ use App\Modules\Communication\Controllers\DocumentController;
 use App\Modules\Communication\Controllers\CitoyenController;
 use App\Modules\Communication\Controllers\SmsController;
 use App\Modules\Communication\Controllers\StatsController;
+use App\Modules\Communication\Controllers\AbonnementController;
 
 // ── Auth publique ─────────────────────────────────────────────────────────────
 // ── Routes protégées Sanctum ──────────────────────────────────────────────────
@@ -60,6 +61,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('sms/campagne',           [SmsController::class, 'lancerCampagne']);
         Route::post('sms/alerte',             [SmsController::class, 'envoyerAlerte']);
         Route::get('sms/export',              [SmsController::class, 'export']);
+
+        // ── Abonnements citoyens ──────────────────────────────────────────────
+        Route::get('abonnements',                [AbonnementController::class, 'index']);
+        Route::patch('abonnements/{abonnement}/statut', [AbonnementController::class, 'updateStatut']);
 
         // ── Statistiques ──────────────────────────────────────────────────────
         Route::get('statistiques',            [StatsController::class, 'dashboard']);

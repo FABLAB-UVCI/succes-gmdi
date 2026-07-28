@@ -10,6 +10,8 @@ export interface Demarche {
   type_demarche: string | null;
   statut: string;
   donnees?: any;
+  commentaire_gestionnaire?: string | null;
+  demandeur?: string | null;
   created_at: string;
   updated_at: string;
 }

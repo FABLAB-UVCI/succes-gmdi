@@ -224,9 +224,10 @@ export class CitoyenDashboardComponent implements OnInit {
   recentDemarches = () => this.demarches().slice(0, 5);
 
   modules: ModuleInfo[] = [
-    { label: 'État civil',          desc: 'Naissance, mariage, décès',    route: '/citoyen/etat-civil/demande',          ico: 'ti ti-file-text', color: '#003366' },
-    { label: 'Services techniques', desc: 'Signalement voirie, éclairage', route: '/citoyen/services-techniques/demande', ico: 'ti ti-tool', color: '#e63946' },
-    { label: 'Finances',            desc: 'Paiements, reçus',              route: '/citoyen/finances/demande',            ico: 'ti ti-cash', color: '#F77F00' },
+    { label: 'État civil',          desc: 'Naissance, mariage, décès',       route: '/citoyen/etat-civil/demande',                  ico: 'ti ti-file-text', color: '#003366' },
+    { label: 'Services techniques', desc: 'Signaler un incident',            route: '/citoyen/services-techniques/signalement',    ico: 'ti ti-tool', color: '#e63946' },
+    { label: 'Finances',            desc: 'Paiement des taxes, reçus',       route: '/citoyen/finances/paiements',                 ico: 'ti ti-cash', color: '#F77F00' },
+    { label: 'Communication',       desc: 'Actualités, agenda, abonnement',  route: '/citoyen/communication',                      ico: 'ti ti-news', color: '#009A44' },
   ];
 
   ngOnInit(): void {
