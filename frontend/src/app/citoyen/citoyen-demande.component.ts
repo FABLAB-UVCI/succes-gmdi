@@ -4,6 +4,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CitoyenService, Demarche } from './citoyen.service';
 import { ToastService } from '../communication/core/services/toast.service';
+import { TOUTES_COMMUNES } from '../etat-civil/communes.ci';
 
 @Component({
   selector: 'app-citoyen-demande',
@@ -104,7 +105,15 @@ import { ToastService } from '../communication/core/services/toast.service';
               </div>
               <div class="form-grid">
                 <div class="fg"><div class="fl">Lieu de naissance <span class="req">*</span></div><input type="text" class="fi" formControlName="lieu_naissance" placeholder="Ex: CHU de Cocody"></div>
-                <div class="fg"><div class="fl">Commune d'enregistrement <span class="req">*</span></div><input type="text" class="fi" formControlName="commune" placeholder="Ex: Cocody"></div>
+                <div class="fg">
+                  <div class="fl">Commune d'enregistrement <span class="req">*</span></div>
+                  <select class="fsel" formControlName="commune">
+                    <option value="" disabled>-- Sélectionnez une commune --</option>
+                    @for (commune of communesList; track commune) {
+                      <option [value]="commune">{{ commune }}</option>
+                    }
+                  </select>
+                </div>
               </div>
 
               <div class="fsec ivoire-border">Informations du père</div>
@@ -377,6 +386,7 @@ export class CitoyenDemandeComponent implements OnInit {
 
   module: string = '';
   moduleLabel: string = '';
+  communesList = TOUTES_COMMUNES;
   loading = signal(false);
   mesDemarches = signal<Demarche[]>([]);
 
