@@ -132,11 +132,11 @@ const TYPES_COMMUNICATION = [
           <form [formGroup]="form" (ngSubmit)="onSubmit()" class="abo-form">
             <div class="form-grid">
               <div class="fg"><div class="fl">Nom <span class="req">*</span></div><input type="text" class="fi" formControlName="nom"></div>
-              <div class="fg"><div class="fl">Prénom</div><input type="text" class="fi" formControlName="prenom"></div>
+              <div class="fg"><div class="fl">Prénom <span class="req">*</span></div><input type="text" class="fi" formControlName="prenom"></div>
             </div>
             <div class="form-grid">
               <div class="fg"><div class="fl">Email <span class="req">*</span></div><input type="email" class="fi" formControlName="email"></div>
-              <div class="fg"><div class="fl">Téléphone</div><input type="text" class="fi" formControlName="telephone"></div>
+              <div class="fg"><div class="fl">Téléphone <span class="req">*</span></div><input type="text" class="fi" formControlName="telephone"></div>
             </div>
             <div class="form-grid" style="grid-template-columns: 1fr;">
               <div class="fg">
@@ -146,7 +146,7 @@ const TYPES_COMMUNICATION = [
                 </select>
               </div>
             </div>
-            <button type="submit" class="btn-submit" [disabled]="submitting() || form.invalid">
+            <button type="submit" class="btn-submit" [disabled]="submitting()">
               <i class="ti ti-send" style="margin-right:8px;"></i>
               {{ submitting() ? 'Envoi en cours...' : "S'abonner" }}
             </button>
@@ -197,6 +197,7 @@ const TYPES_COMMUNICATION = [
       .fg { display: flex; flex-direction: column; gap: 0.5rem; }
       .fl { font-size: 12px; font-weight: 600; color: #475569; }
       .req { color: #ef4444; }
+      .fi.ng-invalid.ng-touched, select.fsel.ng-invalid.ng-touched { border-color: #ef4444; background: #fff5f5; }
       .fi, .fsel { padding: 0.6rem 1rem; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 14px; outline: none; background: #f8fafc; font-family: inherit; width: 100%; box-sizing: border-box; height: 44px; }
       .fi:focus, .fsel:focus { border-color: #F77F00; background: #fff; box-shadow: 0 0 0 3px rgba(247,127,0,0.1); }
       .btn-submit { padding: 1rem; background: #009A44; color: #fff; border: none; border-radius: 8px; font-weight: 700; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 100%; }
@@ -236,9 +237,9 @@ export class CitoyenCommunicationComponent implements OnInit {
 
   form = this.fb.group({
     nom: ['', Validators.required],
-    prenom: [''],
+    prenom: ['', Validators.required],
     email: ['', [Validators.required, Validators.email]],
-    telephone: [''],
+    telephone: ['', Validators.required],
     type_communication: ['tous', Validators.required],
   });
 
@@ -272,8 +273,9 @@ export class CitoyenCommunicationComponent implements OnInit {
   }
 
   onSubmit() {
+    this.form.markAllAsTouched();
     if (this.form.invalid) {
-      this.toast.showError('abo-err', 'Veuillez remplir les champs obligatoires.', 'Erreur');
+      this.toast.showError('abo-err', 'Veuillez remplir tous les champs obligatoires (marqués d\'une étoile rouge *).', 'Champs manquants');
       return;
     }
     this.submitting.set(true);

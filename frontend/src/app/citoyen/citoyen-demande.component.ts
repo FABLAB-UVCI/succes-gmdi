@@ -55,7 +55,7 @@ import { TOUTES_TRIBUNAUX } from '../etat-civil/tribunaux.ci';
           </div>
 
           <!-- Formulaire dynamique avec le style "Gestionnaire" -->
-          <form [formGroup]="demandeForm" (ngSubmit)="onSubmit()" class="dynamic-form">
+          <form [formGroup]="demandeForm" (ngSubmit)="onInitiateSubmit()" class="dynamic-form">
             
             <!-- Champs État Civil : Naissance -->
             <ng-container *ngIf="typeControl.value === 'Demande d\\'acte de naissance'">
@@ -90,22 +90,22 @@ import { TOUTES_TRIBUNAUX } from '../etat-civil/tribunaux.ci';
 
               <div class="fsec ivoire-border">Informations du père</div>
               <div class="form-grid-3">
-                <div class="fg"><div class="fl">Nom et Prénoms</div><input type="text" class="fi" formControlName="pere_nom" placeholder="Ex: DOUKOURÉ Youssouf"></div>
-                <div class="fg"><div class="fl">Profession</div><input type="text" class="fi" formControlName="pere_profession" placeholder="Ex: Enseignant"></div>
-                <div class="fg"><div class="fl">Nationalité</div><input type="text" class="fi" formControlName="pere_nationalite" placeholder="Ex: Ivoirienne"></div>
+                <div class="fg"><div class="fl">Nom et Prénoms <span class="req">*</span></div><input type="text" class="fi" formControlName="pere_nom" placeholder="Ex: DOUKOURÉ Youssouf"></div>
+                <div class="fg"><div class="fl">Profession <span class="req">*</span></div><input type="text" class="fi" formControlName="pere_profession" placeholder="Ex: Enseignant"></div>
+                <div class="fg"><div class="fl">Nationalité <span class="req">*</span></div><input type="text" class="fi" formControlName="pere_nationalite" placeholder="Ex: Ivoirienne"></div>
               </div>
               <div class="form-grid" style="grid-template-columns: 1fr;">
-                <div class="fg"><div class="fl">Pièce d'identité du père (PDF/JPG)</div><input type="file" class="fi" (change)="onFileSelected($event)"></div>
+                <div class="fg"><div class="fl">Pièce d'identité du père (PDF/JPG) <span class="req">*</span></div><input type="file" class="fi" (change)="onFileSelected($event, 'piece_pere')">@if (fichiers()['piece_pere']) { <span class="file-ok"><i class="ti ti-circle-check"></i> {{ fichiers()['piece_pere']?.name }}</span> }</div>
               </div>
 
               <div class="fsec ivoire-border">Informations de la mère</div>
               <div class="form-grid-3">
-                <div class="fg"><div class="fl">Nom et Prénoms</div><input type="text" class="fi" formControlName="mere_nom" placeholder="Ex: KONÉ Aminata"></div>
-                <div class="fg"><div class="fl">Profession</div><input type="text" class="fi" formControlName="mere_profession" placeholder="Ex: Commerçante"></div>
-                <div class="fg"><div class="fl">Nationalité</div><input type="text" class="fi" formControlName="mere_nationalite" placeholder="Ex: Ivoirienne"></div>
+                <div class="fg"><div class="fl">Nom et Prénoms <span class="req">*</span></div><input type="text" class="fi" formControlName="mere_nom" placeholder="Ex: KONÉ Aminata"></div>
+                <div class="fg"><div class="fl">Profession <span class="req">*</span></div><input type="text" class="fi" formControlName="mere_profession" placeholder="Ex: Commerçante"></div>
+                <div class="fg"><div class="fl">Nationalité <span class="req">*</span></div><input type="text" class="fi" formControlName="mere_nationalite" placeholder="Ex: Ivoirienne"></div>
               </div>
               <div class="form-grid" style="grid-template-columns: 1fr;">
-                <div class="fg"><div class="fl">Pièce d'identité de la mère (PDF/JPG)</div><input type="file" class="fi" (change)="onFileSelected($event)"></div>
+                <div class="fg"><div class="fl">Pièce d'identité de la mère (PDF/JPG) <span class="req">*</span></div><input type="file" class="fi" (change)="onFileSelected($event, 'piece_mere')">@if (fichiers()['piece_mere']) { <span class="file-ok"><i class="ti ti-circle-check"></i> {{ fichiers()['piece_mere']?.name }}</span> }</div>
               </div>
             </ng-container>
 
@@ -117,8 +117,8 @@ import { TOUTES_TRIBUNAUX } from '../etat-civil/tribunaux.ci';
                 <div class="fg"><div class="fl">Prénoms <span class="req">*</span></div><input type="text" class="fi" formControlName="epoux_prenom" placeholder="Ex: Jean-Marc"></div>
                 <div class="fg"><div class="fl">Nationalité <span class="req">*</span></div><input type="text" class="fi" formControlName="epoux_nationalite"></div>
                 <div class="fg"><div class="fl">Profession <span class="req">*</span></div><input type="text" class="fi" formControlName="epoux_profession"></div>
-                <div class="fg"><div class="fl">Témoin de l'époux</div><input type="text" class="fi" formControlName="epoux_temoin_nom" placeholder="Ex: KONÉ Souleymane"></div>
-                <div class="fg"><div class="fl">Profession du témoin</div><input type="text" class="fi" formControlName="epoux_temoin_profession"></div>
+                <div class="fg"><div class="fl">Témoin de l'époux <span class="req">*</span></div><input type="text" class="fi" formControlName="epoux_temoin_nom" placeholder="Ex: KONÉ Souleymane"></div>
+                <div class="fg"><div class="fl">Profession du témoin <span class="req">*</span></div><input type="text" class="fi" formControlName="epoux_temoin_profession"></div>
               </div>
 
               <div class="fsec ivoire-border">Informations sur l'épouse</div>
@@ -127,15 +127,15 @@ import { TOUTES_TRIBUNAUX } from '../etat-civil/tribunaux.ci';
                 <div class="fg"><div class="fl">Prénoms <span class="req">*</span></div><input type="text" class="fi" formControlName="epouse_prenom" placeholder="Ex: Aminata"></div>
                 <div class="fg"><div class="fl">Nationalité <span class="req">*</span></div><input type="text" class="fi" formControlName="epouse_nationalite"></div>
                 <div class="fg"><div class="fl">Profession <span class="req">*</span></div><input type="text" class="fi" formControlName="epouse_profession"></div>
-                <div class="fg"><div class="fl">Témoin de l'épouse</div><input type="text" class="fi" formControlName="epouse_temoin_nom" placeholder="Ex: BAMBA Mariam"></div>
-                <div class="fg"><div class="fl">Profession du témoin</div><input type="text" class="fi" formControlName="epouse_temoin_profession"></div>
+                <div class="fg"><div class="fl">Témoin de l'épouse <span class="req">*</span></div><input type="text" class="fi" formControlName="epouse_temoin_nom" placeholder="Ex: BAMBA Mariam"></div>
+                <div class="fg"><div class="fl">Profession du témoin <span class="req">*</span></div><input type="text" class="fi" formControlName="epouse_temoin_profession"></div>
               </div>
 
               <div class="fsec ivoire-border">Détails du mariage</div>
               <div class="form-grid-3">
                 <div class="fg"><div class="fl">Date du mariage <span class="req">*</span></div><input type="date" class="fi" formControlName="date_mariage"></div>
-                <div class="fg"><div class="fl">Lieu</div><input type="text" class="fi" formControlName="lieu_mariage" placeholder="Ex: Mairie de Cocody"></div>
-                <div class="fg"><div class="fl">Régime matrimonial</div>
+                <div class="fg"><div class="fl">Lieu <span class="req">*</span></div><input type="text" class="fi" formControlName="lieu_mariage" placeholder="Ex: Mairie de Cocody"></div>
+                <div class="fg"><div class="fl">Régime matrimonial <span class="req">*</span></div>
                   <select class="fsel" formControlName="regime_matrimonial">
                     <option value="Communauté de biens">Communauté de biens</option>
                     <option value="Séparation de biens">Séparation de biens</option>
@@ -146,12 +146,12 @@ import { TOUTES_TRIBUNAUX } from '../etat-civil/tribunaux.ci';
 
               <div class="fsec ivoire-border">Documents d'identité</div>
               <div class="form-grid">
-                <div class="fg"><div class="fl">CNI / Passeport — Époux</div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onFileSelected($event)"></div>
-                <div class="fg"><div class="fl">CNI / Passeport — Épouse</div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onFileSelected($event)"></div>
+                <div class="fg"><div class="fl">CNI / Passeport — Époux <span class="req">*</span></div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onFileSelected($event, 'piece_epoux')">@if (fichiers()['piece_epoux']) { <span class="file-ok"><i class="ti ti-circle-check"></i> {{ fichiers()['piece_epoux']?.name }}</span> }</div>
+                <div class="fg"><div class="fl">CNI / Passeport — Épouse <span class="req">*</span></div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onFileSelected($event, 'piece_epouse')">@if (fichiers()['piece_epouse']) { <span class="file-ok"><i class="ti ti-circle-check"></i> {{ fichiers()['piece_epouse']?.name }}</span> }</div>
               </div>
               <div class="form-grid">
-                <div class="fg"><div class="fl">CNI / Passeport — Témoin de l'époux</div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onFileSelected($event)"></div>
-                <div class="fg"><div class="fl">CNI / Passeport — Témoin de l'épouse</div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onFileSelected($event)"></div>
+                <div class="fg"><div class="fl">CNI / Passeport — Témoin de l'époux <span class="req">*</span></div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onFileSelected($event, 'piece_temoin_epoux')">@if (fichiers()['piece_temoin_epoux']) { <span class="file-ok"><i class="ti ti-circle-check"></i> {{ fichiers()['piece_temoin_epoux']?.name }}</span> }</div>
+                <div class="fg"><div class="fl">CNI / Passeport — Témoin de l'épouse <span class="req">*</span></div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onFileSelected($event, 'piece_temoin_epouse')">@if (fichiers()['piece_temoin_epouse']) { <span class="file-ok"><i class="ti ti-circle-check"></i> {{ fichiers()['piece_temoin_epouse']?.name }}</span> }</div>
               </div>
             </ng-container>
 
@@ -163,26 +163,26 @@ import { TOUTES_TRIBUNAUX } from '../etat-civil/tribunaux.ci';
                 <div class="fg"><div class="fl">Prénom(s) <span class="req">*</span></div><input type="text" class="fi" formControlName="defunt_prenom" placeholder="Ex: Jean Marc"></div>
               </div>
               <div class="form-grid">
-                <div class="fg"><div class="fl">Date de naissance (si connue)</div><input type="date" class="fi" formControlName="defunt_date_naissance"></div>
-                <div class="fg"><div class="fl">Commune</div><input type="text" class="fi" formControlName="defunt_commune" placeholder="Ex: Cocody"></div>
+                <div class="fg"><div class="fl">Date de naissance (si connue) <span class="req">*</span></div><input type="date" class="fi" formControlName="defunt_date_naissance"></div>
+                <div class="fg"><div class="fl">Commune <span class="req">*</span></div><input type="text" class="fi" formControlName="defunt_commune" placeholder="Ex: Cocody"></div>
               </div>
 
               <div class="fsec ivoire-border">Détails du décès</div>
               <div class="form-grid-3">
                 <div class="fg"><div class="fl">Date du décès <span class="req">*</span></div><input type="date" class="fi" formControlName="date_deces"></div>
-                <div class="fg"><div class="fl">Heure</div><input type="time" class="fi" formControlName="heure_deces"></div>
+                <div class="fg"><div class="fl">Heure <span class="req">*</span></div><input type="time" class="fi" formControlName="heure_deces"></div>
                 <div class="fg"><div class="fl">Lieu du décès <span class="req">*</span></div><input type="text" class="fi" formControlName="lieu_deces" placeholder="Ex: CHU Treichville"></div>
               </div>
               <div class="form-grid">
-                <div class="fg"><div class="fl">Cause du décès</div><input type="text" class="fi" formControlName="cause_deces" placeholder="Ex: Insuffisance cardiaque"></div>
-                <div class="fg"><div class="fl">Déclarant (nom)</div><input type="text" class="fi" formControlName="declarant_nom"></div>
+                <div class="fg"><div class="fl">Cause du décès <span class="req">*</span></div><input type="text" class="fi" formControlName="cause_deces" placeholder="Ex: Insuffisance cardiaque"></div>
+                <div class="fg"><div class="fl">Déclarant (nom) <span class="req">*</span></div><input type="text" class="fi" formControlName="declarant_nom"></div>
               </div>
 
               <div class="fsec ivoire-border">Documents justificatifs</div>
               <div class="form-grid-3">
-                <div class="fg"><div class="fl">CNI du défunt</div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onFileSelected($event)"></div>
-                <div class="fg"><div class="fl">Certificat de décès (PDF)</div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onFileSelected($event)"></div>
-                <div class="fg"><div class="fl">CNI du déclarant</div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onFileSelected($event)"></div>
+                <div class="fg"><div class="fl">CNI du défunt <span class="req">*</span></div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onFileSelected($event, 'piece_defunt')">@if (fichiers()['piece_defunt']) { <span class="file-ok"><i class="ti ti-circle-check"></i> {{ fichiers()['piece_defunt']?.name }}</span> }</div>
+                <div class="fg"><div class="fl">Certificat de décès (PDF) <span class="req">*</span></div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onFileSelected($event, 'certificat_deces')">@if (fichiers()['certificat_deces']) { <span class="file-ok"><i class="ti ti-circle-check"></i> {{ fichiers()['certificat_deces']?.name }}</span> }</div>
+                <div class="fg"><div class="fl">CNI du déclarant <span class="req">*</span></div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onFileSelected($event, 'piece_declarant')">@if (fichiers()['piece_declarant']) { <span class="file-ok"><i class="ti ti-circle-check"></i> {{ fichiers()['piece_declarant']?.name }}</span> }</div>
               </div>
             </ng-container>
 
@@ -191,18 +191,18 @@ import { TOUTES_TRIBUNAUX } from '../etat-civil/tribunaux.ci';
               <div class="fsec ivoire-border">Informations du demandeur</div>
               <div class="form-grid">
                 <div class="fg"><div class="fl">Nom <span class="req">*</span></div><input type="text" class="fi" formControlName="nom" placeholder="Ex: KONAN"></div>
-                <div class="fg"><div class="fl">Prénom(s)</div><input type="text" class="fi" formControlName="prenom" placeholder="Ex: Kouassi"></div>
+                <div class="fg"><div class="fl">Prénom(s) <span class="req">*</span></div><input type="text" class="fi" formControlName="prenom" placeholder="Ex: Kouassi"></div>
               </div>
               <div class="form-grid">
-                <div class="fg"><div class="fl">Date de naissance</div><input type="date" class="fi" formControlName="date_naissance"></div>
-                <div class="fg"><div class="fl">Profession</div><input type="text" class="fi" formControlName="profession" placeholder="Ex: Commerçant"></div>
+                <div class="fg"><div class="fl">Date de naissance <span class="req">*</span></div><input type="date" class="fi" formControlName="date_naissance"></div>
+                <div class="fg"><div class="fl">Profession <span class="req">*</span></div><input type="text" class="fi" formControlName="profession" placeholder="Ex: Commerçant"></div>
               </div>
               <div class="form-grid" style="grid-template-columns: 1fr;">
-                <div class="fg"><div class="fl">Référence acte de naissance</div><input type="text" class="fi" formControlName="acte_reference" placeholder="Ex: CI-CC-2000-N-001234"></div>
+                <div class="fg"><div class="fl">Référence acte de naissance <span class="req">*</span></div><input type="text" class="fi" formControlName="acte_reference" placeholder="Ex: CI-CC-2000-N-001234"></div>
               </div>
               <div class="fsec ivoire-border">Documents justificatifs</div>
               <div class="form-grid" style="grid-template-columns: 1fr;">
-                <div class="fg"><div class="fl">CNI / Passeport du demandeur</div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onFileSelected($event)"></div>
+                <div class="fg"><div class="fl">CNI / Passeport du demandeur <span class="req">*</span></div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onFileSelected($event, 'piece_identite')">@if (fichiers()['piece_identite']) { <span class="file-ok"><i class="ti ti-circle-check"></i> {{ fichiers()['piece_identite']?.name }}</span> }</div>
               </div>
             </ng-container>
 
@@ -211,13 +211,13 @@ import { TOUTES_TRIBUNAUX } from '../etat-civil/tribunaux.ci';
               <div class="fsec ivoire-border">Informations du demandeur</div>
               <div class="form-grid">
                 <div class="fg"><div class="fl">Nom <span class="req">*</span></div><input type="text" class="fi" formControlName="nom" placeholder="Ex: TRAORÉ"></div>
-                <div class="fg"><div class="fl">Prénom(s)</div><input type="text" class="fi" formControlName="prenom" placeholder="Ex: Aminata"></div>
+                <div class="fg"><div class="fl">Prénom(s) <span class="req">*</span></div><input type="text" class="fi" formControlName="prenom" placeholder="Ex: Aminata"></div>
               </div>
               <div class="form-grid-3">
-                <div class="fg"><div class="fl">Adresse complète</div><input type="text" class="fi" formControlName="adresse" placeholder="Ex: 12 Rue des Jardins, Cocody"></div>
-                <div class="fg"><div class="fl">Quartier</div><input type="text" class="fi" formControlName="quartier" placeholder="Ex: Angré 8e Tranche"></div>
+                <div class="fg"><div class="fl">Adresse complète <span class="req">*</span></div><input type="text" class="fi" formControlName="adresse" placeholder="Ex: 12 Rue des Jardins, Cocody"></div>
+                <div class="fg"><div class="fl">Quartier <span class="req">*</span></div><input type="text" class="fi" formControlName="quartier" placeholder="Ex: Angré 8e Tranche"></div>
                 <div class="fg">
-                  <div class="fl">Commune</div>
+                  <div class="fl">Commune <span class="req">*</span></div>
                   <select class="fsel" formControlName="commune">
                     <option value="" disabled>-- Sélectionnez une commune --</option>
                     @for (commune of communesList; track commune) {
@@ -228,7 +228,7 @@ import { TOUTES_TRIBUNAUX } from '../etat-civil/tribunaux.ci';
               </div>
               <div class="fsec ivoire-border">Documents justificatifs</div>
               <div class="form-grid" style="grid-template-columns: 1fr;">
-                <div class="fg"><div class="fl">CNI / Passeport du demandeur</div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onFileSelected($event)"></div>
+                <div class="fg"><div class="fl">CNI / Passeport du demandeur <span class="req">*</span></div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onFileSelected($event, 'piece_identite')">@if (fichiers()['piece_identite']) { <span class="file-ok"><i class="ti ti-circle-check"></i> {{ fichiers()['piece_identite']?.name }}</span> }</div>
               </div>
             </ng-container>
 
@@ -237,14 +237,14 @@ import { TOUTES_TRIBUNAUX } from '../etat-civil/tribunaux.ci';
               <div class="fsec ivoire-border">Informations du demandeur</div>
               <div class="form-grid">
                 <div class="fg"><div class="fl">Nom <span class="req">*</span></div><input type="text" class="fi" formControlName="nom" placeholder="Ex: KOUADIO"></div>
-                <div class="fg"><div class="fl">Prénom(s)</div><input type="text" class="fi" formControlName="prenom" placeholder="Ex: Jean"></div>
+                <div class="fg"><div class="fl">Prénom(s) <span class="req">*</span></div><input type="text" class="fi" formControlName="prenom" placeholder="Ex: Jean"></div>
               </div>
               <div class="form-grid" style="grid-template-columns: 1fr;">
-                <div class="fg"><div class="fl">Date de naissance</div><input type="date" class="fi" formControlName="date_naissance"></div>
+                <div class="fg"><div class="fl">Date de naissance <span class="req">*</span></div><input type="date" class="fi" formControlName="date_naissance"></div>
               </div>
               <div class="fsec ivoire-border">Documents justificatifs</div>
               <div class="form-grid" style="grid-template-columns: 1fr;">
-                <div class="fg"><div class="fl">CNI / Passeport du demandeur</div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onFileSelected($event)"></div>
+                <div class="fg"><div class="fl">CNI / Passeport du demandeur <span class="req">*</span></div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onFileSelected($event, 'piece_identite')">@if (fichiers()['piece_identite']) { <span class="file-ok"><i class="ti ti-circle-check"></i> {{ fichiers()['piece_identite']?.name }}</span> }</div>
               </div>
             </ng-container>
 
@@ -253,23 +253,23 @@ import { TOUTES_TRIBUNAUX } from '../etat-civil/tribunaux.ci';
               <div class="fsec ivoire-border">Transcription de jugement supplétif</div>
               <div class="form-grid">
                 <div class="fg"><div class="fl">Nom et prénoms <span class="req">*</span></div><input type="text" class="fi" formControlName="nom" placeholder="Ex: KONAN Yao"></div>
-                <div class="fg"><div class="fl">Lieu de naissance</div><input type="text" class="fi" formControlName="lieu" placeholder="Ex: Cocody, Abidjan"></div>
+                <div class="fg"><div class="fl">Lieu de naissance <span class="req">*</span></div><input type="text" class="fi" formControlName="lieu" placeholder="Ex: Cocody, Abidjan"></div>
               </div>
               <div class="form-grid-3">
                 <div class="fg"><div class="fl">Date de naissance <span class="req">*</span></div><input type="date" class="fi" formControlName="date_naissance"></div>
                 <div class="fg">
-                  <div class="fl">Tribunal</div>
+                  <div class="fl">Tribunal <span class="req">*</span></div>
                   <select class="fsel" formControlName="tribunal">
                     @for (tribunal of tribunauxList; track tribunal) {
                       <option [value]="tribunal">{{ tribunal }}</option>
                     }
                   </select>
                 </div>
-                <div class="fg"><div class="fl">Date du jugement</div><input type="date" class="fi" formControlName="date_jugement"></div>
+                <div class="fg"><div class="fl">Date du jugement <span class="req">*</span></div><input type="date" class="fi" formControlName="date_jugement"></div>
               </div>
               <div class="fsec ivoire-border">Documents justificatifs</div>
               <div class="form-grid" style="grid-template-columns: 1fr;">
-                <div class="fg"><div class="fl">Document du jugement supplétif</div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onFileSelected($event)"></div>
+                <div class="fg"><div class="fl">Document du jugement supplétif <span class="req">*</span></div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onFileSelected($event, 'document_jugement')">@if (fichiers()['document_jugement']) { <span class="file-ok"><i class="ti ti-circle-check"></i> {{ fichiers()['document_jugement']?.name }}</span> }</div>
               </div>
             </ng-container>
 
@@ -278,30 +278,30 @@ import { TOUTES_TRIBUNAUX } from '../etat-civil/tribunaux.ci';
               <div class="fsec ivoire-border">Informations de l'enfant</div>
               <div class="form-grid">
                 <div class="fg"><div class="fl">Nom et prénoms de l'enfant <span class="req">*</span></div><input type="text" class="fi" formControlName="enfant_nom" placeholder="Ex: KOUADIO Ange"></div>
-                <div class="fg"><div class="fl">Date de naissance</div><input type="date" class="fi" formControlName="enfant_date_naissance"></div>
+                <div class="fg"><div class="fl">Date de naissance <span class="req">*</span></div><input type="date" class="fi" formControlName="enfant_date_naissance"></div>
               </div>
               <div class="form-grid" style="grid-template-columns: 1fr;">
-                <div class="fg"><div class="fl">Lieu de naissance</div><input type="text" class="fi" formControlName="enfant_lieu_naissance" placeholder="Ex: CHU de Cocody"></div>
+                <div class="fg"><div class="fl">Lieu de naissance <span class="req">*</span></div><input type="text" class="fi" formControlName="enfant_lieu_naissance" placeholder="Ex: CHU de Cocody"></div>
               </div>
 
               <div class="fsec ivoire-border">Père adoptant</div>
               <div class="form-grid-3">
                 <div class="fg"><div class="fl">Nom et prénoms <span class="req">*</span></div><input type="text" class="fi" formControlName="pere_nom" placeholder="Ex: KOUADIO Jean"></div>
-                <div class="fg"><div class="fl">Profession</div><input type="text" class="fi" formControlName="pere_profession" placeholder="Ex: Enseignant"></div>
-                <div class="fg"><div class="fl">Nationalité</div><input type="text" class="fi" formControlName="pere_nationalite"></div>
+                <div class="fg"><div class="fl">Profession <span class="req">*</span></div><input type="text" class="fi" formControlName="pere_profession" placeholder="Ex: Enseignant"></div>
+                <div class="fg"><div class="fl">Nationalité <span class="req">*</span></div><input type="text" class="fi" formControlName="pere_nationalite"></div>
               </div>
 
               <div class="fsec ivoire-border">Mère adoptante</div>
               <div class="form-grid-3">
                 <div class="fg"><div class="fl">Nom et prénoms <span class="req">*</span></div><input type="text" class="fi" formControlName="mere_nom" placeholder="Ex: KOUADIO Marie"></div>
-                <div class="fg"><div class="fl">Profession</div><input type="text" class="fi" formControlName="mere_profession" placeholder="Ex: Médecin"></div>
-                <div class="fg"><div class="fl">Nationalité</div><input type="text" class="fi" formControlName="mere_nationalite"></div>
+                <div class="fg"><div class="fl">Profession <span class="req">*</span></div><input type="text" class="fi" formControlName="mere_profession" placeholder="Ex: Médecin"></div>
+                <div class="fg"><div class="fl">Nationalité <span class="req">*</span></div><input type="text" class="fi" formControlName="mere_nationalite"></div>
               </div>
 
               <div class="fsec ivoire-border">Détails du jugement d'adoption</div>
               <div class="form-grid-3">
                 <div class="fg">
-                  <div class="fl">Tribunal</div>
+                  <div class="fl">Tribunal <span class="req">*</span></div>
                   <select class="fsel" formControlName="tribunal">
                     @for (tribunal of tribunauxList; track tribunal) {
                       <option [value]="tribunal">{{ tribunal }}</option>
@@ -309,7 +309,7 @@ import { TOUTES_TRIBUNAUX } from '../etat-civil/tribunaux.ci';
                   </select>
                 </div>
                 <div class="fg"><div class="fl">Date du jugement d'adoption <span class="req">*</span></div><input type="date" class="fi" formControlName="date_jugement"></div>
-                <div class="fg"><div class="fl">Type d'adoption</div>
+                <div class="fg"><div class="fl">Type d'adoption <span class="req">*</span></div>
                   <select class="fsel" formControlName="type_adoption">
                     <option value="Pleine">Adoption pleine</option>
                     <option value="Simple">Adoption simple</option>
@@ -320,11 +320,11 @@ import { TOUTES_TRIBUNAUX } from '../etat-civil/tribunaux.ci';
 
               <div class="fsec ivoire-border">Documents justificatifs</div>
               <div class="form-grid">
-                <div class="fg"><div class="fl">Pièce d'identité du père adoptant</div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onFileSelected($event)"></div>
-                <div class="fg"><div class="fl">Pièce d'identité de la mère adoptante</div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onFileSelected($event)"></div>
+                <div class="fg"><div class="fl">Pièce d'identité du père adoptant <span class="req">*</span></div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onFileSelected($event, 'piece_pere')">@if (fichiers()['piece_pere']) { <span class="file-ok"><i class="ti ti-circle-check"></i> {{ fichiers()['piece_pere']?.name }}</span> }</div>
+                <div class="fg"><div class="fl">Pièce d'identité de la mère adoptante <span class="req">*</span></div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onFileSelected($event, 'piece_mere')">@if (fichiers()['piece_mere']) { <span class="file-ok"><i class="ti ti-circle-check"></i> {{ fichiers()['piece_mere']?.name }}</span> }</div>
               </div>
               <div class="form-grid" style="grid-template-columns: 1fr;">
-                <div class="fg"><div class="fl">Document du jugement d'adoption (PDF)</div><input type="file" class="fi" accept=".pdf" (change)="onFileSelected($event)"></div>
+                <div class="fg"><div class="fl">Document du jugement d'adoption (PDF) <span class="req">*</span></div><input type="file" class="fi" accept=".pdf" (change)="onFileSelected($event, 'document_jugement')">@if (fichiers()['document_jugement']) { <span class="file-ok"><i class="ti ti-circle-check"></i> {{ fichiers()['document_jugement']?.name }}</span> }</div>
               </div>
             </ng-container>
 
@@ -334,7 +334,7 @@ import { TOUTES_TRIBUNAUX } from '../etat-civil/tribunaux.ci';
               <div class="fsec ivoire-border">Localisation du problème</div>
               <div class="form-grid">
                 <div class="fg"><div class="fl">Quartier / Adresse exacte <span class="req">*</span></div><input type="text" class="fi" formControlName="adresse" placeholder="Ex: Quartier Palmeraie, rue des jardins"></div>
-                <div class="fg"><div class="fl">Repère précis</div><input type="text" class="fi" formControlName="repere" placeholder="Ex: Devant la pharmacie"></div>
+                <div class="fg"><div class="fl">Repère précis <span class="req">*</span></div><input type="text" class="fi" formControlName="repere" placeholder="Ex: Devant la pharmacie"></div>
               </div>
               <div class="fsec ivoire-border">Détails de l'intervention demandée</div>
               <div class="form-grid-3">
@@ -351,7 +351,7 @@ import { TOUTES_TRIBUNAUX } from '../etat-civil/tribunaux.ci';
                 <div class="fg"><div class="fl">Description complète <span class="req">*</span></div><textarea class="fi" formControlName="description" rows="4" placeholder="Lampadaire en panne, nid de poule dangereux, canalisation bouchée..."></textarea></div>
               </div>
               <div class="form-grid" style="grid-template-columns: 1fr;">
-                <div class="fg"><div class="fl">Joindre une photo du problème (JPG/PNG)</div><input type="file" class="fi" (change)="onFileSelected($event)" accept="image/*"></div>
+                <div class="fg"><div class="fl">Joindre une photo du problème (JPG/PNG) <span class="req">*</span></div><input type="file" class="fi" (change)="onFileSelected($event, 'photo')" accept="image/*">@if (fichiers()['photo']) { <span class="file-ok"><i class="ti ti-circle-check"></i> {{ fichiers()['photo']?.name }}</span> }</div>
               </div>
             </ng-container>
 
@@ -371,11 +371,11 @@ import { TOUTES_TRIBUNAUX } from '../etat-civil/tribunaux.ci';
                 </div>
               </div>
               <div class="form-grid" style="grid-template-columns: 1fr;">
-                <div class="fg"><div class="fl">Preuve de paiement / Reçu (PDF/JPG)</div><input type="file" class="fi" (change)="onFileSelected($event)"></div>
+                <div class="fg"><div class="fl">Preuve de paiement / Reçu (PDF/JPG) <span class="req">*</span></div><input type="file" class="fi" (change)="onFileSelected($event, 'preuve_paiement')">@if (fichiers()['preuve_paiement']) { <span class="file-ok"><i class="ti ti-circle-check"></i> {{ fichiers()['preuve_paiement']?.name }}</span> }</div>
               </div>
             </ng-container>
 
-            <button type="submit" class="btn-submit" [disabled]="loading() || demandeForm.invalid">
+            <button type="submit" class="btn-submit" [disabled]="loading()">
               <i class="ti ti-check" style="margin-right:8px;"></i>
               {{ loading() ? 'Enregistrement...' : 'Soumettre le dossier' }}
             </button>
@@ -438,6 +438,8 @@ import { TOUTES_TRIBUNAUX } from '../etat-civil/tribunaux.ci';
       .fg { display: flex; flex-direction: column; gap: 0.5rem; justify-content: flex-end; }
       .fl { font-size: 12px; font-weight: 600; color: #475569; display: flex; align-items: center; gap: 4px; }
       .req { color: #ef4444; margin-left: 2px; }
+      .file-ok { display: inline-flex; align-items: center; gap: 4px; font-size: 0.78rem; color: #009A44; font-weight: 600; margin-top: 0.3rem; }
+      .fi.ng-invalid.ng-touched, select.fsel.ng-invalid.ng-touched { border-color: #ef4444; background: #fff5f5; }
       .fi, .fsel { padding: 0.6rem 1rem; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 14px; outline: none; transition: all 0.2s; background: #f8fafc; font-family: inherit; width: 100%; box-sizing: border-box; }
       input.fi, select.fsel { height: 44px; }
       textarea.fi { min-height: 100px; padding: 0.8rem 1rem; }
@@ -529,58 +531,80 @@ export class CitoyenDemandeComponent implements OnInit {
           nom: ['', Validators.required], prenom: ['', Validators.required],
           date_naissance: ['', Validators.required], heure_naissance: ['', Validators.required],
           sexe: ['', Validators.required], lieu_naissance: ['', Validators.required], commune: ['', Validators.required],
-          pere_nom: [''], pere_profession: [''], pere_nationalite: ['Ivoirienne'],
-          mere_nom: [''], mere_profession: [''], mere_nationalite: ['Ivoirienne']
+          pere_nom: ['', Validators.required], pere_profession: ['', Validators.required], pere_nationalite: ['Ivoirienne', Validators.required],
+          mere_nom: ['', Validators.required], mere_profession: ['', Validators.required], mere_nationalite: ['Ivoirienne', Validators.required]
         };
       } else if (type === "Demande d'acte de mariage") {
         controls = {
           epoux_nom: ['', Validators.required], epoux_prenom: ['', Validators.required], epoux_profession: ['', Validators.required], epoux_nationalite: ['Ivoirienne', Validators.required],
-          epoux_temoin_nom: [''], epoux_temoin_profession: [''],
+          epoux_temoin_nom: ['', Validators.required], epoux_temoin_profession: ['', Validators.required],
           epouse_nom: ['', Validators.required], epouse_prenom: ['', Validators.required], epouse_profession: ['', Validators.required], epouse_nationalite: ['Ivoirienne', Validators.required],
-          epouse_temoin_nom: [''], epouse_temoin_profession: [''],
-          date_mariage: ['', Validators.required], lieu_mariage: [''], regime_matrimonial: ['Communauté de biens']
+          epouse_temoin_nom: ['', Validators.required], epouse_temoin_profession: ['', Validators.required],
+          date_mariage: ['', Validators.required], lieu_mariage: ['', Validators.required], regime_matrimonial: ['Communauté de biens', Validators.required]
         };
       } else if (type === "Demande d'acte de décès") {
         controls = {
           defunt_nom: ['', Validators.required], defunt_prenom: ['', Validators.required],
-          defunt_date_naissance: [''], defunt_commune: [''],
-          date_deces: ['', Validators.required], heure_deces: [''], lieu_deces: ['', Validators.required],
-          cause_deces: [''], declarant_nom: ['']
+          defunt_date_naissance: ['', Validators.required], defunt_commune: ['', Validators.required],
+          date_deces: ['', Validators.required], heure_deces: ['', Validators.required], lieu_deces: ['', Validators.required],
+          cause_deces: ['', Validators.required], declarant_nom: ['', Validators.required]
         };
       } else if (type === 'Certificat de célibat') {
         controls = {
-          nom: ['', Validators.required], prenom: [''],
-          date_naissance: [''], profession: [''], acte_reference: ['']
+          nom: ['', Validators.required], prenom: ['', Validators.required],
+          date_naissance: ['', Validators.required], profession: ['', Validators.required], acte_reference: ['', Validators.required]
         };
       } else if (type === 'Certificat de résidence') {
         controls = {
-          nom: ['', Validators.required], prenom: [''],
-          adresse: [''], quartier: [''], commune: ['']
+          nom: ['', Validators.required], prenom: ['', Validators.required],
+          adresse: ['', Validators.required], quartier: ['', Validators.required], commune: ['', Validators.required]
         };
       } else if (type === 'Certificat de vie individuelle') {
         controls = {
-          nom: ['', Validators.required], prenom: [''], date_naissance: ['']
+          nom: ['', Validators.required], prenom: ['', Validators.required], date_naissance: ['', Validators.required]
         };
       } else if (type === 'Jugement supplétif') {
         controls = {
-          nom: ['', Validators.required], lieu: [''],
-          date_naissance: ['', Validators.required], tribunal: ['TPI Abidjan (Plateau)'], date_jugement: ['']
+          nom: ['', Validators.required], lieu: ['', Validators.required],
+          date_naissance: ['', Validators.required], tribunal: ['TPI Abidjan (Plateau)', Validators.required], date_jugement: ['', Validators.required]
         };
       } else if (type === "Demande d'adoption") {
         controls = {
-          enfant_nom: ['', Validators.required], enfant_date_naissance: [''], enfant_lieu_naissance: [''],
-          pere_nom: ['', Validators.required], pere_profession: [''], pere_nationalite: ['Ivoirienne'],
-          mere_nom: ['', Validators.required], mere_profession: [''], mere_nationalite: ['Ivoirienne'],
-          tribunal: ['TPI Abidjan (Plateau)'], date_jugement: ['', Validators.required], type_adoption: ['Pleine']
+          enfant_nom: ['', Validators.required], enfant_date_naissance: ['', Validators.required], enfant_lieu_naissance: ['', Validators.required],
+          pere_nom: ['', Validators.required], pere_profession: ['', Validators.required], pere_nationalite: ['Ivoirienne', Validators.required],
+          mere_nom: ['', Validators.required], mere_profession: ['', Validators.required], mere_nationalite: ['Ivoirienne', Validators.required],
+          tribunal: ['TPI Abidjan (Plateau)', Validators.required], date_jugement: ['', Validators.required], type_adoption: ['Pleine', Validators.required]
         };
       }
     } else if (this.module === 'services-techniques') {
-      controls = { adresse: ['', Validators.required], repere: [''], urgence: ['', Validators.required], description: ['', Validators.required] };
+      controls = { adresse: ['', Validators.required], repere: ['', Validators.required], urgence: ['', Validators.required], description: ['', Validators.required] };
     } else if (this.module === 'finances') {
       controls = { reference_facture: ['', Validators.required], montant: ['', Validators.required], mode_paiement: ['', Validators.required] };
     }
 
     this.demandeForm = this.fb.group(controls);
+    this.fichiers.set({});
+  }
+
+  /** Documents obligatoires par type de démarche — clé du fichier -> libellé affiché dans le message d'erreur. */
+  private readonly REQUIRED_FILES: Record<string, Record<string, string>> = {
+    "Demande d'acte de naissance": { piece_pere: "Pièce d'identité du père", piece_mere: "Pièce d'identité de la mère" },
+    "Demande d'acte de mariage": {
+      piece_epoux: 'CNI / Passeport — Époux', piece_epouse: 'CNI / Passeport — Épouse',
+      piece_temoin_epoux: "CNI / Passeport — Témoin de l'époux", piece_temoin_epouse: "CNI / Passeport — Témoin de l'épouse",
+    },
+    "Demande d'acte de décès": { piece_defunt: 'CNI du défunt', certificat_deces: 'Certificat de décès', piece_declarant: 'CNI du déclarant' },
+    'Certificat de célibat': { piece_identite: 'CNI / Passeport du demandeur' },
+    'Certificat de résidence': { piece_identite: 'CNI / Passeport du demandeur' },
+    'Certificat de vie individuelle': { piece_identite: 'CNI / Passeport du demandeur' },
+    'Jugement supplétif': { document_jugement: 'Document du jugement supplétif' },
+    "Demande d'adoption": { piece_pere: "Pièce d'identité du père adoptant", piece_mere: "Pièce d'identité de la mère adoptante", document_jugement: "Document du jugement d'adoption" },
+  };
+  private requiredFilesForCurrentSelection(): Record<string, string> {
+    if (this.module === 'etat-civil') return this.REQUIRED_FILES[this.typeControl.value ?? ''] ?? {};
+    if (this.module === 'services-techniques') return { photo: 'Photo du problème' };
+    if (this.module === 'finances') return { preuve_paiement: 'Preuve de paiement / Reçu' };
+    return {};
   }
 
   loadDemarches() {
@@ -590,63 +614,47 @@ export class CitoyenDemandeComponent implements OnInit {
     });
   }
 
-  selectedFiles: File[] = [];
-  showPaymentModal = signal(false);
-  paymentMethod = signal('wave');
-
-  needsPayment(): boolean {
-    const type = this.typeControl.value;
-    if (this.module === 'finances') return true;
-    if (this.module === 'etat-civil' && type === "Demande d'acte de mariage") return true;
-    return false;
-  }
+  fichiers = signal<Record<string, File>>({});
 
   onInitiateSubmit() {
+    this.demandeForm.markAllAsTouched();
     if (this.demandeForm.invalid) {
-      this.toast.showError('demande-err', 'Veuillez remplir tous les champs obligatoires.', 'Erreur');
+      this.toast.showError('demande-err', 'Veuillez remplir tous les champs obligatoires (marqués d\'une étoile rouge *).', 'Champs manquants');
       return;
     }
-    if (this.needsPayment()) {
-      this.showPaymentModal.set(true);
-    } else {
-      this.onSubmit();
+
+    const requis = this.requiredFilesForCurrentSelection();
+    const fichiersActuels = this.fichiers();
+    const manquants = Object.entries(requis)
+      .filter(([cle]) => !fichiersActuels[cle])
+      .map(([, libelle]) => libelle);
+
+    if (manquants.length > 0) {
+      this.toast.showError('demande-files-err', `Document(s) manquant(s) : ${manquants.join(', ')}.`, 'Pièces justificatives manquantes');
+      return;
     }
+
+    this.onSubmit();
   }
 
-  processPayment() {
-    this.loading.set(true);
-    // Simulation API de paiement (2s)
-    setTimeout(() => {
-      this.toast.show('paiement-ok', 'Paiement effectué avec succès via ' + this.paymentMethod().toUpperCase());
-      this.showPaymentModal.set(false);
-      this.onSubmit(true); // Passer true pour indiquer que c'est payé
-    }, 2000);
-  }
-
-  onSubmit(isPaid: boolean = false) {
+  onSubmit() {
     this.loading.set(true);
     const formData = new FormData();
     formData.append('module', this.module);
     if (this.typeControl.value) {
       formData.append('type_demarche', this.typeControl.value);
     }
-    
-    // Si la démarche nécessitait un paiement, on l'ajoute dans les données
-    const donnees = this.demandeForm.value;
-    if (isPaid) {
-      donnees['paiement'] = { statut: 'Payé', methode: this.paymentMethod(), date: new Date().toISOString() };
-    }
-    
-    formData.append('donnees', JSON.stringify(donnees));
-    
-    this.selectedFiles.forEach(f => formData.append('files[]', f));
+
+    formData.append('donnees', JSON.stringify(this.demandeForm.value));
+
+    Object.values(this.fichiers()).forEach(f => formData.append('files[]', f));
 
     this.citoyenService.createDemarche(formData).subscribe({
       next: (res) => {
         this.loading.set(false);
         this.toast.show('demande-ok', 'Votre demande a été soumise avec succès.');
         this.demandeForm.reset();
-        this.selectedFiles = [];
+        this.fichiers.set({});
         this.loadDemarches(); // Reload tracking list
       },
       error: () => {
@@ -656,10 +664,10 @@ export class CitoyenDemandeComponent implements OnInit {
     });
   }
 
-  onFileSelected(event: any) {
+  onFileSelected(event: any, cle: string) {
     const file = event.target.files[0];
     if (file) {
-      this.selectedFiles.push(file);
+      this.fichiers.update(f => ({ ...f, [cle]: file }));
       this.toast.show('file-ok', `Fichier ${file.name} sélectionné avec succès.`);
     }
   }

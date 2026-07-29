@@ -91,13 +91,13 @@ const STATUT_COLORS_ST: Record<string, string> = {
             </div>
             <div class="form-grid" style="grid-template-columns: 1fr;">
               <div class="fg">
-                <div class="fl">Joindre une photo du problème (simulation)</div>
+                <div class="fl">Joindre une photo du problème (simulation) <span class="req">*</span></div>
                 <input type="file" class="fi" accept="image/*" (change)="onFileSelected($event)">
                 @if (selectedFile) { <span class="file-name"><i class="ti ti-paperclip"></i> {{ selectedFile.name }}</span> }
               </div>
             </div>
 
-            <button type="submit" class="btn-submit" [disabled]="loading() || form.invalid">
+            <button type="submit" class="btn-submit" [disabled]="loading()">
               <i class="ti ti-send" style="margin-right:8px;"></i>
               {{ loading() ? 'Envoi en cours...' : 'Envoyer le signalement' }}
             </button>
@@ -157,6 +157,7 @@ const STATUT_COLORS_ST: Record<string, string> = {
       .fg { display: flex; flex-direction: column; gap: 0.5rem; justify-content: flex-end; }
       .fl { font-size: 12px; font-weight: 600; color: #475569; display: flex; align-items: center; gap: 4px; }
       .req { color: #ef4444; margin-left: 2px; }
+      .fi.ng-invalid.ng-touched, select.fsel.ng-invalid.ng-touched { border-color: #ef4444; background: #fff5f5; }
       .fi, .fsel { padding: 0.6rem 1rem; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 14px; outline: none; transition: all 0.2s; background: #f8fafc; font-family: inherit; width: 100%; box-sizing: border-box; }
       input.fi, select.fsel { height: 44px; }
       textarea.fi { min-height: 100px; padding: 0.8rem 1rem; }
@@ -246,8 +247,13 @@ export class CitoyenSignalementComponent implements OnInit {
   }
 
   onSubmit() {
+    this.form.markAllAsTouched();
     if (this.form.invalid) {
-      this.toast.showError('signal-err', 'Veuillez remplir tous les champs obligatoires.', 'Erreur');
+      this.toast.showError('signal-err', 'Veuillez remplir tous les champs obligatoires (marqués d\'une étoile rouge *).', 'Champs manquants');
+      return;
+    }
+    if (!this.selectedFile) {
+      this.toast.showError('signal-photo-err', 'Veuillez joindre une photo du problème.', 'Photo manquante');
       return;
     }
     this.loading.set(true);
