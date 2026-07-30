@@ -99,7 +99,7 @@ export type Section = 'voirie' | 'eclairage' | 'eau' | 'batiments' | 'interventi
         <i class="ti ti-inbox"></i>Demandes Citoyens
       </div>
 
-      <app-annonces-maire />
+      <app-annonces-maire moduleKey="services-techniques" />
     </nav>
 
     <!-- ── Main ─────────────────────────────────────────────────────────── -->

@@ -23,9 +23,19 @@ class PublicAnnoncesController extends Controller
     {
         $limit = min((int) $request->get('limit', 50), 100);
 
-        $data = Actualite::query()
+        $query = Actualite::query()
             ->where('type', 'annonce')
-            ->where('statut', 'publie')
+            ->where('statut', 'publie');
+
+        // Un widget de module (sidebar gestionnaire) précise `module` et ne voit
+        // que ce qui lui est destiné : ciblage exact, tous les services, ou public.
+        // Sans ce paramètre (ex: tableau de bord du Maire), aucune restriction —
+        // le Maire retrouve l'intégralité de ce qu'il a publié.
+        if ($module = $request->get('module')) {
+            $query->whereIn('audience', ['public', 'tous_services', $module]);
+        }
+
+        $data = $query
             ->orderByDesc('date')
             ->limit($limit)
             ->get()
@@ -36,6 +46,7 @@ class PublicAnnoncesController extends Controller
                 'auteur' => $a->auteur,
                 'date' => $a->date?->format('Y-m-d'),
                 'urgent' => $a->categorie === 'Urgent',
+                'audience' => $a->audience,
             ]);
 
         return response()->json(['data' => $data]);

@@ -81,7 +81,7 @@ export type Section = 'inventaire' | 'immobilier' | 'affectation' | 'maintenance
         <i class="ti ti-inbox"></i>Demandes Citoyens
       </div>
 
-      <app-annonces-maire />
+      <app-annonces-maire moduleKey="patrimoine" />
     </nav>
 
     <!-- Main -->

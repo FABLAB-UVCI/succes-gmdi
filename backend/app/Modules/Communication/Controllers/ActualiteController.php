@@ -4,11 +4,19 @@ namespace App\Modules\Communication\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Modules\Communication\Models\Actualite;
+use App\Support\GmdiAccess;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class ActualiteController extends Controller
 {
     use PaginationHelper;
+
+    /** @return list<string> */
+    private function audienceValues(): array
+    {
+        return array_merge(['public', 'tous_services'], GmdiAccess::MODULES);
+    }
 
     public function index(Request $request)
     {
@@ -30,11 +38,13 @@ class ActualiteController extends Controller
             'statut'    => 'nullable|in:publie,brouillon',
             'categorie' => 'nullable|string|max:100',
             'date'      => 'nullable|date',
+            'audience'  => ['nullable', Rule::in($this->audienceValues())],
         ]);
         $a = Actualite::create(array_merge($v, [
-            'statut' => $v['statut'] ?? 'publie',
-            'auteur' => $v['auteur'] ?? 'Service Communication',
-            'date'   => $v['date']   ?? now()->format('Y-m-d'),
+            'statut'   => $v['statut'] ?? 'publie',
+            'auteur'   => $v['auteur'] ?? 'Service Communication',
+            'date'     => $v['date']   ?? now()->format('Y-m-d'),
+            'audience' => $v['audience'] ?? 'public',
         ]));
         return response()->json(['success'=>true,'message'=>"Publication créée — {$a->titre}",'data'=>$this->fmt($a)], 201);
     }
@@ -50,6 +60,7 @@ class ActualiteController extends Controller
             'statut'    => 'nullable|in:publie,brouillon',
             'categorie' => 'nullable|string|max:100',
             'date'      => 'nullable|date',
+            'audience'  => ['nullable', Rule::in($this->audienceValues())],
         ]);
         $a->update($v);
         return response()->json(['success'=>true,'message'=>"Publication mise à jour — {$a->titre}",'data'=>$this->fmt($a->fresh())]);
@@ -71,6 +82,6 @@ class ActualiteController extends Controller
 
     private function fmt(Actualite $a): array
     {
-        return ['id'=>$a->id,'type'=>$a->type,'titre'=>$a->titre,'contenu'=>$a->contenu,'auteur'=>$a->auteur,'date'=>$a->date?->format('Y-m-d'),'statut'=>$a->statut,'categorie'=>$a->categorie,'created_at'=>$a->created_at?->toISOString()];
+        return ['id'=>$a->id,'type'=>$a->type,'titre'=>$a->titre,'contenu'=>$a->contenu,'auteur'=>$a->auteur,'date'=>$a->date?->format('Y-m-d'),'statut'=>$a->statut,'categorie'=>$a->categorie,'audience'=>$a->audience,'created_at'=>$a->created_at?->toISOString()];
     }
 }

@@ -37,6 +37,7 @@ class CitoyenCommunicationController extends Controller
 
         $data = Actualite::query()
             ->where('statut', 'publie')
+            ->where('audience', 'public')
             ->whereIn('type', ['communique', 'annonce'])
             ->orderByDesc('date')
             ->get();
@@ -53,6 +54,7 @@ class CitoyenCommunicationController extends Controller
 
         $data = Actualite::query()
             ->where('statut', 'publie')
+            ->where('audience', 'public')
             ->where('type', 'evenement')
             ->orderBy('date')
             ->get();

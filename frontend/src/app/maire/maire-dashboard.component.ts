@@ -7,7 +7,19 @@ import { AuthService } from '../communication/core/services/auth.service';
 import { environment } from '@env/environment';
 import { DemandesCitoyensComponent } from '../shared/components/demandes-citoyens.component';
 
-interface AnnonceForm { titre: string; contenu: string; urgent: boolean; }
+interface AnnonceForm { titre: string; contenu: string; urgent: boolean; destinataire: string; serviceCible: string; }
+
+interface ServiceOption { value: string; label: string; }
+
+const SERVICES_CIBLABLES: ServiceOption[] = [
+  { value: 'communication', label: 'Communication' },
+  { value: 'etat-civil', label: 'État civil' },
+  { value: 'finances', label: 'Finances' },
+  { value: 'patrimoine', label: 'Patrimoine' },
+  { value: 'rh', label: 'Ressources humaines' },
+  { value: 'services-techniques', label: 'Services techniques' },
+  { value: 'urbanisme', label: 'Urbanisme / SIG' },
+];
 
 interface ModuleStat {
   key: string; label: string; ico: string; color: string;
@@ -54,6 +66,7 @@ interface ModuleStat {
             <div class="ann-row" [class.urgent]="a.urgent">
               <div class="ann-row-head">
                 <span class="ann-row-titre">{{ a.titre }}</span>
+                <span class="ann-row-audience">{{ labelAudience(a.audience) }}</span>
                 @if (a.urgent) { <span class="ann-row-badge">Urgent</span> }
               </div>
               <p class="ann-row-contenu">{{ a.contenu }}</p>
@@ -154,8 +167,24 @@ interface ModuleStat {
         </div>
         <div class="ann-fg">
           <label>Contenu <span class="req">*</span></label>
-          <textarea rows="5" [(ngModel)]="annonceForm.contenu" placeholder="Détails de l'annonce à diffuser à tous les services..."></textarea>
+          <textarea rows="5" [(ngModel)]="annonceForm.contenu" placeholder="Détails de l'annonce à diffuser..."></textarea>
         </div>
+        <div class="ann-fg">
+          <label>Destinataires <span class="req">*</span></label>
+          <select [(ngModel)]="annonceForm.destinataire">
+            <option value="public">Tous les citoyens et tous les services</option>
+            <option value="tous_services">Tous les services (gestionnaires uniquement)</option>
+            <option value="specifique">Un service précis...</option>
+          </select>
+        </div>
+        @if (annonceForm.destinataire === 'specifique') {
+          <div class="ann-fg">
+            <label>Service ciblé <span class="req">*</span></label>
+            <select [(ngModel)]="annonceForm.serviceCible">
+              @for (s of servicesCiblables; track s.value) { <option [value]="s.value">{{ s.label }}</option> }
+            </select>
+          </div>
+        }
         <label class="ann-checkbox">
           <input type="checkbox" [(ngModel)]="annonceForm.urgent"> Marquer comme urgente
         </label>
@@ -314,7 +343,8 @@ interface ModuleStat {
 .ann-fg { display: flex; flex-direction: column; gap: .4rem; }
 .ann-fg label { font-size: .78rem; font-weight: 700; color: #475569; }
 .ann-fg .req { color: #ef4444; }
-.ann-fg input, .ann-fg textarea { padding: .6rem .8rem; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: .88rem; font-family: inherit; outline: none; }
+.ann-fg input, .ann-fg textarea, .ann-fg select { padding: .6rem .8rem; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: .88rem; font-family: inherit; outline: none; background: #fff; width: 100%; box-sizing: border-box; }
+.ann-row-audience { background: #e0f2fe; color: #0369a1; font-size: .68rem; font-weight: 700; padding: .15rem .5rem; border-radius: 20px; text-transform: uppercase; white-space: nowrap; }
 .ann-fg input:focus, .ann-fg textarea:focus { border-color: #F77F00; box-shadow: 0 0 0 3px rgba(247,127,0,.1); }
 .ann-checkbox { display: flex; align-items: center; gap: .5rem; font-size: .85rem; color: #334155; cursor: pointer; }
 .ann-error { color: #e63946; font-size: .82rem; margin: 0; }
@@ -329,11 +359,12 @@ export class MaireDashboardComponent implements OnInit {
   readonly user = this.auth.currentUser();
   private http  = inject(HttpClient);
 
-  mesAnnonces = signal<{ id: number; titre: string; contenu: string; date: string; urgent: boolean }[]>([]);
+  mesAnnonces = signal<{ id: number; titre: string; contenu: string; date: string; urgent: boolean; audience: string }[]>([]);
   modalAnnonceOuvert = signal(false);
   publishingAnnonce  = signal(false);
   annonceError       = signal('');
-  annonceForm: AnnonceForm = { titre: '', contenu: '', urgent: false };
+  annonceForm: AnnonceForm = { titre: '', contenu: '', urgent: false, destinataire: 'public', serviceCible: 'communication' };
+  servicesCiblables = SERVICES_CIBLABLES;
 
   globalKpis = [
     { label: 'Démarches citoyens',  value: '—', ico: '📋', color: '#003366', trend: 0 },
@@ -432,7 +463,7 @@ export class MaireDashboardComponent implements OnInit {
   }
 
   ouvrirModalAnnonce(): void {
-    this.annonceForm = { titre: '', contenu: '', urgent: false };
+    this.annonceForm = { titre: '', contenu: '', urgent: false, destinataire: 'public', serviceCible: 'communication' };
     this.annonceError.set('');
     this.modalAnnonceOuvert.set(true);
   }
@@ -449,6 +480,10 @@ export class MaireDashboardComponent implements OnInit {
     this.publishingAnnonce.set(true);
     this.annonceError.set('');
 
+    const audience = this.annonceForm.destinataire === 'specifique'
+      ? this.annonceForm.serviceCible
+      : this.annonceForm.destinataire;
+
     this.http.post(`${environment.apiUrl}/com/actualites`, {
       type: 'annonce',
       titre: this.annonceForm.titre.trim(),
@@ -456,6 +491,7 @@ export class MaireDashboardComponent implements OnInit {
       auteur: this.user?.name ?? 'Le Maire',
       statut: 'publie',
       categorie: this.annonceForm.urgent ? 'Urgent' : null,
+      audience,
     }).subscribe({
       next: () => {
         this.publishingAnnonce.set(false);
@@ -467,6 +503,12 @@ export class MaireDashboardComponent implements OnInit {
         this.annonceError.set(err?.error?.message ?? "Impossible de publier l'annonce.");
       },
     });
+  }
+
+  labelAudience(audience: string): string {
+    if (audience === 'public') return 'Tous + citoyens';
+    if (audience === 'tous_services') return 'Tous les services';
+    return this.servicesCiblables.find(s => s.value === audience)?.label ?? audience;
   }
 
   loadKpis(): void {

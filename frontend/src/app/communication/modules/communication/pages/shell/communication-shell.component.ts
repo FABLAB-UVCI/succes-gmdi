@@ -93,7 +93,7 @@ export type Section = 'actualites' | 'reseaux' | 'relations' | 'documents' | 'ci
         <span class="sb-label">Abonnements</span>
       </div>
 
-      <app-annonces-maire />
+      <app-annonces-maire moduleKey="communication" />
     </nav>
 
     <!-- ── Main ─────────────────────────────────────────────────────────── -->

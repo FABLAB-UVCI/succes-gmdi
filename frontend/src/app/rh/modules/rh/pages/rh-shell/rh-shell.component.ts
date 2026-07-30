@@ -68,7 +68,7 @@ interface NavItem { id: Section; label: string; icon: string; }
         <i class="ti ti-inbox" aria-hidden="true"></i>Demandes Citoyens
       </div>
 
-      <app-annonces-maire />
+      <app-annonces-maire moduleKey="rh" />
     </nav>
 
     <!-- Main content -->

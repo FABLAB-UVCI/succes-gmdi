@@ -69,7 +69,7 @@ import { AnnoncesMaireComponent } from '../../../shared/components/annonces-mair
           <div class="sb-sec">Citoyens</div>
           <a class="sb-item" routerLink="/finances/demandes" routerLinkActive="act" (click)="closeSidebar()"><i class="ti ti-inbox"></i>Demandes Citoyens</a>
 
-          <app-annonces-maire />
+          <app-annonces-maire moduleKey="finances" />
         </nav>
 
         <!-- ── Main Content ── -->

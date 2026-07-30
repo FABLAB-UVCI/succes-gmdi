@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '@env/environment';
@@ -10,6 +10,7 @@ export interface AnnonceMaire {
   auteur: string | null;
   date: string;
   urgent: boolean;
+  audience: string;
 }
 
 /**
@@ -124,6 +125,9 @@ export interface AnnonceMaire {
   `]
 })
 export class AnnoncesMaireComponent implements OnInit {
+  /** Slug du module qui embarque ce widget (ex: 'finances', 'etat-civil'). */
+  @Input() moduleKey?: string;
+
   private http = inject(HttpClient);
   private base = environment.apiUrl;
 
@@ -132,7 +136,8 @@ export class AnnoncesMaireComponent implements OnInit {
   showAll  = signal(false);
 
   ngOnInit(): void {
-    this.http.get<{ data: AnnonceMaire[] }>(`${this.base}/public/annonces`).subscribe({
+    const url = this.moduleKey ? `${this.base}/public/annonces?module=${this.moduleKey}` : `${this.base}/public/annonces`;
+    this.http.get<{ data: AnnonceMaire[] }>(url).subscribe({
       next:  r => { this.annonces.set(r.data); this.loading.set(false); },
       error: () => this.loading.set(false),
     });

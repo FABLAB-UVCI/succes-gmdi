@@ -130,7 +130,7 @@ export type Section = 'foncier' | 'permis' | 'cartographie' | 'projets' | 'geolo
         </div>
       </div>
 
-      <app-annonces-maire />
+      <app-annonces-maire moduleKey="urbanisme" />
 
       <!-- Pied sidebar -->
       <div class="sb-footer">
