@@ -31,6 +31,8 @@ export class SidebarComponent {
     { type: 'item', route: 'recherche',    label: 'Rechercher acte', icon: 'ti ti-search' },
     { type: 'section', label: 'Citoyens' },
     { type: 'item', route: 'demandes',     label: 'Demandes Citoyens', icon: 'ti ti-inbox' },
+    { type: 'section', label: 'Ressources humaines' },
+    { type: 'item', route: 'demande-rh',   label: 'Demande RH', icon: 'ti ti-briefcase' },
   ];
 
   navigate(item: MenuItem) {

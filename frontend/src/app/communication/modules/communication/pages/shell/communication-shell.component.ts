@@ -12,8 +12,9 @@ import { LoadingService }       from '../../../../core/services/loading.service'
 import { AuthService }          from '../../../../core/services/auth.service';
 import { AnnoncesMaireComponent } from '../../../../../shared/components/annonces-maire/annonces-maire.component';
 import { DemandesCitoyensComponent } from '../../../../../shared/components/demandes-citoyens.component';
+import { DemandeRhComponent } from '../../../../../shared/components/demande-rh/demande-rh.component';
 
-export type Section = 'actualites' | 'reseaux' | 'relations' | 'documents' | 'citoyens' | 'sms' | 'demandes-citoyens' | 'abonnements';
+export type Section = 'actualites' | 'reseaux' | 'relations' | 'documents' | 'citoyens' | 'sms' | 'demandes-citoyens' | 'abonnements' | 'demande-rh';
 
 @Component({
   selector: 'app-communication-shell',
@@ -25,6 +26,7 @@ export type Section = 'actualites' | 'reseaux' | 'relations' | 'documents' | 'ci
     AnnoncesMaireComponent,
     DemandesCitoyensComponent,
     AbonnementsComponent,
+    DemandeRhComponent,
   ],
   template: `
 <div class="root">
@@ -92,6 +94,10 @@ export type Section = 'actualites' | 'reseaux' | 'relations' | 'documents' | 'ci
         <span class="sb-icon-wrap"><i class="ti ti-users-group"></i></span>
         <span class="sb-label">Abonnements</span>
       </div>
+      <div class="sb-item" [class.act]="active()==='demande-rh'" (click)="navigate('demande-rh')" role="button">
+        <span class="sb-icon-wrap"><i class="ti ti-briefcase"></i></span>
+        <span class="sb-label">Demande RH</span>
+      </div>
 
       <app-annonces-maire moduleKey="communication" />
     </nav>
@@ -149,6 +155,7 @@ export type Section = 'actualites' | 'reseaux' | 'relations' | 'documents' | 'ci
         <app-demandes-citoyens moduleName="communication" moduleLabel="Communication" />
       }
       @if (active()==='abonnements') { <app-abonnements /> }
+      @if (active()==='demande-rh') { <app-demande-rh moduleOrigine="communication" /> }
 
     </main>
   </div>

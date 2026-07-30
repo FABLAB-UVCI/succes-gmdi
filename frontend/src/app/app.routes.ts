@@ -53,6 +53,7 @@ export const routes: Routes = [
       { path: 'tresorerie',   title: 'E-Mairie — Finances | Trésorerie', loadComponent: () => import('./finances/features/tresorerie/tresorerie.component').then(m => m.TresorerieComponent) },
       { path: 'rapports',     title: 'E-Mairie — Finances | Rapports', loadComponent: () => import('./finances/features/rapports/rapports.component').then(m => m.RapportsComponent) },
       { path: 'demandes',     title: 'E-Mairie — Finances | Demandes Citoyens', loadComponent: () => import('./finances/features/demandes/demandes.component').then(m => m.DemandesComponent) },
+      { path: 'demande-rh',   title: 'E-Mairie — Finances | Demande RH', loadComponent: () => import('./finances/features/demande-rh/demande-rh.component').then(m => m.FinancesDemandeRhComponent) },
     ]
   },
 

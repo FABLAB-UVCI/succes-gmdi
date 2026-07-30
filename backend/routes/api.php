@@ -96,3 +96,4 @@ require __DIR__.'/modules/finances.php';            // préfixes: recettes, depe
 require __DIR__.'/modules/patrimoine.php';          // préfixe interne: patrimoine
 require __DIR__.'/modules/services-techniques.php'; // préfixe interne: st
 require __DIR__.'/modules/urbanisme.php';           // préfixe interne: urb
+require __DIR__.'/modules/rh-demandes.php';         // préfixe interne: rh-demandes (demandes internes -> RH)

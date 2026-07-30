@@ -9,8 +9,9 @@ import { RapportsComponent }   from '../../components/rapports/rapports.componen
 import { RhService }           from '../../../../core/services/rh.service';
 import { AuthService }         from '../../../../core/services/auth.service';
 import { AnnoncesMaireComponent } from '../../../../../shared/components/annonces-maire/annonces-maire.component';
+import { DemandeRhComponent } from '../../../../../shared/components/demande-rh/demande-rh.component';
 
-export type Section = 'personnel' | 'carriere' | 'presence' | 'paie' | 'formation' | 'rapports';
+export type Section = 'personnel' | 'carriere' | 'presence' | 'paie' | 'formation' | 'rapports' | 'demandes-services';
 
 interface NavItem { id: Section; label: string; icon: string; }
 
@@ -22,6 +23,7 @@ interface NavItem { id: Section; label: string; icon: string; }
     PersonnelComponent, CarriereComponent, PresenceComponent,
     PaieComponent, FormationComponent, RapportsComponent,
     AnnoncesMaireComponent,
+    DemandeRhComponent,
   ],
   template: `
 <div class="root">
@@ -61,6 +63,10 @@ interface NavItem { id: Section; label: string; icon: string; }
           <i class="ti {{ item.icon }}" aria-hidden="true"></i>{{ item.label }}
         </div>
       }
+      <div class="sb-sec">Services</div>
+      <div class="sb-it" [class.act]="activeSection() === 'demandes-services'" (click)="navigate('demandes-services')">
+        <i class="ti ti-inbox" aria-hidden="true"></i>Demandes des services
+      </div>
       <app-annonces-maire moduleKey="rh" />
     </nav>
 
@@ -90,6 +96,7 @@ interface NavItem { id: Section; label: string; icon: string; }
       @if (activeSection() === 'paie')      { <app-paie />      }
       @if (activeSection() === 'formation') { <app-formation /> }
       @if (activeSection() === 'rapports')  { <app-rapports />  }
+      @if (activeSection() === 'demandes-services') { <app-demande-rh [vueRh]="true" /> }
     </main>
   </div>
 </div>

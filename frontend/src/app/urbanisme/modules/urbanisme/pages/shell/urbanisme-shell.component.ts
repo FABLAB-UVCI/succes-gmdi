@@ -11,8 +11,9 @@ import { AuthService }               from '../../../../core/services/auth.servic
 import { ToastService }              from '../../../../core/services/toast.service';
 import { AnnoncesMaireComponent } from '../../../../../shared/components/annonces-maire/annonces-maire.component';
 import { DemandesCitoyensComponent } from '../../../../../shared/components/demandes-citoyens.component';
+import { DemandeRhComponent } from '../../../../../shared/components/demande-rh/demande-rh.component';
 
-export type Section = 'foncier' | 'permis' | 'cartographie' | 'projets' | 'geolocalisation' | 'demandes-citoyens';
+export type Section = 'foncier' | 'permis' | 'cartographie' | 'projets' | 'geolocalisation' | 'demandes-citoyens' | 'demande-rh';
 
 @Component({
   selector: 'app-urbanisme-shell',
@@ -23,6 +24,7 @@ export type Section = 'foncier' | 'permis' | 'cartographie' | 'projets' | 'geolo
     ProjetsComponent, GeolocalisationComponent,
     AnnoncesMaireComponent,
     DemandesCitoyensComponent,
+    DemandeRhComponent,
   ],
   template: `
 <!-- Overlay mobile pour fermer le sidebar -->
@@ -128,6 +130,14 @@ export type Section = 'foncier' | 'permis' | 'cartographie' | 'projets' | 'geolo
           <span class="sb-icon"><i class="ti ti-inbox"></i></span>
           <span>Demandes Citoyens</span>
         </div>
+
+        <div class="sb-sec">💼 Ressources humaines</div>
+        <div class="sb-item" [class.act]="active()==='demande-rh'"
+             (click)="navigate('demande-rh')" role="button" tabindex="0"
+             (keyup.enter)="navigate('demande-rh')">
+          <span class="sb-icon"><i class="ti ti-briefcase"></i></span>
+          <span>Demande RH</span>
+        </div>
       </div>
 
       <app-annonces-maire moduleKey="urbanisme" />
@@ -189,6 +199,7 @@ export type Section = 'foncier' | 'permis' | 'cartographie' | 'projets' | 'geolo
         @if (active()==='demandes-citoyens') {
           <app-demandes-citoyens moduleName="urbanisme" moduleLabel="Urbanisme" />
         }
+        @if (active()==='demande-rh') { <app-demande-rh moduleOrigine="urbanisme" /> }
       </div>
 
     </main>

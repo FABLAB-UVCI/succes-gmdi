@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 class EnforceGmdiModuleAccess
 {
     /** @var list<string> */
-    private const SKIP_PREFIXES = ['auth', 'public', 'demarches', 'admin', 'citoyen'];
+    private const SKIP_PREFIXES = ['auth', 'public', 'demarches', 'admin', 'citoyen', 'rh-demandes'];
 
     public function handle(Request $request, Closure $next): Response
     {

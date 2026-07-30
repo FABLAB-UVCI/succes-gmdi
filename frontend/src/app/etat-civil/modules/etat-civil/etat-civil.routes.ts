@@ -47,6 +47,10 @@ export const ETAT_CIVIL_ROUTES: Routes = [
         path: 'demandes',
         loadComponent: () => import('../../../shared/components/demandes-citoyens.component').then(m => m.DemandesCitoyensComponent),
         data: { moduleName: 'etat-civil', moduleLabel: 'État Civil' }
+      },
+      {
+        path: 'demande-rh',
+        loadComponent: () => import('./pages/demande-rh/demande-rh').then(m => m.EtatCivilDemandeRhComponent)
       }
     ]
   }

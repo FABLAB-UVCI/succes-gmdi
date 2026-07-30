@@ -12,8 +12,9 @@ import { AuthService }               from '../../../../core/services/auth.servic
 import { ToastService }              from '../../../../core/services/toast.service';
 import { AnnoncesMaireComponent } from '../../../../../shared/components/annonces-maire/annonces-maire.component';
 import { DemandesCitoyensComponent } from '../../../../../shared/components/demandes-citoyens.component';
+import { DemandeRhComponent } from '../../../../../shared/components/demande-rh/demande-rh.component';
 
-export type Section = 'voirie' | 'eclairage' | 'eau' | 'batiments' | 'interventions' | 'maintenance' | 'demandes-citoyens';
+export type Section = 'voirie' | 'eclairage' | 'eau' | 'batiments' | 'interventions' | 'maintenance' | 'demandes-citoyens' | 'demande-rh';
 
 @Component({
   selector: 'app-st-shell',
@@ -24,6 +25,7 @@ export type Section = 'voirie' | 'eclairage' | 'eau' | 'batiments' | 'interventi
     BatimentsComponent, InterventionsComponent, MaintenanceComponent,
     AnnoncesMaireComponent,
     DemandesCitoyensComponent,
+    DemandeRhComponent,
   ],
   template: `
 <div class="root st-shell">
@@ -98,6 +100,10 @@ export type Section = 'voirie' | 'eclairage' | 'eau' | 'batiments' | 'interventi
       <div class="sb-item" [class.act]="active()==='demandes-citoyens'" (click)="navigate('demandes-citoyens')" role="button">
         <i class="ti ti-inbox"></i>Demandes Citoyens
       </div>
+      <div class="sb-sec"><i class="ti ti-briefcase"></i>Ressources humaines</div>
+      <div class="sb-item" [class.act]="active()==='demande-rh'" (click)="navigate('demande-rh')" role="button">
+        <i class="ti ti-briefcase"></i>Demande RH
+      </div>
 
       <app-annonces-maire moduleKey="services-techniques" />
     </nav>
@@ -154,6 +160,7 @@ export type Section = 'voirie' | 'eclairage' | 'eau' | 'batiments' | 'interventi
       @if (active()==='demandes-citoyens') {
         <app-demandes-citoyens moduleName="services-techniques" moduleLabel="Services Techniques" />
       }
+      @if (active()==='demande-rh') { <app-demande-rh moduleOrigine="services-techniques" /> }
 
     </main>
   </div>

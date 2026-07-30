@@ -14,8 +14,9 @@ import { AuthService }       from '../../../../core/services/auth.service';
 import { ToastService }      from '../../../../core/services/toast.service';
 import { AnnoncesMaireComponent } from '../../../../../shared/components/annonces-maire/annonces-maire.component';
 import { DemandesCitoyensComponent } from '../../../../../shared/components/demandes-citoyens.component';
+import { DemandeRhComponent } from '../../../../../shared/components/demande-rh/demande-rh.component';
 
-export type Section = 'inventaire' | 'immobilier' | 'affectation' | 'maintenance' | 'amortissement' | 'rapports' | 'demandes-citoyens';
+export type Section = 'inventaire' | 'immobilier' | 'affectation' | 'maintenance' | 'amortissement' | 'rapports' | 'demandes-citoyens' | 'demande-rh';
 
 @Component({
   selector: 'app-patrimoine-shell',
@@ -26,6 +27,7 @@ export type Section = 'inventaire' | 'immobilier' | 'affectation' | 'maintenance
     MaintenanceComponent, AmortissementComponent, RapportsPatrimoineComponent,
     AnnoncesMaireComponent,
     DemandesCitoyensComponent,
+    DemandeRhComponent,
   ],
   template: `
 <div class="r">
@@ -80,6 +82,10 @@ export type Section = 'inventaire' | 'immobilier' | 'affectation' | 'maintenance
       <div class="si" [class.on]="activeSection() === 'demandes-citoyens'" (click)="navigate('demandes-citoyens')">
         <i class="ti ti-inbox"></i>Demandes Citoyens
       </div>
+      <div class="ss">Ressources humaines</div>
+      <div class="si" [class.on]="activeSection() === 'demande-rh'" (click)="navigate('demande-rh')">
+        <i class="ti ti-briefcase"></i>Demande RH
+      </div>
 
       <app-annonces-maire moduleKey="patrimoine" />
     </nav>
@@ -125,6 +131,7 @@ export type Section = 'inventaire' | 'immobilier' | 'affectation' | 'maintenance
       @if (activeSection() === 'demandes-citoyens') {
         <app-demandes-citoyens moduleName="patrimoine" moduleLabel="Patrimoine" />
       }
+      @if (activeSection() === 'demande-rh') { <app-demande-rh moduleOrigine="patrimoine" /> }
     </div>
   </div>
 </div>
