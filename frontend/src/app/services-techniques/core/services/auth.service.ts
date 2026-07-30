@@ -43,7 +43,7 @@ export class AuthService {
 
   /** Reste connecte, revient juste au selecteur de modules. */
   backToModules(): void {
-    this.router.navigate(['/accueil']);
+    this.router.navigate([this._user()?.role === 'maire' ? '/maire' : '/accueil']);
   }
 
   refreshToken() {

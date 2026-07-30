@@ -21,7 +21,7 @@ export class AuthService {
   }
   logout():void{this.http.post(`${environment.apiUrl}/auth/logout`,{}).subscribe({complete:()=>this._clear(),error:()=>this._clear()});}
   /** Reste connecte, revient juste au selecteur de modules. */
-  backToModules():void{this.router.navigate(['/accueil']);}
+  backToModules():void{this.router.navigate([this._user()?.role==='maire'?'/maire':'/accueil']);}
   refreshToken(){return this.http.post<LoginResponse>(`${environment.apiUrl}/auth/refresh`,{}).pipe(tap(r=>{localStorage.setItem(TK,r.token);this._token.set(r.token);}));}
   private _clear():void{localStorage.removeItem(TK);localStorage.removeItem(UK);this._token.set(null);this._user.set(null);this.router.navigate(['/']);}
   private _load():UserApi|null{try{const r=localStorage.getItem(UK);return r?JSON.parse(r):null;}catch{return null;}}

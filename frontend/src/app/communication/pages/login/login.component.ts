@@ -106,7 +106,8 @@ export class LoginComponent {
           this.error.set('Espace réservé aux professionnels. Veuillez vous connecter depuis la page d\'accueil.');
           this.loading.set(false);
         } else {
-          this.router.navigate(['/accueil']);
+          const isMaire = user?.role === 'maire' || user?.roles?.includes('maire');
+          this.router.navigate([isMaire ? '/maire' : '/accueil']);
         }
       },
       error: (err: Error) => { this.error.set(err.message); this.loading.set(false); }
