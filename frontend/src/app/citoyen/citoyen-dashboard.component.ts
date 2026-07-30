@@ -240,6 +240,7 @@ export class CitoyenDashboardComponent implements OnInit {
     { label: 'Services techniques', desc: 'Signaler un incident',            route: '/citoyen/services-techniques/signalement',    ico: 'ti ti-tool', color: '#e63946' },
     { label: 'Finances',            desc: 'Paiement des taxes, reçus',       route: '/citoyen/finances/paiements',                 ico: 'ti ti-cash', color: '#F77F00' },
     { label: 'Communication',       desc: 'Actualités, agenda, abonnement',  route: '/citoyen/communication',                      ico: 'ti ti-news', color: '#009A44' },
+    { label: 'Urbanisme',           desc: 'Permis, certificats, occupation', route: '/citoyen/urbanisme/demande',                  ico: 'ti ti-building-community', color: '#004fa3' },
   ];
 
   ngOnInit(): void {
@@ -259,6 +260,7 @@ export class CitoyenDashboardComponent implements OnInit {
     const map: Record<string, string> = {
       'etat-civil': 'État civil',
       'finances': 'Finances', 'services-techniques': 'Services Techniques',
+      'urbanisme': 'Urbanisme',
     };
     return map[m] ?? m;
   }

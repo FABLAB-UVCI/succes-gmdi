@@ -120,7 +120,7 @@ export interface Demarche {
                 }
               </div>
 
-              @if (selectedDemarche()?.donnees?.recette_reference || selectedDemarche()?.donnees?.intervention_ref) {
+              @if (selectedDemarche()?.donnees?.recette_reference || selectedDemarche()?.donnees?.intervention_ref || selectedDemarche()?.donnees?.permis_reference) {
                 <div class="donnees-box" style="border-color:#009A44;background:#f0fdf4;">
                   <h4><i class="ti ti-link"></i> Suivi métier lié :</h4>
                   <div class="donnees-grid">
@@ -129,6 +129,9 @@ export interface Demarche {
                     }
                     @if (selectedDemarche()?.donnees?.intervention_ref) {
                       <div class="donnee-item"><span class="donnee-key">Registre des interventions</span><span class="donnee-val">{{ selectedDemarche()?.donnees?.intervention_ref }}</span></div>
+                    }
+                    @if (selectedDemarche()?.donnees?.permis_reference) {
+                      <div class="donnee-item"><span class="donnee-key">Registre des permis</span><span class="donnee-val">{{ selectedDemarche()?.donnees?.permis_reference }}</span></div>
                     }
                   </div>
                 </div>
@@ -372,6 +375,44 @@ export class DemandesCitoyensComponent implements OnInit {
         extraDonnees['intervention_ref'] = res?.data?.reference;
       } catch (e) {
         console.error("Impossible de créer la demande d'intervention :", e);
+      }
+    }
+
+    // Promotion vers le registre des permis/certificats d'urbanisme à la validation
+    if (nouveauStatut === 'valide' && this.moduleName === 'urbanisme' && !d.donnees?.permis_reference) {
+      try {
+        const don: any = d.donnees || {};
+        const demandeur = don.demandeur || don.beneficiaire || d.demandeur || 'Citoyen';
+        let res: any = null;
+
+        if (d.type_demarche === 'Permis de construire') {
+          res = await firstValueFrom(this.http.post(`${this.base}/urb/permis/construire`, {
+            demandeur, telephone: don.telephone,
+            adresse_travaux: don.adresse_travaux, quartier: don.quartier,
+            type_construire: don.type_construire, nombre_etages: Number(don.nombre_etages) || undefined,
+            superficie: Number(don.superficie) || undefined, cout_estime: Number(don.cout_estime) || undefined,
+            observations: don.observations,
+          }));
+        } else if (d.type_demarche === 'Permis de démolir') {
+          res = await firstValueFrom(this.http.post(`${this.base}/urb/permis/demolir`, {
+            demandeur, adresse_travaux: don.adresse_travaux,
+            description_batiment: don.description_batiment, quartier: don.quartier,
+          }));
+        } else if (d.type_demarche === "Certificat d'urbanisme") {
+          res = await firstValueFrom(this.http.post(`${this.base}/urb/permis/certificats`, {
+            demandeur, adresse: don.adresse, type: don.type, quartier: don.quartier,
+          }));
+        } else if (d.type_demarche === "Autorisation d'occupation du sol") {
+          res = await firstValueFrom(this.http.post(`${this.base}/urb/permis/autorisations`, {
+            beneficiaire: demandeur, type_occupation: don.type_occupation,
+            localisation: don.localisation, superficie: Number(don.superficie) || undefined,
+            date_debut: don.date_debut, date_fin: don.date_fin, quartier: don.quartier,
+          }));
+        }
+
+        if (res?.data?.reference) extraDonnees['permis_reference'] = res.data.reference;
+      } catch (e) {
+        console.error("Impossible de créer le dossier d'urbanisme :", e);
       }
     }
 

@@ -19,9 +19,9 @@ final class GmdiAccess
 
     /**
      * Modules pour lesquels un citoyen peut soumettre une démarche depuis le
-     * portail citoyen. Communication, RH, urbanisme et patrimoine sont des
-     * modules internes qui ne concernent pas les citoyens et n'y sont pas
-     * exposés (pour le moment).
+     * portail citoyen. Communication, RH et patrimoine sont des modules
+     * internes qui ne concernent pas les citoyens et n'y sont pas exposés
+     * (pour le moment).
      *
      * @var list<string>
      */
@@ -29,6 +29,7 @@ final class GmdiAccess
         'etat-civil',
         'finances',
         'services-techniques',
+        'urbanisme',
     ];
 
     public static function permissionForModule(string $module): string

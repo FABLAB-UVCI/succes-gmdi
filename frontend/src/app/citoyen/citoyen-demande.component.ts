@@ -54,6 +54,16 @@ import { TOUTES_TRIBUNAUX } from '../etat-civil/tribunaux.ci';
             </select>
           </div>
 
+          <div class="type-selector" *ngIf="module === 'urbanisme'">
+            <label>Type de demande :</label>
+            <select [formControl]="typeControl" (change)="onTypeChange()">
+              <option value="Permis de construire">Permis de construire</option>
+              <option value="Permis de démolir">Permis de démolir</option>
+              <option value="Certificat d'urbanisme">Certificat d'urbanisme</option>
+              <option value="Autorisation d'occupation du sol">Autorisation d'occupation du sol</option>
+            </select>
+          </div>
+
           <!-- Formulaire dynamique avec le style "Gestionnaire" -->
           <form [formGroup]="demandeForm" (ngSubmit)="onInitiateSubmit()" class="dynamic-form">
             
@@ -375,6 +385,111 @@ import { TOUTES_TRIBUNAUX } from '../etat-civil/tribunaux.ci';
               </div>
             </ng-container>
 
+            <!-- Champs Urbanisme : Permis de construire -->
+            <ng-container *ngIf="typeControl.value === 'Permis de construire'">
+              <div class="fsec ivoire-border">Demandeur</div>
+              <div class="form-grid">
+                <div class="fg"><div class="fl">Nom et prénoms du demandeur <span class="req">*</span></div><input type="text" class="fi" formControlName="demandeur" placeholder="Ex: KOUAME Jean-Baptiste"></div>
+                <div class="fg"><div class="fl">Téléphone <span class="req">*</span></div><input type="text" class="fi" formControlName="telephone" placeholder="Ex: 07 00 00 00 00"></div>
+              </div>
+              <div class="fsec ivoire-border">Localisation des travaux</div>
+              <div class="form-grid">
+                <div class="fg"><div class="fl">Adresse des travaux <span class="req">*</span></div><input type="text" class="fi" formControlName="adresse_travaux" placeholder="Ex: Lot 245, Angré 8e Tranche"></div>
+                <div class="fg"><div class="fl">Quartier <span class="req">*</span></div><input type="text" class="fi" formControlName="quartier" placeholder="Ex: Angré"></div>
+              </div>
+              <div class="fsec ivoire-border">Nature des travaux</div>
+              <div class="form-grid-3">
+                <div class="fg"><div class="fl">Type de construction <span class="req">*</span></div>
+                  <select class="fsel" formControlName="type_construire">
+                    <option value="">Sélectionner...</option>
+                    <option value="villa">Villa</option>
+                    <option value="immeuble">Immeuble</option>
+                    <option value="commerce">Local commercial</option>
+                    <option value="industriel">Bâtiment industriel</option>
+                    <option value="autre">Autre</option>
+                  </select>
+                </div>
+                <div class="fg"><div class="fl">Nombre d'étages <span class="req">*</span></div><input type="number" class="fi" formControlName="nombre_etages" placeholder="Ex: 2"></div>
+                <div class="fg"><div class="fl">Superficie (m²) <span class="req">*</span></div><input type="number" class="fi" formControlName="superficie" placeholder="Ex: 250"></div>
+              </div>
+              <div class="form-grid">
+                <div class="fg"><div class="fl">Coût estimé des travaux (FCFA) <span class="req">*</span></div><input type="number" class="fi" formControlName="cout_estime" placeholder="Ex: 15000000"></div>
+              </div>
+              <div class="form-grid" style="grid-template-columns: 1fr;">
+                <div class="fg"><div class="fl">Description complémentaire <span class="req">*</span></div><textarea class="fi" formControlName="observations" rows="3" placeholder="Précisions utiles sur le projet..."></textarea></div>
+              </div>
+              <div class="fsec ivoire-border">Documents justificatifs</div>
+              <div class="form-grid">
+                <div class="fg"><div class="fl">Pièce d'identité du demandeur <span class="req">*</span></div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onFileSelected($event, 'piece_identite')">@if (fichiers()['piece_identite']) { <span class="file-ok"><i class="ti ti-circle-check"></i> {{ fichiers()['piece_identite']?.name }}</span> }</div>
+                <div class="fg"><div class="fl">Plan / croquis du projet (PDF) <span class="req">*</span></div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png" (change)="onFileSelected($event, 'plan_projet')">@if (fichiers()['plan_projet']) { <span class="file-ok"><i class="ti ti-circle-check"></i> {{ fichiers()['plan_projet']?.name }}</span> }</div>
+              </div>
+            </ng-container>
+
+            <!-- Champs Urbanisme : Permis de démolir -->
+            <ng-container *ngIf="typeControl.value === 'Permis de démolir'">
+              <div class="fsec ivoire-border">Demandeur</div>
+              <div class="form-grid">
+                <div class="fg"><div class="fl">Nom et prénoms du demandeur <span class="req">*</span></div><input type="text" class="fi" formControlName="demandeur" placeholder="Ex: TRAORÉ Aminata"></div>
+                <div class="fg"><div class="fl">Quartier <span class="req">*</span></div><input type="text" class="fi" formControlName="quartier" placeholder="Ex: Cocody"></div>
+              </div>
+              <div class="form-grid" style="grid-template-columns: 1fr;">
+                <div class="fg"><div class="fl">Adresse du bâtiment à démolir <span class="req">*</span></div><input type="text" class="fi" formControlName="adresse_travaux" placeholder="Ex: Rue des Jardins, Cocody"></div>
+              </div>
+              <div class="form-grid" style="grid-template-columns: 1fr;">
+                <div class="fg"><div class="fl">Description du bâtiment <span class="req">*</span></div><textarea class="fi" formControlName="description_batiment" rows="3" placeholder="Type de bâtiment, état, raison de la démolition..."></textarea></div>
+              </div>
+              <div class="fsec ivoire-border">Documents justificatifs</div>
+              <div class="form-grid" style="grid-template-columns: 1fr;">
+                <div class="fg"><div class="fl">Pièce d'identité du demandeur <span class="req">*</span></div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onFileSelected($event, 'piece_identite')">@if (fichiers()['piece_identite']) { <span class="file-ok"><i class="ti ti-circle-check"></i> {{ fichiers()['piece_identite']?.name }}</span> }</div>
+              </div>
+            </ng-container>
+
+            <!-- Champs Urbanisme : Certificat d'urbanisme -->
+            <ng-container *ngIf="typeControl.value === 'Certificat d\\'urbanisme'">
+              <div class="fsec ivoire-border">Demandeur</div>
+              <div class="form-grid">
+                <div class="fg"><div class="fl">Nom et prénoms du demandeur <span class="req">*</span></div><input type="text" class="fi" formControlName="demandeur" placeholder="Ex: KONÉ Souleymane"></div>
+                <div class="fg"><div class="fl">Quartier <span class="req">*</span></div><input type="text" class="fi" formControlName="quartier" placeholder="Ex: Marcory"></div>
+              </div>
+              <div class="form-grid">
+                <div class="fg"><div class="fl">Adresse du terrain <span class="req">*</span></div><input type="text" class="fi" formControlName="adresse" placeholder="Ex: Lot 12, Marcory Zone 4"></div>
+                <div class="fg"><div class="fl">Type de certificat <span class="req">*</span></div>
+                  <select class="fsel" formControlName="type">
+                    <option value="">Sélectionner...</option>
+                    <option value="informatif">Informatif (renseignements sur la parcelle)</option>
+                    <option value="operationnel">Opérationnel (faisabilité d'un projet)</option>
+                  </select>
+                </div>
+              </div>
+              <div class="fsec ivoire-border">Documents justificatifs</div>
+              <div class="form-grid" style="grid-template-columns: 1fr;">
+                <div class="fg"><div class="fl">Pièce d'identité du demandeur <span class="req">*</span></div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onFileSelected($event, 'piece_identite')">@if (fichiers()['piece_identite']) { <span class="file-ok"><i class="ti ti-circle-check"></i> {{ fichiers()['piece_identite']?.name }}</span> }</div>
+              </div>
+            </ng-container>
+
+            <!-- Champs Urbanisme : Autorisation d'occupation du sol -->
+            <ng-container *ngIf="typeControl.value === 'Autorisation d\\'occupation du sol'">
+              <div class="fsec ivoire-border">Bénéficiaire</div>
+              <div class="form-grid">
+                <div class="fg"><div class="fl">Nom et prénoms du bénéficiaire <span class="req">*</span></div><input type="text" class="fi" formControlName="beneficiaire" placeholder="Ex: BAMBA Fatoumata"></div>
+                <div class="fg"><div class="fl">Quartier <span class="req">*</span></div><input type="text" class="fi" formControlName="quartier" placeholder="Ex: Treichville"></div>
+              </div>
+              <div class="fsec ivoire-border">Détails de l'occupation</div>
+              <div class="form-grid-3">
+                <div class="fg"><div class="fl">Nature de l'occupation <span class="req">*</span></div><input type="text" class="fi" formControlName="type_occupation" placeholder="Ex: Terrasse, kiosque, panneau..."></div>
+                <div class="fg"><div class="fl">Localisation précise <span class="req">*</span></div><input type="text" class="fi" formControlName="localisation" placeholder="Ex: Devant le lot 34, avenue 7"></div>
+                <div class="fg"><div class="fl">Superficie occupée (m²) <span class="req">*</span></div><input type="number" class="fi" formControlName="superficie" placeholder="Ex: 20"></div>
+              </div>
+              <div class="form-grid">
+                <div class="fg"><div class="fl">Date de début souhaitée <span class="req">*</span></div><input type="date" class="fi" formControlName="date_debut"></div>
+                <div class="fg"><div class="fl">Date de fin souhaitée <span class="req">*</span></div><input type="date" class="fi" formControlName="date_fin"></div>
+              </div>
+              <div class="fsec ivoire-border">Documents justificatifs</div>
+              <div class="form-grid" style="grid-template-columns: 1fr;">
+                <div class="fg"><div class="fl">Pièce d'identité du bénéficiaire <span class="req">*</span></div><input type="file" class="fi" accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.gif" (change)="onFileSelected($event, 'piece_identite')">@if (fichiers()['piece_identite']) { <span class="file-ok"><i class="ti ti-circle-check"></i> {{ fichiers()['piece_identite']?.name }}</span> }</div>
+              </div>
+            </ng-container>
+
             <button type="submit" class="btn-submit" [disabled]="loading()">
               <i class="ti ti-check" style="margin-right:8px;"></i>
               {{ loading() ? 'Enregistrement...' : 'Soumettre le dossier' }}
@@ -500,6 +615,7 @@ export class CitoyenDemandeComponent implements OnInit {
       'etat-civil': 'État civil',
       'services-techniques': 'Services techniques',
       'finances': 'Finances',
+      'urbanisme': 'Urbanisme',
     };
     this.moduleLabel = labels[this.module] || this.module;
   }
@@ -510,6 +626,7 @@ export class CitoyenDemandeComponent implements OnInit {
     if (this.module === 'etat-civil') defaultType = "Demande d'acte de naissance";
     else if (this.module === 'services-techniques') defaultType = "Voirie et éclairage";
     else if (this.module === 'finances') defaultType = "Paiement de taxe municipale";
+    else if (this.module === 'urbanisme') defaultType = 'Permis de construire';
 
     this.typeControl.setValue(defaultType);
     this.buildDynamicForm();
@@ -580,6 +697,32 @@ export class CitoyenDemandeComponent implements OnInit {
       controls = { adresse: ['', Validators.required], repere: ['', Validators.required], urgence: ['', Validators.required], description: ['', Validators.required] };
     } else if (this.module === 'finances') {
       controls = { reference_facture: ['', Validators.required], montant: ['', Validators.required], mode_paiement: ['', Validators.required] };
+    } else if (this.module === 'urbanisme') {
+      if (type === 'Permis de construire') {
+        controls = {
+          demandeur: ['', Validators.required], telephone: ['', Validators.required],
+          adresse_travaux: ['', Validators.required], quartier: ['', Validators.required],
+          type_construire: ['', Validators.required], nombre_etages: ['', Validators.required],
+          superficie: ['', Validators.required], cout_estime: ['', Validators.required],
+          observations: ['', Validators.required],
+        };
+      } else if (type === 'Permis de démolir') {
+        controls = {
+          demandeur: ['', Validators.required], quartier: ['', Validators.required],
+          adresse_travaux: ['', Validators.required], description_batiment: ['', Validators.required],
+        };
+      } else if (type === "Certificat d'urbanisme") {
+        controls = {
+          demandeur: ['', Validators.required], quartier: ['', Validators.required],
+          adresse: ['', Validators.required], type: ['', Validators.required],
+        };
+      } else if (type === "Autorisation d'occupation du sol") {
+        controls = {
+          beneficiaire: ['', Validators.required], quartier: ['', Validators.required],
+          type_occupation: ['', Validators.required], localisation: ['', Validators.required],
+          superficie: ['', Validators.required], date_debut: ['', Validators.required], date_fin: ['', Validators.required],
+        };
+      }
     }
 
     this.demandeForm = this.fb.group(controls);
@@ -599,9 +742,14 @@ export class CitoyenDemandeComponent implements OnInit {
     'Certificat de vie individuelle': { piece_identite: 'CNI / Passeport du demandeur' },
     'Jugement supplétif': { document_jugement: 'Document du jugement supplétif' },
     "Demande d'adoption": { piece_pere: "Pièce d'identité du père adoptant", piece_mere: "Pièce d'identité de la mère adoptante", document_jugement: "Document du jugement d'adoption" },
+    'Permis de construire': { piece_identite: "Pièce d'identité du demandeur", plan_projet: 'Plan / croquis du projet' },
+    'Permis de démolir': { piece_identite: "Pièce d'identité du demandeur" },
+    "Certificat d'urbanisme": { piece_identite: "Pièce d'identité du demandeur" },
+    "Autorisation d'occupation du sol": { piece_identite: "Pièce d'identité du bénéficiaire" },
   };
   private requiredFilesForCurrentSelection(): Record<string, string> {
     if (this.module === 'etat-civil') return this.REQUIRED_FILES[this.typeControl.value ?? ''] ?? {};
+    if (this.module === 'urbanisme') return this.REQUIRED_FILES[this.typeControl.value ?? ''] ?? {};
     if (this.module === 'services-techniques') return { photo: 'Photo du problème' };
     if (this.module === 'finances') return { preuve_paiement: 'Preuve de paiement / Reçu' };
     return {};
