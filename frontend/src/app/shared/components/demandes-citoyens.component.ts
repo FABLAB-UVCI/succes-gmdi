@@ -365,7 +365,7 @@ export class DemandesCitoyensComponent implements OnInit {
           type_service: d.donnees?.type_incident || d.type_demarche || 'Signalement citoyen',
           description: d.donnees?.description || 'Signalement transmis via le portail citoyen.',
           localisation: [d.donnees?.quartier, d.donnees?.localisation || d.donnees?.adresse].filter(Boolean).join(' — ') || 'Non renseignée',
-          demandeur: d.demandeur || 'Citoyen',
+          demandeur: d.donnees?.nom_demandeur || d.demandeur || 'Citoyen',
           telephone: d.demandeur_telephone || undefined,
           priorite: this.mapPriorite(d.donnees?.urgence),
         }));

@@ -51,6 +51,14 @@ const STATUT_COLORS_ST: Record<string, string> = {
           <h2>Nouveau signalement</h2>
 
           <form [formGroup]="form" (ngSubmit)="onSubmit()" class="dynamic-form">
+            <div class="fsec ivoire-border">Informations du demandeur (facultatif)</div>
+            <div class="form-grid" style="grid-template-columns: 1fr;">
+              <div class="fg">
+                <div class="fl">Nom et prénoms du demandeur</div>
+                <input type="text" class="fi" formControlName="nom_demandeur" placeholder="Ex: KOUASSI Jean (si différent de votre compte)">
+              </div>
+            </div>
+
             <div class="fsec ivoire-border">Nature du problème</div>
             <div class="form-grid">
               <div class="fg">
@@ -201,6 +209,7 @@ export class CitoyenSignalementComponent implements OnInit {
   selectedFile: File | null = null;
 
   form = this.fb.group({
+    nom_demandeur: [''],
     type_incident: [TYPES_INCIDENT[0], Validators.required],
     quartier: ['', Validators.required],
     localisation: ['', Validators.required],
@@ -268,7 +277,7 @@ export class CitoyenSignalementComponent implements OnInit {
       next: () => {
         this.loading.set(false);
         this.toast.show('signal-ok', 'Votre signalement a été enregistré. Un ticket vous a été attribué.');
-        this.form.reset({ type_incident: TYPES_INCIDENT[0], quartier: '', localisation: '', gps: '', description: '' });
+        this.form.reset({ nom_demandeur: '', type_incident: TYPES_INCIDENT[0], quartier: '', localisation: '', gps: '', description: '' });
         this.selectedFile = null;
         this.loadSignalements();
       },
