@@ -41,10 +41,12 @@ class PublicationBansController extends Controller
             'date_mariage_prevue' => 'nullable|date',
         ]);
 
-        $data['numero'] = 'CI-CC-' . date('Y') . '-B-' . str_pad(PublicationBans::count() + 1, 6, '0', STR_PAD_LEFT);
         $data['statut'] = 'Publié';
 
-        $bans = PublicationBans::create($data);
+        $bans = $this->createWithUniqueNumero(function () use ($data) {
+            $data['numero'] = 'CI-CC-' . date('Y') . '-B-' . str_pad(PublicationBans::count() + 1, 6, '0', STR_PAD_LEFT);
+            return PublicationBans::create($data);
+        });
 
         return response()->json([
             'id' => $bans->id,
@@ -61,5 +63,18 @@ class PublicationBansController extends Controller
     {
         $publicationsBan->delete();
         return response()->json(['message' => 'Supprimé']);
+    }
+
+    private function createWithUniqueNumero(\Closure $attempt, int $maxAttempts = 5)
+    {
+        for ($i = 0; $i < $maxAttempts; $i++) {
+            try {
+                return $attempt();
+            } catch (\Illuminate\Database\QueryException $e) {
+                if ($i >= $maxAttempts - 1 || !str_contains(strtolower($e->getMessage()), 'unique')) {
+                    throw $e;
+                }
+            }
+        }
     }
 }
