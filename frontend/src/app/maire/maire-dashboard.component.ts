@@ -45,7 +45,10 @@ interface ModuleStat {
     </div>
     <div class="topbar-right">
       <button class="btn-annonce" (click)="ouvrirModalAnnonce()"><i class="ti ti-speakerphone"></i> Nouvelle annonce</button>
-      <span class="mayor-name">🏛️ {{ user?.name ?? 'Monsieur le Maire' }}</span>
+      <span class="mayor-badge">
+        <span class="mayor-avatar">🏛️</span>
+        <span class="mayor-name">{{ user?.name ?? 'Monsieur le Maire' }}</span>
+      </span>
       <button class="btn-logout" (click)="auth.logout()">Déconnexion</button>
     </div>
   </header>
@@ -55,7 +58,7 @@ interface ModuleStat {
     <!-- Annonces du Maire -->
     <section class="annonces-section">
       <div class="section-head-row">
-        <h2 class="section-title">Mes annonces publiées</h2>
+        <h2 class="section-title">📣 Mes annonces publiées</h2>
         <button class="btn-annonce-inline" (click)="ouvrirModalAnnonce()"><i class="ti ti-plus"></i> Publier une annonce</button>
       </div>
       @if (mesAnnonces().length === 0) {
@@ -97,7 +100,7 @@ interface ModuleStat {
     </section>
 
     <!--  Modules -->
-    <section>
+    <section class="modules-section">
       <h2 class="section-title">🗂️ Accès aux modules — Supervision</h2>
       <div class="modules-grid">
         @for (m of modules; track m.key) {
@@ -118,7 +121,6 @@ interface ModuleStat {
               }
             </div>
             <a class="module-btn" [routerLink]="[m.route]">
-              Accéder au module <span>→</span>
               Accéder au module <span>→</span>
             </a>
           </div>
@@ -220,7 +222,14 @@ interface ModuleStat {
 .topbar-title { color: #fff; font-size: 1.3rem; font-weight: 800; margin: 0; }
 .topbar-sub { color: rgba(255,255,255,.6); font-size: .8rem; margin: .1rem 0 0; }
 .topbar-right { display: flex; align-items: center; gap: 1rem; }
-.mayor-name { color: rgba(255,255,255,.9); font-size: .9rem; font-weight: 600; }
+.mayor-badge { display: flex; align-items: center; gap: .5rem; padding: .3rem .8rem .3rem .3rem; border-radius: 999px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.12); }
+.mayor-avatar {
+  display: flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; border-radius: 50%; font-size: .95rem;
+  background: #fff;
+  box-shadow: 0 0 0 2px #F77F00, 0 0 0 4px #fff, 0 0 0 5px #009A44;
+}
+.mayor-name { color: rgba(255,255,255,.9); font-size: .85rem; font-weight: 600; }
 .btn-logout {
   padding: .45rem 1rem; border-radius: 8px;
   background: rgba(230,57,70,.2); color: #ff8080;

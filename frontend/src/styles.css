@@ -33,6 +33,7 @@
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: var(--font-sans); background: var(--color-background-tertiary); }
+html { scroll-behavior: smooth; }
 
 /* ── Shell ─────────────────────────────────────────────────────────────────── */
 .root {

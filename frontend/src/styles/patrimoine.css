@@ -184,7 +184,7 @@ body { font-family: var(--font-sans); background: var(--ci-cream); }
 .req  { color: #E24B4A; }
 .fa   { display: flex; justify-content: flex-end; gap: 6px; margin-top: 10px; padding-top: 9px; border-top: .5px solid var(--color-border-tertiary); }
 
-input, select { height: 31px; border: .5px solid var(--color-border-secondary); border-radius: 6px; padding: 0 8px; font-size: 12px; background: var(--color-background-primary); color: var(--color-text-primary); width: 100%; outline: none; }
+input:not([type="checkbox"]):not([type="radio"]), select { height: 31px; border: .5px solid var(--color-border-secondary); border-radius: 6px; padding: 0 8px; font-size: 12px; background: var(--color-background-primary); color: var(--color-text-primary); width: 100%; outline: none; }
 input:focus, select:focus { border-color: var(--ci-gold); box-shadow: 0 0 0 2px rgba(245,166,35,.15); }
 
 /* ── Boutons ── */
