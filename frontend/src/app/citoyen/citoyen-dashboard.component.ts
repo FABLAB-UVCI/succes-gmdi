@@ -3,8 +3,6 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../communication/core/services/auth.service';
 import { CitoyenService, Demarche } from './citoyen.service';
-import { FileDownloadService } from '../shared/services/file-download.service';
-import { environment } from '@env/environment';
 
 interface ModuleInfo { label: string; route: string; ico: string; color: string; desc: string; }
 
@@ -61,11 +59,6 @@ interface ModuleInfo { label: string; route: string; ico: string; color: string;
               @if (peutImprimerExtrait(d)) {
                 <button class="btn-print" (click)="imprimerExtrait(d)" title="Imprimer l'extrait">
                   <i class="ti ti-printer"></i> Imprimer
-                </button>
-              }
-              @if (d.donnees?.document_officiel) {
-                <button type="button" class="btn-pdf" title="Télécharger le document officiel" (click)="telechargerDocument(d)">
-                  <i class="ti ti-download"></i> PDF
                 </button>
               }
               <span class="dr-statut" [style.background]="colorForStatut(d.statut)+'22'" [style.color]="colorForStatut(d.statut)">
@@ -177,13 +170,6 @@ interface ModuleInfo { label: string; route: string; ico: string; color: string;
 .dr-right { display: flex; align-items: center; gap: .8rem; }
 .dr-statut { font-size: .75rem; font-weight: 700; padding: .2rem .65rem; border-radius: 20px; }
 .dr-date { font-size: .75rem; color: #b09070; }
-.btn-pdf {
-  display: inline-flex; align-items: center; gap: 0.3rem;
-  background: #fef2f2; color: #ef4444; border: 1px solid #fca5a5;
-  padding: 0.2rem 0.6rem; border-radius: 6px; font-size: 0.75rem; font-weight: 700;
-  text-decoration: none; transition: all 0.2s; font-family: inherit; cursor: pointer;
-}
-.btn-pdf:hover { background: #ef4444; color: #fff; }
 .btn-print {
   display: inline-flex; align-items: center; gap: 0.3rem;
   background: #003366; color: #fff; border: none;
@@ -226,7 +212,6 @@ interface ModuleInfo { label: string; route: string; ico: string; color: string;
 })
 export class CitoyenDashboardComponent implements OnInit {
   private citoyenSvc = inject(CitoyenService);
-  private fileDownload = inject(FileDownloadService);
   readonly auth      = inject(AuthService);
   readonly user      = this.auth.currentUser();
 
@@ -275,12 +260,6 @@ export class CitoyenDashboardComponent implements OnInit {
    * peut être réimprimé par le citoyen — avec le même modèle que celui utilisé
    * par le gestionnaire, pour un rendu strictement identique.
    */
-  telechargerDocument(d: Demarche): void {
-    if (d.donnees?.document_officiel) {
-      this.fileDownload.telecharger(`${environment.apiUrl}/demarches/${d.id}/document`, `${d.reference}.pdf`);
-    }
-  }
-
   peutImprimerExtrait(d: Demarche): boolean {
     return d.type_demarche === "Demande d'acte de naissance" && (d.statut === 'valide' || d.statut === 'termine');
   }
