@@ -11,6 +11,7 @@ export interface ApiResponse<T = null> { success: boolean; message: string; data
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
 export interface LoginRequest  { email: string; password: string; }
+export interface RegisterRequest { name: string; email: string; password: string; password_confirmation: string; }
 export interface LoginResponse { token: string; token_type: 'Bearer'; expires_in: number; user: UserApi; }
 export interface UserApi { id: number; name: string; email: string; role: string; roles?: string[]; permissions: string[]; }
 

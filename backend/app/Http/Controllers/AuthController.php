@@ -8,10 +8,36 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
+    public function register(Request $request)
+    {
+        $v = $request->validate([
+            'name'                  => 'required|string|max:150',
+            'email'                 => 'required|email|unique:users,email',
+            'password'              => ['required', 'confirmed', Password::defaults()],
+            'password_confirmation' => 'required',
+        ]);
+
+        $user = User::create([
+            'name'     => $v['name'],
+            'email'    => $v['email'],
+            'password' => Hash::make($v['password']),
+            'role'     => 'citoyen',
+        ]);
+        $user->assignRole('citoyen');
+
+        $token = $user->createToken('gmdi-token')->plainTextToken;
+
+        return response()->json([
+            'token' => $token,
+            'user'  => $this->userPayload($user),
+        ], 201);
+    }
+
     public function login(Request $request)
     {
         $request->validate([

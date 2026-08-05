@@ -305,14 +305,17 @@ export class PublicLandingComponent {
     }
     this.loading.set(true);
     this.errorMessage.set('');
-    
-    // If register is not in AuthService yet, we mock a success for now:
-    setTimeout(() => {
-      this.loading.set(false);
-      this.isLoginMode.set(true); // Switch to login after successful register
-      this.loginForm.patchValue({ email: this.registerForm.value.email });
-      this.errorMessage.set('');
-      alert('Compte créé avec succès ! Veuillez vous connecter.');
-    }, 1500);
+
+    const { name, email, password, password_confirmation } = this.registerForm.value;
+    this.authService.register({ name, email, password, password_confirmation } as any).subscribe({
+      next: () => {
+        this.loading.set(false);
+        this.router.navigate(['/citoyen']);
+      },
+      error: (err: any) => {
+        this.loading.set(false);
+        this.errorMessage.set(err.message);
+      }
+    });
   }
 }
