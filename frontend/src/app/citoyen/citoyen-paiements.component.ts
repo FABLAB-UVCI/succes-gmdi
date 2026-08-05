@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { CitoyenService, Demarche } from './citoyen.service';
 import { ToastService } from '../communication/core/services/toast.service';
+import { FileDownloadService } from '../shared/services/file-download.service';
 
 interface Taxe {
   code: string;
@@ -129,9 +130,9 @@ const MOYENS_PAIEMENT: MoyenPaiement[] = [
                   }
                   <span class="p-statut" [ngClass]="d.statut">{{ getStatutLabel(d.statut) }}</span>
                   @if (d.donnees?.document_officiel) {
-                    <a [href]="d.donnees.document_officiel" target="_blank" class="btn-recu" title="Télécharger le reçu">
+                    <button type="button" class="btn-recu" title="Télécharger le reçu" (click)="telechargerRecu(d)">
                       <i class="ti ti-download"></i> Reçu
-                    </a>
+                    </button>
                   }
                 </div>
               </div>
@@ -220,7 +221,7 @@ const MOYENS_PAIEMENT: MoyenPaiement[] = [
       .p-statut.en_cours { background: #cce5ff; color: #004085; }
       .p-statut.valide, .p-statut.termine { background: #d4edda; color: #155724; }
       .p-statut.refuse { background: #f8d7da; color: #721c24; }
-      .btn-recu { display: inline-flex; align-items: center; gap: 0.3rem; background: #fef2f2; color: #ef4444; border: 1px solid #fca5a5; padding: 0.2rem 0.6rem; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-decoration: none; }
+      .btn-recu { display: inline-flex; align-items: center; gap: 0.3rem; background: #fef2f2; color: #ef4444; border: 1px solid #fca5a5; padding: 0.2rem 0.6rem; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-decoration: none; font-family: inherit; cursor: pointer; }
       .btn-recu:hover { background: #ef4444; color: #fff; }
 
       .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.55); display: flex; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(2px); }
@@ -245,6 +246,7 @@ const MOYENS_PAIEMENT: MoyenPaiement[] = [
 export class CitoyenPaiementsComponent implements OnInit {
   private citoyenService = inject(CitoyenService);
   private toast = inject(ToastService);
+  private fileDownload = inject(FileDownloadService);
 
   taxes = TAXES_CATALOGUE;
   moyens = MOYENS_PAIEMENT;
@@ -321,5 +323,11 @@ export class CitoyenPaiementsComponent implements OnInit {
 
   getStatutLabel(statut: string): string {
     return this.citoyenService.labelForStatut(statut);
+  }
+
+  telechargerRecu(d: Demarche): void {
+    if (d.donnees?.document_officiel) {
+      this.fileDownload.telecharger(d.donnees.document_officiel, `recu-${d.reference}.pdf`);
+    }
   }
 }

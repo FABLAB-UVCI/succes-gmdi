@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../communication/core/services/auth.service';
 import { CitoyenService, Demarche } from './citoyen.service';
+import { FileDownloadService } from '../shared/services/file-download.service';
 
 interface ModuleInfo { label: string; route: string; ico: string; color: string; desc: string; }
 
@@ -62,9 +63,9 @@ interface ModuleInfo { label: string; route: string; ico: string; color: string;
                 </button>
               }
               @if (d.donnees?.document_officiel) {
-                <a [href]="d.donnees.document_officiel" target="_blank" class="btn-pdf" title="Télécharger le document officiel">
+                <button type="button" class="btn-pdf" title="Télécharger le document officiel" (click)="telechargerDocument(d)">
                   <i class="ti ti-download"></i> PDF
-                </a>
+                </button>
               }
               <span class="dr-statut" [style.background]="colorForStatut(d.statut)+'22'" [style.color]="colorForStatut(d.statut)">
                 {{ labelStatut(d.statut) }}
@@ -179,7 +180,7 @@ interface ModuleInfo { label: string; route: string; ico: string; color: string;
   display: inline-flex; align-items: center; gap: 0.3rem;
   background: #fef2f2; color: #ef4444; border: 1px solid #fca5a5;
   padding: 0.2rem 0.6rem; border-radius: 6px; font-size: 0.75rem; font-weight: 700;
-  text-decoration: none; transition: all 0.2s;
+  text-decoration: none; transition: all 0.2s; font-family: inherit; cursor: pointer;
 }
 .btn-pdf:hover { background: #ef4444; color: #fff; }
 .btn-print {
@@ -224,6 +225,7 @@ interface ModuleInfo { label: string; route: string; ico: string; color: string;
 })
 export class CitoyenDashboardComponent implements OnInit {
   private citoyenSvc = inject(CitoyenService);
+  private fileDownload = inject(FileDownloadService);
   readonly auth      = inject(AuthService);
   readonly user      = this.auth.currentUser();
 
@@ -272,6 +274,12 @@ export class CitoyenDashboardComponent implements OnInit {
    * peut être réimprimé par le citoyen — avec le même modèle que celui utilisé
    * par le gestionnaire, pour un rendu strictement identique.
    */
+  telechargerDocument(d: Demarche): void {
+    if (d.donnees?.document_officiel) {
+      this.fileDownload.telecharger(d.donnees.document_officiel, `${d.reference}.pdf`);
+    }
+  }
+
   peutImprimerExtrait(d: Demarche): boolean {
     return d.type_demarche === "Demande d'acte de naissance" && (d.statut === 'valide' || d.statut === 'termine');
   }

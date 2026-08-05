@@ -102,10 +102,11 @@ class DemarcheController extends Controller
                 $pdf      = \Barryvdh\DomPDF\Facade\Pdf::loadView($view, $viewData);
                 $filename = 'acte_' . $demarche->reference . '.pdf';
                 $path     = 'documents_officiels/' . $filename;
-                \Illuminate\Support\Facades\Storage::disk('public')->put($path, $pdf->output());
+                \Illuminate\Support\Facades\Storage::disk('local')->put($path, $pdf->output());
 
                 $donnees = $demarche->donnees ?? [];
-                $donnees['document_officiel'] = asset('storage/' . $path);
+                $donnees['document_officiel_path'] = $path;
+                $donnees['document_officiel'] = url("/api/demarches/{$demarche->id}/document");
                 $demarche->update(['donnees' => $donnees]);
 
                 // Créer une notification pour le citoyen
@@ -153,10 +154,10 @@ class DemarcheController extends Controller
             foreach ($request->file('files') as $file) {
                 // Generate a unique, non-guessable name for the file
                 $filename = \Illuminate\Support\Str::random(40) . '.' . $file->getClientOriginalExtension();
-                $path = $file->storeAs('demarches/' . date('Y-m-d'), $filename, 'public');
+                $path = $file->storeAs('demarches/' . date('Y-m-d'), $filename, 'local');
                 $pieces_jointes[] = [
                     'nom' => $file->getClientOriginalName(),
-                    'url' => asset('storage/' . $path)
+                    'path' => $path,
                 ];
             }
         }
@@ -200,28 +201,45 @@ class DemarcheController extends Controller
 
     public function downloadDocument(Request $request, Demarche $demarche)
     {
+        if ($denied = $this->denyIfNotOwnerOrStaff($request, $demarche)) {
+            return $denied;
+        }
+
+        $path = $demarche->donnees['document_officiel_path'] ?? null;
+
+        if (!$path || !\Illuminate\Support\Facades\Storage::disk('local')->exists($path)) {
+            return response()->json(['message' => 'Le fichier est introuvable sur le serveur.'], 404);
+        }
+
+        return \Illuminate\Support\Facades\Storage::disk('local')->download($path);
+    }
+
+    public function downloadPiece(Request $request, Demarche $demarche, int $index)
+    {
+        if ($denied = $this->denyIfNotOwnerOrStaff($request, $demarche)) {
+            return $denied;
+        }
+
+        $piece = $demarche->donnees['pieces_jointes'][$index] ?? null;
+        $path  = $piece['path'] ?? null;
+
+        if (!$path || !\Illuminate\Support\Facades\Storage::disk('local')->exists($path)) {
+            return response()->json(['message' => 'Fichier introuvable.'], 404);
+        }
+
+        return \Illuminate\Support\Facades\Storage::disk('local')->download($path, $piece['nom'] ?? null);
+    }
+
+    private function denyIfNotOwnerOrStaff(Request $request, Demarche $demarche)
+    {
         $user = $request->user();
 
-        // Security check: only the owner or a manager/admin can download
         if ($user->hasRole('citoyen') || $user->role === 'citoyen') {
             if ($demarche->user_id !== $user->id) {
                 return response()->json(['message' => 'Non autorisé.'], 403);
             }
         }
 
-        if (empty($demarche->donnees['document_officiel'])) {
-            return response()->json(['message' => 'Aucun document officiel généré pour cette démarche.'], 404);
-        }
-
-        $url = $demarche->donnees['document_officiel'];
-        // The URL is like http://localhost:8000/storage/documents_officiels/acte_REF.pdf
-        // We need to get the path relative to the storage disk
-        $path = str_replace(asset('storage') . '/', '', $url);
-
-        if (!\Illuminate\Support\Facades\Storage::disk('public')->exists($path)) {
-            return response()->json(['message' => 'Le fichier est introuvable sur le serveur.'], 404);
-        }
-
-        return \Illuminate\Support\Facades\Storage::disk('public')->download($path);
+        return null;
     }
 }

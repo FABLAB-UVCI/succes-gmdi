@@ -44,6 +44,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('demarches', [App\Http\Controllers\DemarcheController::class, 'store']);
     Route::put('demarches/{demarche}', [App\Http\Controllers\DemarcheController::class, 'update']);
     Route::get('demarches/{demarche}/document', [App\Http\Controllers\DemarcheController::class, 'downloadDocument']);
+    Route::get('demarches/{demarche}/pieces/{index}', [App\Http\Controllers\DemarcheController::class, 'downloadPiece']);
 
     // Notifications citoyen
     Route::get('notifications', [App\Http\Controllers\NotificationController::class, 'index']);

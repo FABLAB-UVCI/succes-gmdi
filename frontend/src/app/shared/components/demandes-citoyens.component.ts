@@ -8,6 +8,7 @@ import { environment } from '@env/environment';
 import { ApiService as EtatCivilApiService } from '../../etat-civil/services/api.service';
 import { FinancesService } from '../../finances/core/services/finances.service';
 import { DemandeApiService } from '../../services-techniques/core/services/services-techniques-api.service';
+import { FileDownloadService } from '../services/file-download.service';
 
 export interface Demarche {
   id: number;
@@ -154,12 +155,12 @@ export interface Demarche {
                   <div class="donnees-box">
                     <h4><i class="ti ti-paperclip"></i> Pièces jointes :</h4>
                     <div class="donnees-grid">
-                      @for (pj of selectedDemarche()?.donnees?.pieces_jointes; track pj.url) {
+                      @for (pj of selectedDemarche()?.donnees?.pieces_jointes; track pj.nom; let i = $index) {
                         <div class="donnee-item" style="justify-content: space-between; align-items: center;">
                           <span class="donnee-key"><i class="ti ti-file" style="margin-right: 5px;"></i> {{ pj.nom }}</span>
-                          <a [href]="pj.url" target="_blank" class="btn-download">
+                          <button type="button" class="btn-download" (click)="telechargerPiece(selectedDemarche()!.id, i, pj.nom)">
                             <i class="ti ti-download"></i> Télécharger
-                          </a>
+                          </button>
                         </div>
                       }
                     </div>
@@ -273,6 +274,7 @@ export class DemandesCitoyensComponent implements OnInit {
   private http  = inject(HttpClient);
   private route = inject(ActivatedRoute);
   private base  = environment.apiUrl;
+  private fileDownload = inject(FileDownloadService);
 
   demarches        = signal<Demarche[]>([]);
   loading          = signal(true);
@@ -555,6 +557,10 @@ export class DemandesCitoyensComponent implements OnInit {
       termine:    'Termine'
     };
     return map[s] || s;
+  }
+
+  telechargerPiece(demarcheId: number, index: number, nom: string): void {
+    this.fileDownload.telecharger(`${this.base}/demarches/${demarcheId}/pieces/${index}`, nom);
   }
 
   objectEntries(obj: any): [string, any][] {

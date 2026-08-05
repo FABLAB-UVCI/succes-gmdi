@@ -185,8 +185,8 @@ class NaissanceController extends Controller
         $pieces = [];
         foreach ($request->file('files') as $file) {
             $filename = \Illuminate\Support\Str::random(40) . '.' . $file->getClientOriginalExtension();
-            $path = $file->storeAs('etat-civil/' . date('Y-m-d'), $filename, 'public');
-            $pieces[] = ['nom' => $file->getClientOriginalName(), 'url' => asset('storage/' . $path)];
+            $path = $file->storeAs('etat-civil/' . date('Y-m-d'), $filename, 'local');
+            $pieces[] = ['nom' => $file->getClientOriginalName(), 'path' => $path];
         }
 
         return $pieces ?: null;
