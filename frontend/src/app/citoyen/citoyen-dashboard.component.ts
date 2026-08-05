@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 import { AuthService } from '../communication/core/services/auth.service';
 import { CitoyenService, Demarche } from './citoyen.service';
 import { FileDownloadService } from '../shared/services/file-download.service';
+import { environment } from '@env/environment';
 
 interface ModuleInfo { label: string; route: string; ico: string; color: string; desc: string; }
 
@@ -276,7 +277,7 @@ export class CitoyenDashboardComponent implements OnInit {
    */
   telechargerDocument(d: Demarche): void {
     if (d.donnees?.document_officiel) {
-      this.fileDownload.telecharger(d.donnees.document_officiel, `${d.reference}.pdf`);
+      this.fileDownload.telecharger(`${environment.apiUrl}/demarches/${d.id}/document`, `${d.reference}.pdf`);
     }
   }
 

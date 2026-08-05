@@ -106,7 +106,10 @@ class DemarcheController extends Controller
 
                 $donnees = $demarche->donnees ?? [];
                 $donnees['document_officiel_path'] = $path;
-                $donnees['document_officiel'] = url("/api/demarches/{$demarche->id}/document");
+                // true (pas une URL absolue) : le frontend construit l'URL relative via
+                // environment.apiUrl, qui passe par le proxy et fonctionne quel que soit
+                // APP_URL/le port réellement utilisé par le serveur.
+                $donnees['document_officiel'] = true;
                 $demarche->update(['donnees' => $donnees]);
 
                 // Créer une notification pour le citoyen

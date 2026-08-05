@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 import { CitoyenService, Demarche } from './citoyen.service';
 import { ToastService } from '../communication/core/services/toast.service';
 import { FileDownloadService } from '../shared/services/file-download.service';
+import { environment } from '@env/environment';
 
 interface Taxe {
   code: string;
@@ -327,7 +328,7 @@ export class CitoyenPaiementsComponent implements OnInit {
 
   telechargerRecu(d: Demarche): void {
     if (d.donnees?.document_officiel) {
-      this.fileDownload.telecharger(d.donnees.document_officiel, `recu-${d.reference}.pdf`);
+      this.fileDownload.telecharger(`${environment.apiUrl}/demarches/${d.id}/document`, `recu-${d.reference}.pdf`);
     }
   }
 }
