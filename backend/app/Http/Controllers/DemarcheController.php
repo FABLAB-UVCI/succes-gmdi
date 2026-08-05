@@ -151,8 +151,8 @@ class DemarcheController extends Controller
         $pieces_jointes = [];
         if ($request->hasFile('files')) {
             foreach ($request->file('files') as $file) {
-                // Generate a unique name for the file
-                $filename = uniqid() . '_' . $file->getClientOriginalName();
+                // Generate a unique, non-guessable name for the file
+                $filename = \Illuminate\Support\Str::random(40) . '.' . $file->getClientOriginalExtension();
                 $path = $file->storeAs('demarches/' . date('Y-m-d'), $filename, 'public');
                 $pieces_jointes[] = [
                     'nom' => $file->getClientOriginalName(),

@@ -116,7 +116,7 @@ class CertificatController extends Controller
 
         $pieces = [];
         foreach ($request->file('files') as $file) {
-            $filename = uniqid() . '_' . $file->getClientOriginalName();
+            $filename = \Illuminate\Support\Str::random(40) . '.' . $file->getClientOriginalExtension();
             $path = $file->storeAs('etat-civil/' . date('Y-m-d'), $filename, 'public');
             $pieces[] = ['nom' => $file->getClientOriginalName(), 'url' => asset('storage/' . $path)];
         }
