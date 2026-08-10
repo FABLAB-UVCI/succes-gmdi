@@ -294,11 +294,6 @@ export class PresenceComponent implements OnInit {
       return;
     }
 
-    // Afficher dans la console le fichier si présent
-    if (this.cg.pieceJointe) {
-      console.log('Pièce jointe congé:', this.cg.pieceJointe.name);
-    }
-
     this.rh.soumettreConge({
       matricule: this.cg.matricule, agent: agent?.nomComplet ?? this.cg.matricule,
       type: this.cg.type as any, dateDebut: this.cg.dateDebut, duree: Number(this.cg.duree),

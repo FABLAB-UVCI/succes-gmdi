@@ -150,13 +150,14 @@ class BienController extends Controller
     }
 
     /**
-     * GET /api/patrimoine/biens/{id}/fiche  — PDF fiche bien (placeholder)
+     * GET /api/patrimoine/biens/{id}/fiche  — PDF fiche bien
      */
     public function fiche($id)
     {
         $bien = Bien::findOrFail($id);
-        // TODO: PDF::loadView('patrimoine.fiche_bien', compact('bien'))->download(...)
-        return response()->json(['success' => true, 'message' => 'PDF — À implémenter avec DomPDF', 'data' => $this->format($bien)]);
+        $pdf  = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.fiche_bien', compact('bien'));
+
+        return $pdf->download("fiche-{$bien->reference}.pdf");
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────

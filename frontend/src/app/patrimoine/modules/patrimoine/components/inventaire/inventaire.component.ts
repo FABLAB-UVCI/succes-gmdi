@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { PatrimoineService } from '../../../../core/services/patrimoine.service';
 import { ToastService } from '../../../../core/services/toast.service';
 import { FcfaPipe } from '../../../../core/pipes/fcfa.pipe';
+import { FileDownloadService } from '../../../../../shared/services/file-download.service';
+import { environment } from '@env/environment';
 
 type Tab = 'tous' | 'mobilier' | 'informatique' | 'vehicule' | 'equipement' | 'nouveau';
 
@@ -324,6 +326,7 @@ const STAT_CHIP:  Record<string, string> = { occupe:'ci', disponible:'cv', loue:
 export class InventaireComponent implements OnInit {
   readonly pat   = inject(PatrimoineService);
   readonly toast = inject(ToastService);
+  private fileDownload = inject(FileDownloadService);
 
   activeTab       = signal<Tab>('tous');
   saving          = signal(false);
@@ -459,7 +462,11 @@ export class InventaireComponent implements OnInit {
 
   resetNouveauBien(): void { this.nv = { categorie: '', designation: '', localisation: '', valeur: null, dateAcquisition: '', affectation: '', tauxAmort: null }; }
 
-  voirFiche(id: string): void { const b = this.pat.biens().find(x => x.id === id); if (b) alert(`Fiche patrimoniale\n\nRéférence : ${b.reference}\nQR Code    : ${b.qrCode ?? 'QR-' + b.reference}\nDésignation: ${b.designation}\nCatégorie  : ${b.categorie}\nLocalisation: ${b.localisation}\nAffectation: ${b.affectation}\nVal. acquisition: ${this.pat.formaterFCFA(b.valeurAcquisition)}\nValeur actuelle : ${this.pat.formaterFCFA(b.valeurActuelle)}\nDate acquisition: ${b.dateAcquisition}\nStatut : ${b.statut}`); }
+  voirFiche(id: string): void {
+    const b = this.pat.biens().find(x => x.id === id);
+    if (!b) return;
+    this.fileDownload.telecharger(`${environment.apiUrl}/patrimoine/biens/${id}/fiche`, `fiche-${b.reference}.pdf`);
+  }
 
   exportLocal(): void { this.pat.exportLocal(this.pat.biens(), 'inventaire_biens'); }
 

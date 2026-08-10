@@ -203,9 +203,5 @@ export class CitoyenLayoutComponent {
   get initial(): string {
     return (this.user?.name ?? 'C').charAt(0).toUpperCase();
   }
-
-  alertDev() {
-    alert('Cette page est en cours de construction. Bientôt disponible !');
-  }
 }
 

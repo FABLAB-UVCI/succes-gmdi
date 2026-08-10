@@ -456,18 +456,6 @@ export class CarriereComponent {
   voirDetailsDepart(depart: any) {
     // Affiche un message toast avec les détails
     this.toast.show('dep', `${depart.nom} (${depart.matricule}) - ${this.labelCause(depart.cause)} - le ${depart.date}`);
-    
-    // Vous pouvez aussi afficher plus de détails dans la console
-    console.log('Détails du départ:', {
-      matricule: depart.matricule,
-      nom: depart.nom,
-      cause: depart.cause,
-      date: depart.date,
-      dernierePresence: depart.dernierePresence,
-      dernierSalaire: depart.dernierSalaire,
-      observations: depart.observations,
-      statut: depart.statut
-    });
   }
 
   validerDepart() {
