@@ -13,7 +13,12 @@ export interface ApiResponse<T = null> { success: boolean; message: string; data
 export interface LoginRequest  { email: string; password: string; }
 export interface RegisterRequest { name: string; email: string; password: string; password_confirmation: string; }
 export interface LoginResponse { token: string; token_type: 'Bearer'; expires_in: number; user: UserApi; }
-export interface UserApi { id: number; name: string; email: string; role: string; roles?: string[]; permissions: string[]; }
+export interface UserApi {
+  id: number; name: string; email: string; role: string; roles?: string[]; permissions: string[];
+  telephone?: string | null; commune?: string | null; numero_cni?: string | null; date_naissance?: string | null;
+}
+export interface UpdateProfileRequest { telephone?: string; commune?: string; numero_cni?: string; date_naissance?: string; }
+export interface ChangePasswordRequest { current_password: string; password: string; password_confirmation: string; }
 
 // ── Actualités ────────────────────────────────────────────────────────────────
 export interface ActualiteApi {

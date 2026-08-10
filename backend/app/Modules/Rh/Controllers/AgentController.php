@@ -100,4 +100,15 @@ class AgentController extends Controller
         Agent::findOrFail($id)->delete();
         return response()->json(['message' => 'Agent supprimé.']);
     }
+
+    /**
+     * GET /api/rh/agents/{id}/fiche — PDF fiche agent
+     */
+    public function fiche(string $id)
+    {
+        $agent = Agent::findOrFail($id);
+        $pdf   = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.fiche_agent', compact('agent'));
+
+        return $pdf->download("fiche-{$agent->matricule}.pdf");
+    }
 }

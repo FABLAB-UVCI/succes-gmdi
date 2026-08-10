@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../communication/core/services/auth.service';
+import { ToastService } from '../communication/core/services/toast.service';
 import { FormsModule } from '@angular/forms';
 
 @Component({
@@ -45,24 +46,24 @@ import { FormsModule } from '@angular/forms';
           </div>
           <div class="fg">
             <div class="fl"><i class="ti ti-phone"></i> Téléphone</div>
-            <input type="text" class="fi" placeholder="Ex: +225 01 02 03 04">
+            <input type="text" class="fi" [(ngModel)]="profil.telephone" placeholder="Ex: +225 01 02 03 04">
           </div>
           <div class="fg">
             <div class="fl"><i class="ti ti-map-pin"></i> Commune de résidence</div>
-            <input type="text" class="fi" placeholder="Ex: Cocody, Yopougon…">
+            <input type="text" class="fi" [(ngModel)]="profil.commune" placeholder="Ex: Cocody, Yopougon…">
           </div>
           <div class="fg">
             <div class="fl"><i class="ti ti-id-badge"></i> Numéro CNI</div>
-            <input type="text" class="fi" placeholder="Ex: CI0000000000">
+            <input type="text" class="fi" [(ngModel)]="profil.numero_cni" placeholder="Ex: CI0000000000">
           </div>
           <div class="fg">
             <div class="fl"><i class="ti ti-calendar"></i> Date de naissance</div>
-            <input type="date" class="fi">
+            <input type="date" class="fi" [(ngModel)]="profil.date_naissance">
           </div>
         </div>
         <div class="form-actions">
-          <button class="btn-save orange-btn" (click)="save()">
-            <i class="ti ti-device-floppy"></i> Enregistrer les modifications
+          <button class="btn-save orange-btn" [disabled]="savingProfil" (click)="save()">
+            <i class="ti ti-device-floppy"></i> {{ savingProfil ? 'Enregistrement...' : 'Enregistrer les modifications' }}
           </button>
         </div>
       </section>
@@ -77,17 +78,22 @@ import { FormsModule } from '@angular/forms';
         </div>
         <div class="form-grid">
           <div class="fg">
+            <div class="fl"><i class="ti ti-lock"></i> Mot de passe actuel</div>
+            <input type="password" class="fi" [(ngModel)]="pwd.current" placeholder="Votre mot de passe actuel">
+          </div>
+          <div class="fg"></div>
+          <div class="fg">
             <div class="fl"><i class="ti ti-lock"></i> Nouveau mot de passe</div>
-            <input type="password" class="fi" placeholder="Laisser vide pour ne pas changer">
+            <input type="password" class="fi" [(ngModel)]="pwd.next" placeholder="8 caractères minimum">
           </div>
           <div class="fg">
             <div class="fl"><i class="ti ti-lock-check"></i> Confirmer le mot de passe</div>
-            <input type="password" class="fi" placeholder="Confirmer le nouveau mot de passe">
+            <input type="password" class="fi" [(ngModel)]="pwd.confirm" placeholder="Confirmer le nouveau mot de passe">
           </div>
         </div>
         <div class="form-actions">
-          <button class="btn-save green-btn">
-            <i class="ti ti-key"></i> Changer le mot de passe
+          <button class="btn-save green-btn" [disabled]="changingPwd" (click)="changePassword()">
+            <i class="ti ti-key"></i> {{ changingPwd ? 'Modification...' : 'Changer le mot de passe' }}
           </button>
         </div>
       </section>
@@ -153,10 +159,11 @@ import { FormsModule } from '@angular/forms';
       font-weight: 800; font-size: .95rem; cursor: pointer;
       transition: all .2s; color: #fff;
     }
+    .btn-save:disabled { opacity: .6; cursor: not-allowed; transform: none !important; }
     .orange-btn { background: linear-gradient(135deg, #F77F00, #FF9A00); box-shadow: 0 4px 15px rgba(247,127,0,.35); }
-    .orange-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(247,127,0,.5); }
+    .orange-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(247,127,0,.5); }
     .green-btn { background: linear-gradient(135deg, #009A44, #00bf57); box-shadow: 0 4px 15px rgba(0,154,68,.35); }
-    .green-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,154,68,.5); }
+    .green-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,154,68,.5); }
 
     @media (max-width: 600px) {
       .form-grid { grid-template-columns: 1fr; }
@@ -166,13 +173,64 @@ import { FormsModule } from '@angular/forms';
 })
 export class CitoyenProfilComponent {
   readonly auth = inject(AuthService);
-  readonly user = this.auth.currentUser();
+  private toast = inject(ToastService);
+  user = this.auth.currentUser();
+
+  profil = {
+    telephone: this.user?.telephone ?? '',
+    commune: this.user?.commune ?? '',
+    numero_cni: this.user?.numero_cni ?? '',
+    date_naissance: this.user?.date_naissance ?? '',
+  };
+  pwd = { current: '', next: '', confirm: '' };
+
+  savingProfil = false;
+  changingPwd = false;
 
   get initial(): string {
     return (this.user?.name ?? 'C').charAt(0).toUpperCase();
   }
 
   save() {
-    alert('✅ Vos informations ont été mises à jour avec succès !');
+    this.savingProfil = true;
+    this.auth.updateProfile(this.profil).subscribe({
+      next: () => {
+        this.savingProfil = false;
+        this.user = this.auth.currentUser();
+        this.toast.show('profil-ok', 'Vos informations ont été mises à jour avec succès.');
+      },
+      error: (err: Error) => {
+        this.savingProfil = false;
+        this.toast.showError('profil-err', err.message, 'Erreur');
+      },
+    });
+  }
+
+  changePassword() {
+    if (!this.pwd.current || !this.pwd.next || !this.pwd.confirm) {
+      this.toast.showError('pwd-err', 'Tous les champs sont obligatoires.', 'Erreur');
+      return;
+    }
+    if (this.pwd.next !== this.pwd.confirm) {
+      this.toast.showError('pwd-err', 'Les mots de passe ne correspondent pas.', 'Erreur');
+      return;
+    }
+    this.changingPwd = true;
+    this.auth.changePassword({
+      current_password: this.pwd.current,
+      password: this.pwd.next,
+      password_confirmation: this.pwd.confirm,
+    }).subscribe({
+      next: () => {
+        this.changingPwd = false;
+        this.pwd = { current: '', next: '', confirm: '' };
+        this.toast.show('pwd-ok', 'Mot de passe modifié avec succès. Veuillez vous reconnecter.');
+        setTimeout(() => this.auth.logout(), 1500);
+      },
+      error: (err: Error) => {
+        this.changingPwd = false;
+        this.toast.showError('pwd-err', err.message, 'Erreur');
+      },
+    });
   }
 }

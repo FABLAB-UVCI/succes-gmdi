@@ -36,6 +36,7 @@ Route::prefix('auth')->group(function () {
         Route::post('logout', [AuthController::class, 'logout']);
         Route::post('refresh', [AuthController::class, 'refresh']);
         Route::get('me', [AuthController::class, 'me']);
+        Route::put('profile', [AuthController::class, 'updateProfile']);
         Route::put('change-password', [AuthController::class, 'changePassword'])->middleware('throttle:8,1');
     });
 });
@@ -80,6 +81,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // --- Ressources humaines ---
     Route::prefix('rh')->group(function () {
+        Route::get('agents/{id}/fiche', [AgentController::class, 'fiche']);
         Route::apiResource('agents', AgentController::class);
         Route::apiResource('conges', CongeController::class);
         Route::apiResource('absences', AbsenceController::class);

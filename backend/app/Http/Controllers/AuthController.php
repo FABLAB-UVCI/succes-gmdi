@@ -85,6 +85,27 @@ class AuthController extends Controller
     }
 
     /**
+     * Met à jour les informations personnelles du profil connecté.
+     */
+    public function updateProfile(Request $request)
+    {
+        $v = $request->validate([
+            'telephone'      => 'nullable|string|max:30',
+            'commune'        => 'nullable|string|max:100',
+            'numero_cni'     => 'nullable|string|max:30',
+            'date_naissance' => 'nullable|date',
+        ]);
+
+        $user = $request->user();
+        $user->update($v);
+
+        return response()->json([
+            'message' => 'Profil mis à jour avec succès.',
+            'user'    => $this->userPayload($user),
+        ]);
+    }
+
+    /**
      * Envoyer un email de réinitialisation de mot de passe.
      */
     public function forgotPassword(Request $request)
@@ -195,10 +216,14 @@ class AuthController extends Controller
     private function userPayload(User $user): array
     {
         return [
-            'id'          => $user->id,
-            'name'        => $user->name,
-            'email'       => $user->email,
-            'role'        => $user->role ?? 'agent',
+            'id'             => $user->id,
+            'name'           => $user->name,
+            'email'          => $user->email,
+            'role'           => $user->role ?? 'agent',
+            'telephone'      => $user->telephone,
+            'commune'        => $user->commune,
+            'numero_cni'     => $user->numero_cni,
+            'date_naissance' => $user->date_naissance,
             'roles'       => $user->getRoleNames(),
             'permissions' => $user->getAllPermissions()->pluck('name'),
         ];

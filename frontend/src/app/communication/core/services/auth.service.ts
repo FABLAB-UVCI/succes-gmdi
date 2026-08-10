@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { tap, catchError, throwError } from 'rxjs';
 import { environment } from '@env/environment';
-import { LoginRequest, LoginResponse, RegisterRequest, UserApi } from '../models/api.models';
+import { LoginRequest, LoginResponse, RegisterRequest, UserApi, UpdateProfileRequest, ChangePasswordRequest } from '../models/api.models';
 const TK='E-Mairie_token', UK='E-Mairie_user';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -23,6 +23,17 @@ export class AuthService {
     return this.http.post<LoginResponse>(`${environment.apiUrl}/auth/register`,c).pipe(
       tap(r=>{localStorage.setItem(TK,r.token);localStorage.setItem(UK,JSON.stringify(r.user));this._token.set(r.token);this._user.set(r.user);}),
       catchError(e=>throwError(()=>new Error(e.error?.message??"Impossible de créer le compte.")))
+    );
+  }
+  updateProfile(c:UpdateProfileRequest){
+    return this.http.put<{message:string;user:UserApi}>(`${environment.apiUrl}/auth/profile`,c).pipe(
+      tap(r=>{localStorage.setItem(UK,JSON.stringify(r.user));this._user.set(r.user);}),
+      catchError(e=>throwError(()=>new Error(e.error?.message??'Impossible de mettre à jour le profil.')))
+    );
+  }
+  changePassword(c:ChangePasswordRequest){
+    return this.http.put<{message:string}>(`${environment.apiUrl}/auth/change-password`,c).pipe(
+      catchError(e=>throwError(()=>new Error(e.error?.message??'Impossible de changer le mot de passe.')))
     );
   }
   logout():void{this.http.post(`${environment.apiUrl}/auth/logout`,{}).subscribe({complete:()=>this._clear(),error:()=>this._clear()});}

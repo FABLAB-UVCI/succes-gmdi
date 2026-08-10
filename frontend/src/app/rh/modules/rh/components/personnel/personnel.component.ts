@@ -6,6 +6,8 @@ import { ToastService } from '../../../../core/services/toast.service';
 import { ToastComponent } from '../../../../shared/components/toast.component';
 import { FcfaPipe } from '../../../../shared/pipes/fcfa.pipe';
 import { Agent, TypeContrat, Categorie } from '../../../../core/models/rh.models';
+import { FileDownloadService } from '../../../../../shared/services/file-download.service';
+import { environment } from '@env/environment';
 
 type Tab = 'fiche' | 'liste' | 'fonct' | 'contrat' | 'stage';
 
@@ -299,7 +301,7 @@ type Tab = 'fiche' | 'liste' | 'fonct' | 'contrat' | 'stage';
   `,
 })
 export class PersonnelComponent {
-  constructor(readonly rh: RhService, readonly toast: ToastService) {}
+  constructor(readonly rh: RhService, readonly toast: ToastService, private fileDownload: FileDownloadService) {}
 
   activeTab = signal<Tab>('fiche');
 
@@ -384,7 +386,7 @@ export class PersonnelComponent {
   }
 
   voirFiche(a: Agent): void {
-    alert(`Fiche agent\n\nMatricule : ${a.matricule}\nNom : ${a.nomComplet}\nPoste : ${a.poste}\nDirection : ${a.direction}\nContrat : ${this.labelContrat(a.typeContrat)}\nCatégorie : ${a.categorie}\nGrade : ${a.grade}\nSalaire brut : ${a.salaireBrut} FCFA\nStatut : ${a.statut}\nEmbauché le : ${a.dateEmbauche}`);
+    this.fileDownload.telecharger(`${environment.apiUrl}/rh/agents/${a.id}/fiche`, `fiche-${a.matricule}.pdf`);
   }
 
   reactiverAgent(a: Agent): void {
