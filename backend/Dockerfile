@@ -21,4 +21,10 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction --no-script
 
 EXPOSE 3000
 
-CMD ["sh", "-c", "(php artisan migrate --force && php artisan queue:work --tries=3 --sleep=3 &) ; php artisan serve --host=0.0.0.0 --port=${PORT:-3000}"]
+# TEMPORAIRE — diagnostic déploiement Voisilab : la commande complète migre la
+# base + lance la queue en tâche de fond avant de démarrer artisan serve, ce
+# qui dépassait le délai de 40s du health-check. Ceci isole si le blocage
+# vient de la connexion à la base ou du démarrage du serveur lui-même.
+# Ligne d'origine à restaurer une fois la cause confirmée :
+# CMD ["sh", "-c", "(php artisan migrate --force && php artisan queue:work --tries=3 --sleep=3 &) ; php artisan serve --host=0.0.0.0 --port=${PORT:-3000}"]
+CMD ["sh", "-c", "php artisan serve --host=0.0.0.0 --port=${PORT:-3000}"]
