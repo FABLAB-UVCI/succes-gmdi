@@ -1,0 +1,19 @@
+Roles et comptes de démonstration GMDI
+
+Rôles :
+- admin
+- maire
+- citoyen
+- gestionnaire
+
+Comptes :
+- admin@emairie.ci | role admin | mot de passe 12345678
+- maire@emairie.ci | role maire | mot de passe 12345678
+- citoyen@emairie.ci | role citoyen | mot de passe 12345678
+- etatcivil@emairie.ci | role gestionnaire | mot de passe 12345678
+- finances@emairie.ci | role gestionnaire | mot de passe 12345678
+- communication@emairie.ci | role gestionnaire | mot de passe 12345678
+- patrimoine@emairie.ci | role gestionnaire | mot de passe 12345678
+- rh@emairie.ci | role gestionnaire | mot de passe 12345678
+- servicestechniques@emairie.ci | role gestionnaire | mot de passe 12345678
+- urbanisme@emairie.ci | role gestionnaire | mot de passe 12345678
