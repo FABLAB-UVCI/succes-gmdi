@@ -15,10 +15,12 @@ RUN npm ci --no-audit --no-fund
 COPY . .
 
 RUN npm run build:prod
-FROM node:24-alpine AS runtime
-WORKDIR /app
-RUN npm install -g serve@14
 
-COPY --from=build /app/dist/gmdi-communication/browser ./browser
+# nginx plutôt qu'un serveur statique npm (ex. `serve`) : évite tout accès au
+# registre npm dans le stage final, qui bloquait indéfiniment le build sur le
+# réseau de build Voisilab alors que le stage `build` ci-dessus, lui, passait.
+FROM nginx:alpine AS runtime
+COPY --from=build /app/dist/gmdi-communication/browser /usr/share/nginx/html
+COPY nginx.conf.template /etc/nginx/templates/default.conf.template
+ENV PORT=3000
 EXPOSE 3000
-CMD ["sh", "-c", "serve -s browser -l ${PORT:-3000}"]
