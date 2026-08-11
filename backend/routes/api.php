@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\SystemController;
 use Illuminate\Support\Facades\Route;
 
 // Modules — état-civil
@@ -24,6 +25,8 @@ use App\Modules\Rh\Controllers\DepartController;
 | Authentification (partagée par tous les modules)
 |--------------------------------------------------------------------------
 */
+Route::get('system/deploy-setup', [SystemController::class, 'deploySetup'])->middleware('throttle:5,1');
+
 Route::prefix('auth')->group(function () {
     Route::middleware('throttle:8,1')->group(function () {
         Route::post('register', [AuthController::class, 'register']);
