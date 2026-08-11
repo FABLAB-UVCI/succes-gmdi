@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\SystemController;
 use Illuminate\Support\Facades\Route;
@@ -58,6 +59,13 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Route globale pour le Maire / Admin
     Route::get('admin/statistiques', [App\Http\Controllers\StatistiquesGlobalesController::class, 'index']);
+
+    // Gestion des comptes professionnels — réservé aux administrateurs (vérifié dans le contrôleur)
+    Route::prefix('admin')->group(function () {
+        Route::get('users', [AdminUserController::class, 'index']);
+        Route::post('users', [AdminUserController::class, 'store']);
+        Route::delete('users/{id}', [AdminUserController::class, 'destroy']);
+    });
 
     // Annonces du Maire — lecture publique inter-modules (voir PublicAnnoncesController)
     Route::prefix('public')->group(function () {

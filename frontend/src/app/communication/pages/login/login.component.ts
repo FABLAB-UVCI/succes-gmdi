@@ -107,7 +107,8 @@ export class LoginComponent {
           this.loading.set(false);
         } else {
           const isMaire = user?.role === 'maire' || user?.roles?.includes('maire');
-          this.router.navigate([isMaire ? '/maire' : '/accueil']);
+          const isAdmin = user?.role === 'admin' || user?.roles?.includes('admin');
+          this.router.navigate([isMaire ? '/maire' : isAdmin ? '/admin' : '/accueil']);
         }
       },
       error: (err: Error) => { this.error.set(err.message); this.loading.set(false); }
