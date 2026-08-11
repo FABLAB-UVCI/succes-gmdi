@@ -112,7 +112,10 @@ interface CompteApi {
                   <td><span class="role-badge" [class.role-admin]="c.role==='admin'" [class.role-maire]="c.role==='maire'">{{ c.roleLabel }}</span></td>
                   <td>{{ labelModules(c.modules) }}</td>
                   <td>{{ c.created_at | date:'dd/MM/yyyy' }}</td>
-                  <td><button class="btn-delete" (click)="supprimerCompte(c)" title="Supprimer"><i class="ti ti-trash"></i></button></td>
+                  <td class="cell-actions">
+                    <button class="btn-reset" (click)="reinitialiserMotDePasse(c)" title="Réinitialiser le mot de passe"><i class="ti ti-key"></i> Réinitialiser</button>
+                    <button class="btn-delete" (click)="supprimerCompte(c)" title="Supprimer"><i class="ti ti-trash"></i></button>
+                  </td>
                 </tr>
               }
             </tbody>
@@ -176,6 +179,13 @@ td { padding: .7rem .5rem; border-bottom: 1px solid #eef1f6; color: #334155; }
 .role-badge { background: #eef4fb; color: #185FA5; font-size: .72rem; font-weight: 700; padding: .2rem .6rem; border-radius: 20px; }
 .role-badge.role-maire { background: #e5f3ea; color: #009A44; }
 .role-badge.role-admin { background: #fdeee0; color: #F77F00; }
+.cell-actions { display: flex; align-items: center; gap: .5rem; white-space: nowrap; }
+.btn-reset {
+  display: inline-flex; align-items: center; gap: .3rem;
+  background: #eef4fb; color: #185FA5; border: 1px solid #cfe3ff;
+  padding: .35rem .7rem; border-radius: 6px; font-size: .72rem; font-weight: 700; cursor: pointer;
+}
+.btn-reset:hover { background: #dbeafe; }
 .btn-delete { background: none; border: none; color: #cbd5e1; cursor: pointer; font-size: 1rem; padding: .3rem; }
 .btn-delete:hover { color: #e63946; }
 </style>
@@ -238,6 +248,14 @@ export class AdminDashboardComponent implements OnInit {
         this.creating.set(false);
         this.formError.set(err?.error?.message ?? 'Impossible de créer le compte.');
       },
+    });
+  }
+
+  reinitialiserMotDePasse(c: CompteApi): void {
+    if (!confirm(`Réinitialiser le mot de passe de ${c.name} ? Un nouveau mot de passe sera généré et envoyé à ${c.email}.`)) return;
+    this.http.post<{ success: boolean; message: string }>(`${environment.apiUrl}/admin/users/${c.id}/reset-password`, {}).subscribe({
+      next: (r) => { this.toast.show('reset-ok', r.message); },
+      error: (err) => { this.toast.showError('reset-err', err?.error?.message ?? 'Impossible de réinitialiser ce mot de passe.'); },
     });
   }
 

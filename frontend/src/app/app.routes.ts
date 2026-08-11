@@ -73,6 +73,7 @@ export const routes: Routes = [
   { path: 'urbanisme', title: 'E-Mairie — Urbanisme', canActivate: [authGuard], loadComponent: () => import('./urbanisme/modules/urbanisme/pages/shell/urbanisme-shell.component').then(m => m.UrbanismeShellComponent) },
 
   { path: 'forgot-password', title: 'E-Mairie — Mot de passe oublié', loadComponent: () => import('./citoyen/forgot-password.component').then(m => m.ForgotPasswordComponent) },
+  { path: 'reset-password', title: 'E-Mairie — Réinitialiser le mot de passe', loadComponent: () => import('./citoyen/reset-password.component').then(m => m.ResetPasswordComponent) },
 
   { path: '404', title: 'E-Mairie — Page introuvable', loadComponent: () => import('./not-found.component').then(m => m.NotFoundComponent) },
   { path: '**', loadComponent: () => import('./not-found.component').then(m => m.NotFoundComponent) },

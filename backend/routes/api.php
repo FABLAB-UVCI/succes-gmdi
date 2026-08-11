@@ -64,6 +64,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('admin')->group(function () {
         Route::get('users', [AdminUserController::class, 'index']);
         Route::post('users', [AdminUserController::class, 'store']);
+        Route::post('users/{id}/reset-password', [AdminUserController::class, 'resetPassword']);
         Route::delete('users/{id}', [AdminUserController::class, 'destroy']);
     });
 

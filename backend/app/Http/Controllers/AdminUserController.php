@@ -105,6 +105,36 @@ class AdminUserController extends Controller
         ], 201);
     }
 
+    public function resetPassword(Request $request, string $id): JsonResponse
+    {
+        $this->denyIfNotAdmin($request);
+
+        $user = User::whereIn('role', ['admin', 'maire', 'gestionnaire'])->findOrFail($id);
+
+        // Même principe qu'à la création : l'admin déclenche la
+        // réinitialisation mais ne voit jamais le nouveau mot de passe.
+        $plainPassword = Str::password(14);
+        $user->update(['password' => Hash::make($plainPassword)]);
+        $user->tokens()->delete();
+
+        try {
+            Mail::send('emails.password-reset-by-admin', [
+                'user' => $user,
+                'password' => $plainPassword,
+                'loginUrl' => config('app.frontend_url', 'http://localhost:4200') . '/login',
+            ], function ($message) use ($user) {
+                $message->to($user->email)->subject('🔐 Votre mot de passe E-Mairie a été réinitialisé');
+            });
+        } catch (\Exception $e) {
+            Log::error("Erreur envoi email réinitialisation: " . $e->getMessage());
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => "Nouveau mot de passe envoyé à {$user->email}.",
+        ]);
+    }
+
     public function destroy(Request $request, string $id): JsonResponse
     {
         $this->denyIfNotAdmin($request);

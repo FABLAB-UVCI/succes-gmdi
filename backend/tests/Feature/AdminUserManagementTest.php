@@ -67,6 +67,35 @@ class AdminUserManagementTest extends TestCase
         ])->assertStatus(422);
     }
 
+    public function test_admin_can_reset_a_gestionnaire_password_without_seeing_it(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $admin->assignRole('admin');
+        $gestionnaire = User::factory()->create(['role' => 'gestionnaire']);
+        $gestionnaire->assignRole('gestionnaire');
+        $oldHash = $gestionnaire->password;
+
+        $response = $this->actingAs($admin)->postJson("/api/admin/users/{$gestionnaire->id}/reset-password");
+
+        $response->assertOk();
+        $this->assertStringNotContainsString('password', strtolower(json_encode($response->json())));
+
+        $gestionnaire->refresh();
+        $this->assertNotEquals($oldHash, $gestionnaire->password);
+        $this->assertCount(0, $gestionnaire->tokens);
+    }
+
+    public function test_a_non_admin_cannot_reset_passwords(): void
+    {
+        $gestionnaire = User::factory()->create(['role' => 'gestionnaire']);
+        $gestionnaire->assignRole('gestionnaire');
+        $other = User::factory()->create(['role' => 'gestionnaire']);
+        $other->assignRole('gestionnaire');
+
+        $this->actingAs($gestionnaire)->postJson("/api/admin/users/{$other->id}/reset-password")
+            ->assertStatus(403);
+    }
+
     public function test_admin_can_list_and_delete_accounts(): void
     {
         $admin = User::factory()->create(['role' => 'admin']);

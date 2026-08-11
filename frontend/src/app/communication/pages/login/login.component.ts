@@ -37,6 +37,7 @@ import { AuthService } from '../../core/services/auth.service';
         @if (loading()) { <i class="ti ti-loader-2" style="animation:spin 1s linear infinite"></i>Connexion… }
         @else { <i class="ti ti-login"></i>Se connecter }
       </button>
+      <div class="forgot-link">Mot de passe oublié ? Contactez votre administrateur.</div>
     </div>
     <div class="login-footer">
       <span>République de Côte d'Ivoire</span><span>·</span><span>E-Mairie v1.0</span><span>·</span><span>UVCI — FabLab</span>
@@ -76,6 +77,7 @@ import { AuthService } from '../../core/services/auth.service';
 .login-btn { width:100%;height:42px;background:linear-gradient(135deg,#F77F00,#cc6600);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:all .15s;box-shadow:0 4px 14px rgba(247,127,0,.4);letter-spacing:.2px; }
 .login-btn:hover:not(:disabled) { box-shadow:0 6px 20px rgba(247,127,0,.55);transform:translateY(-1px); }
 .login-btn:disabled { opacity:.55;cursor:not-allowed;box-shadow:none; }
+.forgot-link { text-align:center;margin-top:14px;font-size:11px;color:#9ca3af; }
 .login-footer { border-top:.5px solid #e5e7eb;padding:.75rem 1.5rem;display:flex;align-items:center;justify-content:center;gap:6px;font-size:10px;color:#9ca3af; }
 @keyframes spin { to { transform:rotate(360deg); } }
 </style>
