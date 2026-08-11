@@ -21,9 +21,11 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction --no-script
 
 EXPOSE 3000
 
-# Migration exécutée avant serve (séquentiel, pas en tâche de fond en
-# parallèle) : les deux processus PHP simultanés se disputaient le CPU limité
+# Migration puis seed exécutés avant serve (séquentiel, pas en tâche de fond
+# en parallèle) : deux processus PHP simultanés se disputaient le CPU limité
 # du conteneur au démarrage, empêchant serve de répondre dans les 40s du
 # health-check Voisilab. Aucun job n'est jamais mis en file d'attente dans
 # l'app (vérifié) : queue:work retiré, pur gaspillage de ressources.
-CMD ["sh", "-c", "php artisan migrate --force; php artisan serve --host=0.0.0.0 --port=${PORT:-3000}"]
+# db:seed est idempotent (updateOrCreate / vérifications count()) : sans
+# risque de doublons à chaque redémarrage du conteneur.
+CMD ["sh", "-c", "php artisan migrate --force; php artisan db:seed --force; php artisan serve --host=0.0.0.0 --port=${PORT:-3000}"]

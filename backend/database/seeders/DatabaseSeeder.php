@@ -3,19 +3,25 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
     /**
      * Seed the application's database.
+     *
+     * Ne PAS utiliser WithoutModelEvents ici : DemoDataSeeder crée des Depense
+     * dont la référence (DEP-2026-0001...) est générée par un événement
+     * `creating()` du modèle — désactiver les événements la laisse vide et
+     * viole la contrainte NOT NULL.
      */
     public function run(): void
     {
+        // Rôles & permissions d'abord : assignRole() plante sur une base neuve
+        // sans ça (aucune migration ne crée les rôles, seul ce seeder le fait).
+        $this->call(GmdiRolesSeeder::class);
+
         // Admin
         User::updateOrCreate(
             ['email' => 'admin@emairie.ci'],
@@ -129,5 +135,8 @@ class DatabaseSeeder extends Seeder
         );
         $gurb->assignRole('gestionnaire');
         $gurb->givePermissionTo('access.urbanisme');
+
+        // Données de démo pour les modules (Patrimoine, RH, Mariages, Dépenses)
+        $this->call(DemoDataSeeder::class);
     }
 }
