@@ -27,4 +27,10 @@ EXPOSE 3000
 # bien plus cher que sur SQLite en local). Le seed se déclenche maintenant
 # séparément via la route protégée /api/system/deploy-setup (voir
 # routes/api.php), à appeler une fois après déploiement.
-CMD ["sh", "-c", "php artisan migrate --force; php artisan serve --host=0.0.0.0 --port=${PORT:-3000}"]
+# permission:cache-reset : le conteneur est éphémère, donc le cache de
+# permissions Spatie (fichier/mémoire local) repart à vide à chaque
+# redémarrage même si la base Postgres persiste. Sans ce reset, les rôles
+# déjà en base ne sont plus reconnus tant que /deploy-setup n'est pas
+# rappelé manuellement. Commande légère (pas de requêtes réseau lourdes),
+# reste sous le budget du health-check.
+CMD ["sh", "-c", "php artisan migrate --force; php artisan permission:cache-reset; php artisan serve --host=0.0.0.0 --port=${PORT:-3000}"]
