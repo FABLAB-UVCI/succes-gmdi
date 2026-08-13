@@ -233,17 +233,85 @@ export class CitoyenDemarchesComponent implements OnInit {
     return map[m] ?? m;
   }
 
-  /**
-   * Seul l'extrait de naissance, une fois validé par l'officier d'état civil,
-   * peut être réimprimé par le citoyen — avec le même modèle que celui utilisé
-   * par le gestionnaire, pour un rendu strictement identique.
-   */
+  /** Types d'état civil pour lesquels un document imprimable existe, une fois la démarche validée. */
+  private readonly TYPES_IMPRIMABLES = [
+    "Demande d'acte de naissance", 'Jugement supplétif', "Demande d'adoption",
+    "Demande d'acte de mariage", "Demande d'acte de décès",
+    'Certificat de célibat', 'Certificat de résidence', 'Certificat de vie individuelle',
+  ];
+
   peutImprimerExtrait(d: Demarche): boolean {
-    return d.type_demarche === "Demande d'acte de naissance" && (d.statut === 'valide' || d.statut === 'termine');
+    return this.TYPES_IMPRIMABLES.includes(d.type_demarche ?? '') && (d.statut === 'valide' || d.statut === 'termine');
   }
 
   async imprimerExtrait(d: Demarche): Promise<void> {
     const don: any = d.donnees || {};
+    const type = d.type_demarche;
+
+    if (type === "Demande d'acte de mariage") {
+      const { genererActeMariagePDF } = await import('../etat-civil/modules/etat-civil/pages/mariages/mariages');
+      await genererActeMariagePDF({
+        numero: d.reference,
+        epoux: `${don.epoux_nom ?? ''} ${don.epoux_prenom ?? ''}`.trim(),
+        epouse: `${don.epouse_nom ?? ''} ${don.epouse_prenom ?? ''}`.trim(),
+        dateMariage: don.date_mariage, lieu: don.lieu_mariage, regime: don.regime_matrimonial,
+        epouxProf: don.epoux_profession, epouxNat: don.epoux_nationalite,
+        epouseProf: don.epouse_profession, epouseNat: don.epouse_nationalite,
+        temoin1: don.epoux_temoin_nom, temoin1Prof: don.epoux_temoin_profession,
+        temoin2: don.epouse_temoin_nom, temoin2Prof: don.epouse_temoin_profession,
+      });
+      return;
+    }
+
+    if (type === "Demande d'acte de décès") {
+      const { genererActeDecesPDF } = await import('../etat-civil/modules/etat-civil/pages/deces/deces');
+      await genererActeDecesPDF({
+        numero: d.reference, nom: don.defunt_nom, prenom: don.defunt_prenom, dob: don.defunt_date_naissance,
+        dateDeces: don.date_deces, heureDeces: don.heure_deces, lieuDeces: don.lieu_deces,
+        commune: don.defunt_commune, causeDeces: don.cause_deces, declarant: don.declarant_nom,
+      });
+      return;
+    }
+
+    if (type === 'Certificat de célibat' || type === 'Certificat de résidence' || type === 'Certificat de vie individuelle') {
+      const { genererCertificatPDF } = await import('../etat-civil/modules/etat-civil/pages/certificats/certificats');
+      const sousType = type === 'Certificat de célibat' ? 'Célibat' : type === 'Certificat de résidence' ? 'Résidence' : 'Vie individuelle';
+      await genererCertificatPDF(sousType, {
+        numero: d.reference, nom: don.nom, prenom: don.prenom,
+        dob: don.date_naissance, acteRef: don.acte_reference, profession: don.profession,
+        adresse: don.adresse, quartier: don.quartier, commune: don.commune,
+        dateDelivrance: d.updated_at,
+      });
+      return;
+    }
+
+    if (type === "Demande d'adoption") {
+      const { genererActeAdoptionPDF } = await import('../etat-civil/modules/etat-civil/pages/naissances/naissances');
+      const nomParts = (don.enfant_nom ?? '').trim().split(' ');
+      await genererActeAdoptionPDF({
+        numero: d.reference, nom: nomParts[0] ?? '', prenom: nomParts.slice(1).join(' '),
+        dateNaissance: don.enfant_date_naissance, lieuNaissance: don.enfant_lieu_naissance, commune: '',
+        pereNom: don.pere_nom, pereProf: don.pere_profession, pereNat: don.pere_nationalite,
+        mereNom: don.mere_nom, mereProf: don.mere_profession, mereNat: don.mere_nationalite,
+        tribunal: don.tribunal, dateJugement: don.date_jugement,
+      });
+      return;
+    }
+
+    if (type === 'Jugement supplétif') {
+      const { genererExtraitNaissancePDF } = await import('../etat-civil/modules/etat-civil/pages/naissances/naissances');
+      const nomParts = (don.nom ?? '').trim().split(' ');
+      await genererExtraitNaissancePDF({
+        numero: d.reference, nom: nomParts[0] ?? '', prenom: nomParts.slice(1).join(' '),
+        dateNaissance: don.date_naissance, heureNaissance: don.heure_naissance ?? '', sexe: don.sexe ?? '',
+        lieuNaissance: don.lieu, commune: don.commune ?? '',
+        pereNom: don.pere_nom ?? '', mereNom: don.mere_nom ?? '',
+        pereProf: don.pere_profession ?? '', mereProf: don.mere_profession ?? '',
+        pereNat: don.pere_nationalite ?? '', mereNat: don.mere_nationalite ?? '',
+      });
+      return;
+    }
+
     const { genererExtraitNaissancePDF } = await import('../etat-civil/modules/etat-civil/pages/naissances/naissances');
     await genererExtraitNaissancePDF({
       numero: d.reference, nom: don.nom, prenom: don.prenom,
