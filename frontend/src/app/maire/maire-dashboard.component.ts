@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { AuthService } from '../communication/core/services/auth.service';
 import { environment } from '@env/environment';
 import { DemandesCitoyensComponent } from '../shared/components/demandes-citoyens.component';
@@ -521,17 +523,64 @@ export class MaireDashboardComponent implements OnInit {
   }
 
   loadKpis(): void {
-    // Chargement des statistiques État civil (exemple réel)
-    this.http.get<any>(`${environment.apiUrl}/etat-civil/statistiques`).subscribe({
-      next: stats => {
-        if (stats) {
-          this.updateModuleKpi('etat-civil', 0, stats.naissances ?? '—');
-          this.updateModuleKpi('etat-civil', 1, stats.mariages ?? '—');
-          this.updateModuleKpi('etat-civil', 2, stats.certificats ?? '—');
-          this.globalKpis[1].value = String(stats.naissances ?? '—');
-        }
-      },
-      error: () => {},
+    const api = environment.apiUrl;
+    const safe = <T>(obs: import('rxjs').Observable<T>) => obs.pipe(catchError(() => of(null)));
+
+    forkJoin({
+      globales: safe<any>(this.http.get(`${api}/admin/statistiques`)),
+      etatCivil: safe<any>(this.http.get(`${api}/etat-civil/statistiques`)),
+      finances: safe<any>(this.http.get(`${api}/dashboard/stats`)),
+      patrimoine: safe<any>(this.http.get(`${api}/patrimoine/statistiques`)),
+      urbanisme: safe<any>(this.http.get(`${api}/urb/statistiques`)),
+      st: safe<any>(this.http.get(`${api}/st/statistiques`)),
+      communication: safe<any>(this.http.get(`${api}/com/statistiques`)),
+    }).subscribe(({ globales, etatCivil, finances, patrimoine, urbanisme, st, communication }) => {
+      const g = globales?.data ?? globales;
+      if (g) {
+        this.globalKpis[0].value = String(g.demarches?.total ?? '—');
+        this.globalKpis[2].value = g.revenus != null ? Number(g.revenus).toLocaleString('fr-FR') : '—';
+        this.globalKpis[3].value = String(g.agents ?? '—');
+        this.updateModuleKpi('rh', 0, g.agents ?? '—');
+      }
+
+      const ec = etatCivil?.totaux;
+      if (ec) {
+        this.updateModuleKpi('etat-civil', 0, ec.naissances ?? '—');
+        this.updateModuleKpi('etat-civil', 1, ec.mariages ?? '—');
+        this.updateModuleKpi('etat-civil', 2, ec.certificats ?? '—');
+        const totalActes = (ec.naissances ?? 0) + (ec.mariages ?? 0) + (ec.deces ?? 0) + (ec.certificats ?? 0);
+        this.globalKpis[1].value = String(totalActes);
+      }
+
+      if (finances) {
+        this.updateModuleKpi('finances', 1, finances.totalRecettes != null ? Number(finances.totalRecettes).toLocaleString('fr-FR') : '—');
+        this.updateModuleKpi('finances', 2, finances.totalDepenses != null ? Number(finances.totalDepenses).toLocaleString('fr-FR') : '—');
+      }
+
+      if (patrimoine) {
+        this.updateModuleKpi('patrimoine', 1, patrimoine.total_biens ?? '—');
+      }
+
+      const uk = urbanisme?.kpi;
+      if (uk) {
+        this.updateModuleKpi('urbanisme', 0, uk.total_parcelles ?? '—');
+        this.updateModuleKpi('urbanisme', 1, uk.permis_en_cours ?? '—');
+        this.globalKpis[4].value = String((uk.permis_en_cours ?? 0) + (uk.permis_accordes ?? 0));
+      }
+
+      const sk = st?.kpi;
+      if (sk) {
+        this.updateModuleKpi('services-techniques', 0, sk.interventions_en_cours ?? '—');
+        this.updateModuleKpi('services-techniques', 1, sk.pannes_signalees ?? '—');
+        this.globalKpis[5].value = String(sk.interventions_en_cours ?? '—');
+      }
+
+      const ck = communication?.kpi;
+      if (ck) {
+        this.updateModuleKpi('communication', 0, ck.publications_mois ?? '—');
+        this.updateModuleKpi('communication', 1, ck.reclamations_ouvertes ?? '—');
+        this.updateModuleKpi('communication', 2, ck.partenaires_actifs ?? '—');
+      }
     });
   }
 
