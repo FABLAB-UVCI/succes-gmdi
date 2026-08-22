@@ -57,31 +57,6 @@ interface ModuleStat {
 
   <div class="maire-body">
 
-    <!-- Annonces du Maire -->
-    <section class="annonces-section">
-      <div class="section-head-row">
-        <h2 class="section-title">📣 Mes annonces publiées</h2>
-        <button class="btn-annonce-inline" (click)="ouvrirModalAnnonce()"><i class="ti ti-plus"></i> Publier une annonce</button>
-      </div>
-      @if (mesAnnonces().length === 0) {
-        <div class="ann-empty-card">Aucune annonce publiée pour le moment. Utilisez le bouton ci-dessus pour communiquer avec tous les services.</div>
-      } @else {
-        <div class="ann-list">
-          @for (a of mesAnnonces(); track a.id) {
-            <div class="ann-row" [class.urgent]="a.urgent">
-              <div class="ann-row-head">
-                <span class="ann-row-titre">{{ a.titre }}</span>
-                <span class="ann-row-audience">{{ labelAudience(a.audience) }}</span>
-                @if (a.urgent) { <span class="ann-row-badge">Urgent</span> }
-              </div>
-              <p class="ann-row-contenu">{{ a.contenu }}</p>
-              <span class="ann-row-date">{{ a.date | date:'dd MMMM yyyy':'':'fr-FR' }}</span>
-            </div>
-          }
-        </div>
-      }
-    </section>
-
     <!-- KPIs globaux  -->
     <section class="kpi-section">
       <h2 class="section-title">📊 Indicateurs globaux</h2>
@@ -133,19 +108,48 @@ interface ModuleStat {
     <!-- ── Alertes ──────────────────────────────────────────────────────── -->
     <section class="alerts-section">
       <h2 class="section-title">🔔 Alertes & actions stratégiques</h2>
-      <div class="alerts-list">
-        @for (a of alerts; track a.message) {
-          <div class="alert-item" [class.warning]="a.level==='warning'" [class.info]="a.level==='info'">
-            <span class="alert-ico">{{ a.ico }}</span>
-            <div class="alert-body">
-              <span class="alert-msg">{{ a.message }}</span>
-              <span class="alert-sub">{{ a.detail }}</span>
+      @if (alerts().length === 0) {
+        <div class="ann-empty-card">Aucune alerte pour le moment — tout est à jour.</div>
+      } @else {
+        <div class="alerts-list">
+          @for (a of alerts(); track a.message) {
+            <div class="alert-item" [class.warning]="a.level==='warning'" [class.info]="a.level==='info'">
+              <span class="alert-ico">{{ a.ico }}</span>
+              <div class="alert-body">
+                <span class="alert-msg">{{ a.message }}</span>
+                <span class="alert-sub">{{ a.detail }}</span>
+              </div>
+              <span class="alert-badge" [style.background]="a.level==='warning'?'#fff3e0':'#e8f0ff'"
+                [style.color]="a.level==='warning'?'#F77F00':'#003366'">{{ a.tag }}</span>
             </div>
-            <span class="alert-badge" [style.background]="a.level==='warning'?'#fff3e0':'#e8f0ff'"
-              [style.color]="a.level==='warning'?'#F77F00':'#003366'">{{ a.tag }}</span>
-          </div>
-        }
+          }
+        </div>
+      }
+    </section>
+
+    <!-- Annonces du Maire -->
+    <section class="annonces-section">
+      <div class="section-head-row">
+        <h2 class="section-title">📣 Mes annonces publiées</h2>
+        <button class="btn-annonce-inline" (click)="ouvrirModalAnnonce()"><i class="ti ti-plus"></i> Publier une annonce</button>
       </div>
+      @if (mesAnnonces().length === 0) {
+        <div class="ann-empty-card">Aucune annonce publiée pour le moment. Utilisez le bouton ci-dessus pour communiquer avec tous les services.</div>
+      } @else {
+        <div class="ann-list">
+          @for (a of mesAnnonces(); track a.id) {
+            <div class="ann-row" [class.urgent]="a.urgent">
+              <div class="ann-row-head">
+                <span class="ann-row-titre">{{ a.titre }}</span>
+                <span class="ann-row-audience">{{ labelAudience(a.audience) }}</span>
+                @if (a.urgent) { <span class="ann-row-badge">Urgent</span> }
+              </div>
+              <p class="ann-row-contenu">{{ a.contenu }}</p>
+              <span class="ann-row-date">{{ a.date | date:'dd MMMM yyyy':'':'fr-FR' }}</span>
+            </div>
+          }
+        </div>
+      }
     </section>
 
     <!-- ── Demandes Citoyens (Supervision) ────────────────────────────────── -->
@@ -452,12 +456,7 @@ export class MaireDashboardComponent implements OnInit {
     },
   ];
 
-  alerts = [
-    { ico: '⚠️', message: 'Dossiers en attente de validation', detail: '3 dossiers État civil nécessitent votre attention', level: 'warning', tag: 'État civil' },
-    { ico: '📢', message: 'Rapport mensuel disponible', detail: 'Le rapport Finances de juillet est prêt', level: 'info', tag: 'Finances' },
-    { ico: '🔧', message: 'Pannes éclairage signalées', detail: '5 pannes en attente de maintenance', level: 'warning', tag: 'Services techniques' },
-    { ico: '👥', message: 'Recrutements en cours', detail: '2 postes ouverts au stade de validation', level: 'info', tag: 'RH' },
-  ];
+  alerts = signal<{ ico: string; message: string; detail: string; level: string; tag: string }[]>([]);
 
   ngOnInit(): void {
     // Ici on pourrait récupérer les vrais KPIs via des appels API parallèles
@@ -581,7 +580,60 @@ export class MaireDashboardComponent implements OnInit {
         this.updateModuleKpi('communication', 1, ck.reclamations_ouvertes ?? '—');
         this.updateModuleKpi('communication', 2, ck.partenaires_actifs ?? '—');
       }
+
+      this.buildAlerts(g, finances, uk, sk, ck);
     });
+  }
+
+  /** Construit les alertes à partir des vraies statistiques déjà chargées — aucune donnée fictive. */
+  private buildAlerts(g: any, finances: any, uk: any, sk: any, ck: any): void {
+    const items: { ico: string; message: string; detail: string; level: string; tag: string }[] = [];
+
+    const enAttente = g?.demarches?.en_attente ?? 0;
+    if (enAttente > 0) {
+      items.push({
+        ico: '⚠️', message: 'Dossiers en attente de validation',
+        detail: `${enAttente} démarche${enAttente > 1 ? 's' : ''} citoyenne${enAttente > 1 ? 's' : ''} en attente, tous modules confondus`,
+        level: 'warning', tag: 'Démarches citoyennes',
+      });
+    }
+
+    if (finances?.tauxExecution != null) {
+      items.push({
+        ico: '📢', message: 'Exécution budgétaire',
+        detail: `Taux d'exécution des recettes : ${finances.tauxExecution}%`,
+        level: 'info', tag: 'Finances',
+      });
+    }
+
+    const pannes = sk?.pannes_signalees ?? 0;
+    if (pannes > 0) {
+      items.push({
+        ico: '🔧', message: 'Pannes signalées',
+        detail: `${pannes} panne${pannes > 1 ? 's' : ''} en attente de résolution`,
+        level: 'warning', tag: 'Services techniques',
+      });
+    }
+
+    const permisEnCours = uk?.permis_en_cours ?? 0;
+    if (permisEnCours > 0) {
+      items.push({
+        ico: '🗺️', message: 'Permis en instruction',
+        detail: `${permisEnCours} permis (construire/démolir) en cours d'instruction`,
+        level: 'info', tag: 'Urbanisme',
+      });
+    }
+
+    const reclamations = ck?.reclamations_ouvertes ?? 0;
+    if (reclamations > 0) {
+      items.push({
+        ico: '📣', message: 'Réclamations citoyennes ouvertes',
+        detail: `${reclamations} réclamation${reclamations > 1 ? 's' : ''} en attente de traitement`,
+        level: 'warning', tag: 'Communication',
+      });
+    }
+
+    this.alerts.set(items);
   }
 
   private updateModuleKpi(moduleKey: string, idx: number, value: string | number): void {
