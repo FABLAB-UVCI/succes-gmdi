@@ -44,9 +44,12 @@ class DemarcheController extends Controller
     {
         $user = $request->user();
         
-        // Only managers/admins can update demarches
+        // Only managers/admins can update demarches — le maire a un accès en lecture seule
         if ($user->hasRole('citoyen') || $user->role === 'citoyen') {
             return response()->json(['message' => 'Non autorisé.'], 403);
+        }
+        if ($user->hasRole('maire')) {
+            return response()->json(['message' => 'Accès en lecture seule pour le Maire.'], 403);
         }
 
         $v = $request->validate([

@@ -6,8 +6,15 @@ use App\Models\Demarche;
 use App\Models\User;
 use App\Modules\Rh\Models\Agent;
 use App\Modules\Finances\Models\Recette;
+use App\Modules\Finances\Models\Depense;
+use App\Modules\EtatCivil\Models\Naissance;
+use App\Modules\EtatCivil\Models\Mariage;
+use App\Modules\EtatCivil\Models\Deces;
+use App\Modules\Urbanisme\Models\Permis;
+use App\Modules\ServicesTechniques\Models\BonTravail;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 class StatistiquesGlobalesController extends Controller
 {
@@ -72,6 +79,70 @@ class StatistiquesGlobalesController extends Controller
                 'agents' => $totalAgents,
                 'revenus' => (float) $totalRevenus
             ]
+        ]);
+    }
+
+    /**
+     * GET /admin/bilan?periode=mois|annee
+     * Bilan de synthèse sur une période, réservé au Maire/Administrateur.
+     */
+    public function bilan(Request $request): JsonResponse
+    {
+        $user = $request->user();
+        if (! $user->hasRole('maire') && ! $user->hasRole('admin') && $user->role !== 'maire' && $user->role !== 'admin') {
+            return response()->json(['message' => 'Accès refusé. Réservé au Maire ou à l\'Administrateur.'], 403);
+        }
+
+        $periode = $request->get('periode', 'mois');
+        $now = Carbon::now();
+        if ($periode === 'annee') {
+            $debut = $now->copy()->startOfYear();
+            $fin = $now->copy()->endOfYear();
+            $label = 'Année ' . $now->format('Y');
+        } else {
+            $periode = 'mois';
+            $debut = $now->copy()->startOfMonth();
+            $fin = $now->copy()->endOfMonth();
+            $label = $now->translatedFormat('F Y');
+        }
+
+        $demarches = Demarche::whereBetween('created_at', [$debut, $fin]);
+        $demarchesParStatut = (clone $demarches)->selectRaw('statut, count(*) as total')->groupBy('statut')->pluck('total', 'statut');
+        $demarchesParModule = (clone $demarches)->selectRaw('module, count(*) as total')->groupBy('module')->pluck('total', 'module');
+
+        $recettes = (float) Recette::whereBetween('created_at', [$debut, $fin])->where('statut', 'valide')->sum('montant');
+        $depenses = (float) Depense::whereBetween('created_at', [$debut, $fin])->where('statut', 'valide')->sum('montant');
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'periode' => $periode,
+                'label' => $label,
+                'debut' => $debut->toDateString(),
+                'fin' => $fin->toDateString(),
+                'demarches' => [
+                    'total' => (clone $demarches)->count(),
+                    'par_statut' => $demarchesParStatut,
+                    'par_module' => $demarchesParModule,
+                ],
+                'finances' => [
+                    'recettes' => $recettes,
+                    'depenses' => $depenses,
+                    'solde' => $recettes - $depenses,
+                ],
+                'etat_civil' => [
+                    'naissances' => Naissance::whereBetween('created_at', [$debut, $fin])->count(),
+                    'mariages' => Mariage::whereBetween('created_at', [$debut, $fin])->count(),
+                    'deces' => Deces::whereBetween('created_at', [$debut, $fin])->count(),
+                ],
+                'urbanisme' => [
+                    'permis_accordes' => Permis::where('statut', 'accorde')->whereBetween('updated_at', [$debut, $fin])->count(),
+                ],
+                'services_techniques' => [
+                    'interventions_terminees' => BonTravail::where('statut', 'termine')->whereBetween('updated_at', [$debut, $fin])->count(),
+                ],
+                'nouveaux_citoyens' => User::where('role', 'citoyen')->whereBetween('created_at', [$debut, $fin])->count(),
+            ],
         ]);
     }
 }

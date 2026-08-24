@@ -59,6 +59,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Route globale pour le Maire / Admin
     Route::get('admin/statistiques', [App\Http\Controllers\StatistiquesGlobalesController::class, 'index']);
+    Route::get('admin/bilan', [App\Http\Controllers\StatistiquesGlobalesController::class, 'bilan']);
 
     // Gestion des comptes professionnels — réservé aux administrateurs (vérifié dans le contrôleur)
     Route::prefix('admin')->group(function () {

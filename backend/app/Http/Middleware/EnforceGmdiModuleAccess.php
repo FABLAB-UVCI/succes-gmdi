@@ -38,6 +38,17 @@ class EnforceGmdiModuleAccess
             return response()->json(['message' => 'Accès refusé à ce module.'], 403);
         }
 
+        if ($request->user()->hasRole('maire') && ! in_array($request->method(), ['GET', 'HEAD'], true)) {
+            // Le maire a une visibilité transverse sur tous les modules mais ne doit pas pouvoir
+            // en modifier les données opérationnelles — seule exception : la publication de ses
+            // propres annonces (voir MaireDashboardComponent::publierAnnonce()).
+            $isAnnoncesMaire = $request->method() === 'POST' && $request->path() === 'api/com/actualites';
+
+            if (! $isAnnoncesMaire) {
+                return response()->json(['message' => 'Accès en lecture seule pour le Maire.'], 403);
+            }
+        }
+
         return $next($request);
     }
 }

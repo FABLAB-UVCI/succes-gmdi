@@ -8,6 +8,17 @@ import { catchError } from 'rxjs/operators';
 import { AuthService } from '../communication/core/services/auth.service';
 import { environment } from '@env/environment';
 import { DemandesCitoyensComponent } from '../shared/components/demandes-citoyens.component';
+import { PrintService } from '../etat-civil/services/print.service';
+
+interface Bilan {
+  periode: string; label: string; debut: string; fin: string;
+  demarches: { total: number; par_statut: Record<string, number>; par_module: Record<string, number> };
+  finances: { recettes: number; depenses: number; solde: number };
+  etat_civil: { naissances: number; mariages: number; deces: number };
+  urbanisme: { permis_accordes: number };
+  services_techniques: { interventions_terminees: number };
+  nouveaux_citoyens: number;
+}
 
 interface AnnonceForm { titre: string; contenu: string; urgent: boolean; destinataire: string; serviceCible: string; }
 
@@ -74,6 +85,64 @@ interface ModuleStat {
           </div>
         }
       </div>
+    </section>
+
+    <!-- Bilan de synthèse -->
+    <section class="bilan-section">
+      <div class="section-head-row">
+        <h2 class="section-title">📈 Bilan de synthèse</h2>
+        <div class="bilan-controls">
+          <select class="bilan-select" [(ngModel)]="bilanPeriode" (ngModelChange)="chargerBilan()">
+            <option value="mois">Ce mois-ci</option>
+            <option value="annee">Cette année</option>
+          </select>
+          @if (bilan()) {
+            <button class="btn-annonce-inline" (click)="imprimerBilan()"><i class="ti ti-printer"></i> Imprimer / Exporter PDF</button>
+          }
+        </div>
+      </div>
+
+      @if (bilanLoading()) {
+        <div class="ann-empty-card">Chargement du bilan…</div>
+      } @else if (bilan(); as b) {
+        <p class="bilan-periode-label">{{ b.label }} — du {{ b.debut | date:'dd/MM/yyyy' }} au {{ b.fin | date:'dd/MM/yyyy' }}</p>
+        <div class="bilan-grid">
+          <div class="bilan-tile">
+            <span class="bt-val">{{ b.demarches.total }}</span>
+            <span class="bt-lbl">Démarches traitées</span>
+          </div>
+          <div class="bilan-tile">
+            <span class="bt-val">{{ b.finances.recettes | number:'1.0-0':'fr-FR' }}</span>
+            <span class="bt-lbl">Recettes encaissées (FCFA)</span>
+          </div>
+          <div class="bilan-tile">
+            <span class="bt-val">{{ b.finances.depenses | number:'1.0-0':'fr-FR' }}</span>
+            <span class="bt-lbl">Dépenses validées (FCFA)</span>
+          </div>
+          <div class="bilan-tile" [class.negatif]="b.finances.solde < 0">
+            <span class="bt-val">{{ b.finances.solde | number:'1.0-0':'fr-FR' }}</span>
+            <span class="bt-lbl">Solde (FCFA)</span>
+          </div>
+          <div class="bilan-tile">
+            <span class="bt-val">{{ b.etat_civil.naissances + b.etat_civil.mariages + b.etat_civil.deces }}</span>
+            <span class="bt-lbl">Actes d'état civil</span>
+          </div>
+          <div class="bilan-tile">
+            <span class="bt-val">{{ b.urbanisme.permis_accordes }}</span>
+            <span class="bt-lbl">Permis accordés</span>
+          </div>
+          <div class="bilan-tile">
+            <span class="bt-val">{{ b.services_techniques.interventions_terminees }}</span>
+            <span class="bt-lbl">Interventions terminées</span>
+          </div>
+          <div class="bilan-tile">
+            <span class="bt-val">{{ b.nouveaux_citoyens }}</span>
+            <span class="bt-lbl">Nouveaux citoyens inscrits</span>
+          </div>
+        </div>
+      } @else {
+        <div class="ann-empty-card">Impossible de charger le bilan pour le moment.</div>
+      }
     </section>
 
     <!--  Modules -->
@@ -268,6 +337,25 @@ interface ModuleStat {
 .kpi-trend { font-size: 1rem; font-weight: 700; color: #c8d0de; }
 .kpi-trend.up { color: #009A44; }
 
+/* ── Bilan de synthèse ── */
+.bilan-section { background: #fff; border-radius: 16px; padding: 1.5rem; box-shadow: 0 2px 12px rgba(0,0,0,.06); }
+.bilan-controls { display: flex; align-items: center; gap: .7rem; flex-wrap: wrap; }
+.bilan-select {
+  padding: .5rem .9rem; border-radius: 8px; border: 1.5px solid #cbd5e1;
+  font-size: .82rem; font-weight: 600; color: #003366; background: #fff; cursor: pointer;
+}
+.bilan-periode-label { font-size: .82rem; color: #7a8aaa; margin: -.6rem 0 1.2rem; font-weight: 600; }
+.bilan-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 1rem; }
+.bilan-tile {
+  background: #f4f7fc; border-radius: 12px; padding: 1.1rem 1.3rem;
+  display: flex; flex-direction: column; gap: .3rem;
+  border-left: 4px solid #009A44;
+}
+.bilan-tile.negatif { border-left-color: #e63946; }
+.bt-val { font-size: 1.5rem; font-weight: 800; color: #003366; }
+.bilan-tile.negatif .bt-val { color: #e63946; }
+.bt-lbl { font-size: .72rem; color: #7a8aaa; font-weight: 600; }
+
 /* ── Modules grid ── */
 .modules-grid {
   display: grid;
@@ -373,6 +461,11 @@ export class MaireDashboardComponent implements OnInit {
   readonly auth = inject(AuthService);
   readonly user = this.auth.currentUser();
   private http  = inject(HttpClient);
+  private printService = inject(PrintService);
+
+  bilan = signal<Bilan | null>(null);
+  bilanLoading = signal(false);
+  bilanPeriode: 'mois' | 'annee' = 'mois';
 
   mesAnnonces = signal<{ id: number; titre: string; contenu: string; date: string; urgent: boolean; audience: string }[]>([]);
   modalAnnonceOuvert = signal(false);
@@ -459,10 +552,9 @@ export class MaireDashboardComponent implements OnInit {
   alerts = signal<{ ico: string; message: string; detail: string; level: string; tag: string }[]>([]);
 
   ngOnInit(): void {
-    // Ici on pourrait récupérer les vrais KPIs via des appels API parallèles
-    // Pour l'instant on affiche la structure prête à recevoir des données
     this.loadKpis();
     this.loadAnnonces();
+    this.chargerBilan();
   }
 
   loadAnnonces(): void {
@@ -470,6 +562,58 @@ export class MaireDashboardComponent implements OnInit {
       next: r => this.mesAnnonces.set(r.data),
       error: () => {},
     });
+  }
+
+  chargerBilan(): void {
+    this.bilanLoading.set(true);
+    this.http.get<{ data: Bilan }>(`${environment.apiUrl}/admin/bilan`, { params: { periode: this.bilanPeriode } }).subscribe({
+      next: r => { this.bilan.set(r.data); this.bilanLoading.set(false); },
+      error: () => { this.bilan.set(null); this.bilanLoading.set(false); },
+    });
+  }
+
+  imprimerBilan(): void {
+    const b = this.bilan();
+    if (!b) return;
+    const fmt = (n: number) => n.toLocaleString('fr-FR');
+    const ligne = (label: string, val: string) => `<tr><td class="lbl">${label}</td><td class="val">${val}</td></tr>`;
+    const html = `
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Bilan — ${b.label}</title>
+  <style>
+    body { font-family: 'Inter', Arial, sans-serif; padding: 2rem; color: #1a1a2e; }
+    h1 { color: #003366; font-size: 1.4rem; margin-bottom: .2rem; }
+    .sub { color: #7a8aaa; font-size: .9rem; margin-bottom: 1.5rem; }
+    table { width: 100%; border-collapse: collapse; }
+    td { padding: .6rem .8rem; border-bottom: 1px solid #e2e8f0; }
+    td.lbl { color: #475569; font-weight: 600; }
+    td.val { text-align: right; font-weight: 800; color: #003366; }
+    .flag-strip { display: flex; width: 40px; height: 26px; border-radius: 4px; overflow: hidden; margin-bottom: 1rem; }
+    .flag-strip span { flex: 1; }
+  </style>
+</head>
+<body>
+  <div class="flag-strip"><span style="background:#F77F00"></span><span style="background:#fff;border:1px solid #eee"></span><span style="background:#009A44"></span></div>
+  <h1>Bilan de synthèse — E-Mairie</h1>
+  <p class="sub">${b.label} — du ${b.debut} au ${b.fin}</p>
+  <table>
+    ${ligne('Démarches citoyennes traitées', String(b.demarches.total))}
+    ${ligne('Recettes encaissées', fmt(b.finances.recettes) + ' FCFA')}
+    ${ligne('Dépenses validées', fmt(b.finances.depenses) + ' FCFA')}
+    ${ligne('Solde', fmt(b.finances.solde) + ' FCFA')}
+    ${ligne("Naissances enregistrées", String(b.etat_civil.naissances))}
+    ${ligne('Mariages célébrés', String(b.etat_civil.mariages))}
+    ${ligne('Décès enregistrés', String(b.etat_civil.deces))}
+    ${ligne('Permis accordés (Urbanisme)', String(b.urbanisme.permis_accordes))}
+    ${ligne('Interventions terminées (Services techniques)', String(b.services_techniques.interventions_terminees))}
+    ${ligne('Nouveaux citoyens inscrits', String(b.nouveaux_citoyens))}
+  </table>
+</body>
+</html>`;
+    this.printService.printDocument(html, `Bilan-${b.periode}`);
   }
 
   ouvrirModalAnnonce(): void {
