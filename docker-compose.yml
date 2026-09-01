@@ -1,0 +1,94 @@
+name: succes-gmdi
+
+# ════════════════════════════════════════════════════════════
+# succes-gmdi — Orchestration de l'app E-Mairie (GMDI)
+#
+# Réunit les DEUX surfaces en un seul point d'entrée (pattern
+# inspiré de YATANAN/docker-compose.yml) :
+#   - backend  : API Laravel (PHP 8.4, `php artisan serve`, port 3000)
+#   - frontend : SPA Angular servie par nginx (port 3000)
+#
+# Un seul hôte Traefik : /api → backend Laravel, / → frontend nginx.
+# La DB (Postgres) est RESTE EXTERNE (via les variables d'environnement
+# Voisilab) — elle n'est PAS montée ici, conformément au pattern de
+# déploiement des autres projets (YATANAN/kunicia/radio-fablab).
+# ════════════════════════════════════════════════════════════
+
+services:
+  # ── API Laravel ────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: gmdi-backend
+    restart: unless-stopped
+    environment:
+      APP_ENV: production
+      APP_URL: ${APP_URL:-https://e-mairie.voisilab.com}
+      # ── DB Postgres externe (env Voisilab) : rien branché en dur ici ──
+      # `:?` force une erreur compose si DB_HOST absent — jamais de repli
+      # silencieux vers 127.0.0.1 (le conteneur SD) comme avant.
+      DB_CONNECTION: pgsql
+      DB_HOST: ${DB_HOST:?DB_HOST est requis (Postgres externe Neon/Voisilab)}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_DATABASE: ${DB_DATABASE:-gmdi}
+      DB_USERNAME: ${DB_USERNAME:-gmdi}
+      DB_PASSWORD: ${DB_PASSWORD}
+      # Neon/Postgres hébergé exige SSL ; mappé dans config/database.php
+      DB_SSLMODE: ${DB_SSLMODE:-require}
+      DEPLOY_TOKEN: ${DEPLOY_TOKEN}
+      # artisan serve écoute sur le port défini dans le Dockerfile du backend
+      PORT: "3000"
+    networks:
+      - gmdi-internal
+      - traefik-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik-network"
+      - "traefik.http.routers.gmdi-api.rule=Host(`${DOMAIN:-e-mairie.voisilab.com}`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.gmdi-api.priority=10"
+      - "traefik.http.routers.gmdi-api.entrypoints=web"
+      - "traefik.http.services.gmdi-api.loadbalancer.server.port=3000"
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:3000"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
+
+  # ── SPA Angular (nginx) ────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: gmdi-frontend
+    restart: unless-stopped
+    environment:
+      PORT: "3000"
+      # adresse du backend pour le proxy /api du nginx (réseau interne)
+      BACKEND_URL: http://backend:3000
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - gmdi-internal
+      - traefik-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik-network"
+      - "traefik.http.routers.gmdi-web.rule=Host(`${DOMAIN:-e-mairie.voisilab.com}`) && !PathPrefix(`/api`)"
+      - "traefik.http.routers.gmdi-web.priority=1"
+      - "traefik.http.routers.gmdi-web.entrypoints=web"
+      - "traefik.http.services.gmdi-web.loadbalancer.server.port=3000"
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:3000"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+networks:
+  gmdi-internal:
+    driver: bridge
+  traefik-network:
+    external: true

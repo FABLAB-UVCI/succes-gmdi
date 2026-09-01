@@ -23,4 +23,10 @@ FROM nginx:alpine AS runtime
 COPY --from=build /app/dist/gmdi-communication/browser /usr/share/nginx/html
 COPY nginx.conf.template /etc/nginx/templates/default.conf.template
 ENV PORT=3000
+# Limite la substitution envsubst aux SEULES variables ci-dessous, afin de
+# préserver les variables internes nginx ($host, $remote_addr, $scheme, ...)
+# utilisées dans le bloc /api/ (proxy vers le backend Laravel). Sans cette
+# liste, l'entrypoint nginx substitue toutes les variables du template et vide
+# $host/$remote_addr/$proxy_add_x_forwarded_for → header Host vide en proxy.
+ENV NGINX_ENVSUBST_VARS='$PORT $BACKEND_URL'
 EXPOSE 3000

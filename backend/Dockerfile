@@ -33,4 +33,9 @@ EXPOSE 3000
 # déjà en base ne sont plus reconnus tant que /deploy-setup n'est pas
 # rappelé manuellement. Commande légère (pas de requêtes réseau lourdes),
 # reste sous le budget du health-check.
-CMD ["sh", "-c", "php artisan migrate --force; php artisan permission:cache-reset; php artisan serve --host=0.0.0.0 --port=${PORT:-3000}"]
+# key:generate --force : aucune APP_KEY n'est définie (ni au build ni via env) —
+# c'est la SEULE source de vérité, pour éviter une clé manquante (500 sur l'auth/
+# sessions/chiffrement). Conteneur éphémère ⇒ nouvelle clé à chaque redémarrage ⇒
+# sessions actives déconnectées : acceptable pour un prototype. Aucun cast
+# 'encrypted' dans les modèles/migrations ⇒ pas de données rendues illisibles.
+CMD ["sh", "-c", "php artisan key:generate --force; php artisan migrate --force; php artisan permission:cache-reset; php artisan serve --host=0.0.0.0 --port=${PORT:-3000}"]

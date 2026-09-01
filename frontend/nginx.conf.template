@@ -14,6 +14,28 @@ server {
         try_files $uri =404;
     }
 
+    # Proxy l'API Laravel (single-host : /api → backend) via le réseau
+    # interne docker-compose. BACKEND_URL est défini par docker-compose ;
+    # en dev local (npm run dev / proxy.conf.json) ce bloc est inactif.
+    #
+    # DNS dynamique : le resolver 127.0.0.11 (DNS Docker) force nginx à
+    # re-résoudre `backend` à chaque requête au lieu de figer l'IP au
+    # démarrage. Critère : le proxy_pass DOIT utiliser une variable
+    # ($backend_upstream) pour que la re-résolution soit active — un nom
+    # en dur dans proxy_pass serait résolu une seule fois et mis en cache.
+    resolver 127.0.0.11 valid=10s ipv6=off;
+    set $backend_upstream ${BACKEND_URL};
+
+    location /api/ {
+        proxy_pass $backend_upstream;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 120s;
+    }
+
     location / {
         try_files $uri $uri/ /index.html;
     }
