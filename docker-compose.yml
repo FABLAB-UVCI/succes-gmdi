@@ -25,6 +25,10 @@ services:
     environment:
       APP_ENV: production
       APP_URL: ${APP_URL:-https://e-mairie.voisilab.com}
+      # Sessions en fichiers : évite que Laravel cherche une table sessions
+      # dans la DB ou un fichier sqlite inexistant (SESSION_CONNECTION vide
+      # par défaut → retombe sur sqlite via .env dev).
+      SESSION_DRIVER: file
       # ── DB Postgres externe (env Voisilab, Neon) : rien branché en dur ici ──
       # Variables décomposées — DB_HOST obligatoire (`:?` échoue si absente),
       # jamais de repli silencieux vers 127.0.0.1 (le conteneur lui-même).
