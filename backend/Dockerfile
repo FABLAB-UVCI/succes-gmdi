@@ -38,4 +38,4 @@ EXPOSE 3000
 # sessions/chiffrement). Conteneur éphémère ⇒ nouvelle clé à chaque redémarrage ⇒
 # sessions actives déconnectées : acceptable pour un prototype. Aucun cast
 # 'encrypted' dans les modèles/migrations ⇒ pas de données rendues illisibles.
-CMD ["sh", "-c", "php artisan key:generate --force; php artisan migrate --force; php artisan permission:cache-reset; php artisan serve --host=0.0.0.0 --port=${PORT:-3000}"]
+CMD ["sh", "-c", "php artisan key:generate --force; php artisan migrate --force; php artisan permission:cache-reset; php -S 0.0.0.0:${PORT:-3000} -t public public/index.php"]
