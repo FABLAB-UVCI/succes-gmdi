@@ -5,6 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../communication/core/services/auth.service';
 import { ToastService } from '../communication/core/services/toast.service';
 import { environment } from '@env/environment';
+import { LoaderComponent } from '../shared/components/loader.component';
 
 interface CompteForm { name: string; email: string; role: 'gestionnaire' | 'maire' | 'admin'; module: string; }
 
@@ -28,7 +29,7 @@ interface CompteApi {
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, LoaderComponent],
   template: `
 <div class="admin">
 
@@ -110,7 +111,7 @@ interface CompteApi {
                   <td class="cell-name">{{ c.name }}</td>
                   <td>{{ c.email }}</td>
                   <td><span class="role-badge" [class.role-admin]="c.role==='admin'" [class.role-maire]="c.role==='maire'">{{ c.roleLabel }}</span></td>
-                  <td>{{ labelModules(c.modules) }}</td>
+                  <td>@if (c.modules?.length) { {{ labelModules(c.modules) }} } @else { <app-loader /> }</td>
                   <td>{{ c.created_at | date:'dd/MM/yyyy' }}</td>
                   <td class="cell-actions">
                     <button class="btn-reset" (click)="reinitialiserMotDePasse(c)" title="Réinitialiser le mot de passe"><i class="ti ti-key"></i> Réinitialiser</button>
@@ -218,7 +219,7 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   labelModules(modules: string[]): string {
-    if (!modules?.length) return '—';
+    if (!modules?.length) return '';
     return modules.map(m => this.modules.find(mo => mo.value === m)?.label ?? m).join(', ');
   }
 

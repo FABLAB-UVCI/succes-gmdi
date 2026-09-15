@@ -6,6 +6,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '@env/environment';
 import { ApiService } from '../../../../services/api.service';
 import { PrintService } from '../../../../services/print.service';
+import { LoaderComponent } from '../../../../../shared/components/loader.component';
 import { qrVerification, codeVerification, formatDateFr, openPrintWindow, buildFormData } from '../../pdf-utils';
 
 const LABEL_STATUT_DEMARCHE: Record<string, string> = {
@@ -15,7 +16,7 @@ const LABEL_STATUT_DEMARCHE: Record<string, string> = {
 @Component({
   selector: 'app-mariages',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, LoaderComponent],
   templateUrl: './mariages.html',
   styleUrls: ['./mariages.css']
 })

@@ -266,7 +266,7 @@ export class ActualitesComponent implements OnInit {
   publierEvenement(): void {
     if (!this.fEvt.titre || !this.fEvt.date) { this.toast.showError('evt', 'Titre et date obligatoires'); return; }
     this.saving.set(true);
-    const contenu = `${this.fEvt.description || ''} | Lieu: ${this.fEvt.lieu || '—'} | ${this.fEvt.hDebut||''}${this.fEvt.hFin?' – '+this.fEvt.hFin:''} | Public: ${this.fEvt.publicCible}`;
+    const contenu = `${this.fEvt.description || ''} | Lieu: ${this.fEvt.lieu || ''} | ${this.fEvt.hDebut||''}${this.fEvt.hFin?' – '+this.fEvt.hFin:''} | Public: ${this.fEvt.publicCible}`;
     const data = { type: 'evenement', titre: this.fEvt.titre, contenu, auteur: this.fEvt.organisateur, statut: 'publie', date: this.fEvt.date };
     const id = this.editingId();
     const req = id ? this.com.modifierActualite(id, data) : this.com.publierActualite(data);

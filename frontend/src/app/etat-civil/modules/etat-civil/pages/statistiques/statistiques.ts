@@ -1,11 +1,12 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ApiService } from '../../../../services/api.service';
+import { LoaderComponent } from '../../../../../shared/components/loader.component';
 
 @Component({
   selector: 'app-statistiques',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, LoaderComponent],
   templateUrl: './statistiques.html',
   styleUrls: ['./statistiques.css']
 })

@@ -104,8 +104,8 @@ export class RechercheComponent implements OnInit {
         this.adoptions = rows.filter((n: any) => n.type === 'Adoption').map((n: any) => ({
           id: n.id, numero: n.numero,
           enfantNom: n.nomComplet, enfantDateNaissance: n.dateNaissance ?? '',
-          adoptantNom: [n.pereNom, n.mereNom].filter(Boolean).join(' & ') || '—',
-          dateJugement: n.dateJugement ?? '', tribunal: n.tribunal ?? '—',
+          adoptantNom: [n.pereNom, n.mereNom].filter(Boolean).join(' & ') || '',
+          dateJugement: n.dateJugement ?? '', tribunal: n.tribunal ?? '',
           statut: n.statut, qrCode: ''
         })) as any;
       },

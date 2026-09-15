@@ -5,6 +5,7 @@ import { NgClass } from '@angular/common';
 import { FinancesService } from '../../core/services/finances.service';
 import { ToastService } from '../../core/services/toast.service';
 import { FcfaPipe } from '../../shared/pipes/fcfa.pipe';
+import { LoaderComponent } from '../../../shared/components/loader.component';
 import { Recette, ModePaiement } from '../../core/models/finances.models';
 import { QRCodeComponent } from 'angularx-qrcode';
 
@@ -13,7 +14,7 @@ type RecetteTab = 'saisie' | 'liste' | 'enc';
 @Component({
   selector: 'app-recettes',
   standalone: true,
-  imports: [FormsModule, NgClass, FcfaPipe, QRCodeComponent],
+  imports: [FormsModule, NgClass, FcfaPipe, QRCodeComponent, LoaderComponent],
   template: `
     <div class="nav">
       @for (tab of tabs; track tab.id) {
@@ -157,7 +158,7 @@ type RecetteTab = 'saisie' | 'liste' | 'enc';
                   <td>{{ r.typeTaxe.replace('_',' ') }}</td>
                   <td class="right bold">{{ r.montant | fcfa }}</td>
                   <td>{{ r.dateEcheance }}</td>
-                  <td>{{ r.modePaiement || '-' }}</td>
+                  <td>@if (r.modePaiement) { {{ r.modePaiement }} } @else { <app-loader /> }</td>
                   <td><span class="chip" [ngClass]="statutClass(r.statut)">{{ r.statut }}</span></td>
                   <td>
                     @if (r.statut !== 'paye') {

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UrbanismeService } from '../../../../core/services/urbanisme.service';
 import { ToastService } from '../../../../core/services/toast.service';
+import { LoaderComponent } from '../../../../../shared/components/loader.component';
 import { TypePermis } from '../../../../core/models/urbanisme.models';
 
 type Tab = 'liste' | 'nouveau' | 'suivi';
@@ -17,7 +18,7 @@ const TYPES_PERMIS: { val: TypePermis | 'occupation'; label: string; icon: strin
 @Component({
   selector: 'app-permis',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, LoaderComponent],
   template: `
 <div class="tabs">
   @for (t of tabs; track t.id) {
@@ -66,8 +67,8 @@ const TYPES_PERMIS: { val: TypePermis | 'occupation'; label: string; icon: strin
             <td style="font-weight:500">{{p.demandeur}}</td>
             <td>{{p.localisation}}</td>
             <td>{{p.dateDepot}}</td>
-            <td>{{p.surfacePlancher ? (p.surfacePlancher | number) + ' m²' : '—'}}</td>
-            <td>{{p.agent || '—'}}</td>
+            <td>@if (p.surfacePlancher) { {{ p.surfacePlancher | number }} m² } @else { <app-loader /> }</td>
+            <td>@if (p.agent) { {{ p.agent }} } @else { <app-loader /> }</td>
             <td><span class="chip" [ngClass]="chipStatut(p.statut)">{{p.statut}}</span></td>
             <td>
               @if (p.statut==='depose' || p.statut==='instruction') {

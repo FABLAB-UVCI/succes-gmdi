@@ -12,6 +12,7 @@ import { PatrimoineService } from '../../../../core/services/patrimoine.service'
 import { LoadingService }    from '../../../../core/services/loading.service';
 import { AuthService }       from '../../../../core/services/auth.service';
 import { ToastService }      from '../../../../core/services/toast.service';
+import { LoaderComponent }   from '../../../../../shared/components/loader.component';
 import { AnnoncesMaireComponent } from '../../../../../shared/components/annonces-maire/annonces-maire.component';
 import { DemandesCitoyensComponent } from '../../../../../shared/components/demandes-citoyens.component';
 import { DemandeRhComponent } from '../../../../../shared/components/demande-rh/demande-rh.component';
@@ -28,6 +29,7 @@ export type Section = 'inventaire' | 'immobilier' | 'affectation' | 'maintenance
     AnnoncesMaireComponent,
     DemandesCitoyensComponent,
     DemandeRhComponent,
+    LoaderComponent,
   ],
   template: `
 <div class="r">
@@ -53,7 +55,7 @@ export type Section = 'inventaire' | 'immobilier' | 'affectation' | 'maintenance
       <div class="tu">
         <div class="av">{{ userInitials() }}</div>
         <div class="tu-name">
-          <div>{{ auth.currentUser()?.name ?? '—' }}</div>
+          <div>@if (auth.currentUser()?.name) { {{ auth.currentUser()?.name }} } @else { <app-loader /> }</div>
           <div style="font-size:10px;color:rgba(255,255,255,.45);text-transform:capitalize">{{ auth.currentUser()?.role ?? 'agent' }}</div>
         </div>
       </div>

@@ -3,13 +3,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UrbanismeService } from '../../../../core/services/urbanisme.service';
 import { ToastService } from '../../../../core/services/toast.service';
+import { LoaderComponent } from '../../../../../shared/components/loader.component';
 
 type Tab = 'lotissements' | 'amenagements' | 'chantiers';
 
 @Component({
   selector: 'app-projets',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, LoaderComponent],
   template: `
 <div class="tabs">
   @for (t of tabs; track t.id) {
@@ -80,7 +81,7 @@ type Tab = 'lotissements' | 'amenagements' | 'chantiers';
             <td>{{l.nombreLots | number}}</td>
             <td>
               <span [style.color]="(l.lotsDisponibles??0) > 0 ? '#009A44' : '#e63946'" style="font-weight:500">
-                {{l.lotsDisponibles ?? '—'}}
+                @if (l.lotsDisponibles != null) { {{ l.lotsDisponibles }} } @else { <app-loader /> }
               </span>
             </td>
             <td><span class="chip" [ngClass]="chipProjet(l.statut)">{{l.statut}}</span></td>
@@ -147,8 +148,8 @@ type Tab = 'lotissements' | 'amenagements' | 'chantiers';
             <td>{{a.type}}</td>
             <td>{{a.localisation}}</td>
             <td>{{a.budget | number}} FCFA</td>
-            <td>{{a.financeur || '—'}}</td>
-            <td>{{a.dateDebut || '—'}}</td>
+            <td>@if (a.financeur) { {{ a.financeur }} } @else { <app-loader /> }</td>
+            <td>@if (a.dateDebut) { {{ a.dateDebut }} } @else { <app-loader /> }</td>
             <td>
               <div style="display:flex;align-items:center;gap:6px">
                 <div style="width:60px;height:4px;background:#e5e7eb;border-radius:2px">
@@ -223,7 +224,7 @@ type Tab = 'lotissements' | 'amenagements' | 'chantiers';
                 <span style="font-size:11px;font-weight:500">{{c.tauxAvancement??c.avancement}}%</span>
               </div>
             </td>
-            <td>{{c.derniereVisite || '—'}}</td>
+            <td>@if (c.derniereVisite) { {{ c.derniereVisite }} } @else { <app-loader /> }</td>
             <td><span class="chip" [ngClass]="chipChantier(c.statut)">{{c.statut}}</span></td>
           </tr>
         }

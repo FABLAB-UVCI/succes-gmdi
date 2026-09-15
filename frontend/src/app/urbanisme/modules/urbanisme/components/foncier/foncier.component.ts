@@ -3,13 +3,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UrbanismeService } from '../../../../core/services/urbanisme.service';
 import { ToastService } from '../../../../core/services/toast.service';
+import { LoaderComponent } from '../../../../../shared/components/loader.component';
 
 type Tab = 'parcelles' | 'lots' | 'titres' | 'reserves';
 
 @Component({
   selector: 'app-foncier',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, LoaderComponent],
   template: `
 <div class="tabs">
   @for (t of tabs; track t.id) {
@@ -96,7 +97,7 @@ type Tab = 'parcelles' | 'lots' | 'titres' | 'reserves';
             <td>{{p.quartier}}</td>
             <td>{{p.superficie | number}} m²</td>
             <td>{{p.usage}}</td>
-            <td class="mono-td">{{p.titreFoncier || '—'}}</td>
+            <td class="mono-td">@if (p.titreFoncier) { {{ p.titreFoncier }} } @else { <app-loader /> }</td>
             <td><span class="chip" [ngClass]="chipPar(p.statut)">{{p.statut}}</span></td>
           </tr>
         }
@@ -145,8 +146,8 @@ type Tab = 'parcelles' | 'lots' | 'titres' | 'reserves';
             <td class="mono-td">{{l.reference}}</td>
             <td style="font-weight:500">{{l.lotissement}}</td>
             <td>{{l.superficie | number}} m²</td>
-            <td>{{l.attributaire || '—'}}</td>
-            <td>{{l.dateAttribution || '—'}}</td>
+            <td>@if (l.attributaire) { {{ l.attributaire }} } @else { <app-loader /> }</td>
+            <td>@if (l.dateAttribution) { {{ l.dateAttribution }} } @else { <app-loader /> }</td>
             <td><span class="chip" [ngClass]="chipLot(l.statut)">{{l.statut}}</span></td>
           </tr>
         }
@@ -213,8 +214,8 @@ type Tab = 'parcelles' | 'lots' | 'titres' | 'reserves';
             <td style="font-weight:500">{{t.proprietaire}}</td>
             <td>{{t.superficie | number}} m²</td>
             <td>{{t.localisation}}</td>
-            <td class="mono-td">{{t.coordonnees ? (t.coordonnees.lat | number:'1.4-4') + ', ' + (t.coordonnees.lng | number:'1.4-4') : '—'}}</td>
-            <td>{{t.dateDelivrance || '—'}}</td>
+            <td class="mono-td">@if (t.coordonnees) { {{ t.coordonnees.lat | number:'1.4-4' }}, {{ t.coordonnees.lng | number:'1.4-4' }} } @else { <app-loader /> }</td>
+            <td>@if (t.dateDelivrance) { {{ t.dateDelivrance }} } @else { <app-loader /> }</td>
             <td><span class="chip" [ngClass]="chipTF(t.statut)">{{t.statut}}</span></td>
           </tr>
         }
@@ -270,8 +271,8 @@ type Tab = 'parcelles' | 'lots' | 'titres' | 'reserves';
             <td>{{r.usage}}</td>
             <td>{{r.superficie | number}} m²</td>
             <td>{{r.localisation}}</td>
-            <td class="mono-td">{{r.coordonnees ? (r.coordonnees.lat | number:'1.4-4') + ', ' + (r.coordonnees.lng | number:'1.4-4') : '—'}}</td>
-            <td>{{r.administration || '—'}}</td>
+            <td class="mono-td">@if (r.coordonnees) { {{ r.coordonnees.lat | number:'1.4-4' }}, {{ r.coordonnees.lng | number:'1.4-4' }} } @else { <app-loader /> }</td>
+            <td>@if (r.administration) { {{ r.administration }} } @else { <app-loader /> }</td>
             <td><span class="chip" [ngClass]="chipRes(r.statut)">{{r.statut}}</span></td>
           </tr>
         }

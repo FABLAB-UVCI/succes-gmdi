@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { FinancesService } from '../../core/services/finances.service';
 import { ToastService } from '../../core/services/toast.service';
 import { FcfaPipe } from '../../shared/pipes/fcfa.pipe';
+import { LoaderComponent } from '../../../shared/components/loader.component';
 
 @Component({
   selector: 'app-rapports',
   standalone: true,
-  imports: [FormsModule, FcfaPipe],
+  imports: [FormsModule, FcfaPipe, LoaderComponent],
   template: `
     <div class="card full">
       <div class="ch">
@@ -33,7 +34,7 @@ import { FcfaPipe } from '../../shared/pipes/fcfa.pipe';
           <tbody>
             <tr><td class="bold">Recettes cumulées</td><td class="right">{{ svc.totalRecettesEncaissees() | fcfa }}</td><td class="right">{{ totalPrevisionnel() | fcfa }}</td><td class="right" style="color:#009A44">{{ svc.pct(svc.totalRecettesEncaissees(), totalPrevisionnel()) }}%</td></tr>
             <tr><td class="bold">Dépenses cumulées</td><td class="right">{{ svc.totalDepensesPayees() | fcfa }}</td><td class="right">{{ totalEngage() | fcfa }}</td><td class="right" style="color:#F77F00">{{ svc.pct(svc.totalDepensesPayees(), totalEngage()) }}%</td></tr>
-            <tr><td class="bold">Solde de trésorerie</td><td class="right">{{ soldeTresorerie() | fcfa }}</td><td class="right">—</td><td class="right" style="color:#009A44">{{ soldeTresorerie() >= 0 ? 'Excédent' : 'Déficit' }}</td></tr>
+            <tr><td class="bold">Solde de trésorerie</td><td class="right">{{ soldeTresorerie() | fcfa }}</td><td class="right"><app-loader /></td><td class="right" style="color:#009A44">{{ soldeTresorerie() >= 0 ? 'Excédent' : 'Déficit' }}</td></tr>
             <tr><td class="bold">Masse salariale versée</td><td class="right">{{ salairesVerses() | fcfa }}</td><td class="right">{{ masseSalarialeEngagee() | fcfa }}</td><td class="right" style="color:#8c4a00">{{ svc.pct(salairesVerses(), masseSalarialeEngagee()) }}%</td></tr>
           </tbody>
         </table>

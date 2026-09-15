@@ -3,13 +3,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ServicesTechniquesService } from '../../../../core/services/services-techniques.service';
 import { ToastService } from '../../../../core/services/toast.service';
+import { LoaderComponent } from '../../../../../shared/components/loader.component';
 
 type Tab = 'routes' | 'entretiens' | 'reparations';
 
 @Component({
   selector: 'app-voirie',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, LoaderComponent],
   template: `
 <div class="tabs">
   @for (t of tabs; track t.id) {
@@ -77,7 +78,7 @@ type Tab = 'routes' | 'entretiens' | 'reparations';
             <td>{{r.longueur | number}} m</td>
             <td>{{r.type}}</td>
             <td><span class="chip" [ngClass]="chipEtat(r.etat)">{{r.etat}}</span></td>
-            <td>{{r.dateDernierEntretien || '—'}}</td>
+            <td>@if (r.dateDernierEntretien) { {{ r.dateDernierEntretien }} } @else { <app-loader /> }</td>
           </tr>
         }
         @empty { <tr><td colspan="6" class="empty-row">Aucune route enregistrée</td></tr> }
@@ -124,7 +125,7 @@ type Tab = 'routes' | 'entretiens' | 'reparations';
             <td style="font-weight:500">{{e.route}}</td>
             <td>{{e.typeEntretien}}</td>
             <td>{{e.dateDebut}}</td>
-            <td>{{e.dateFin || '—'}}</td>
+            <td>@if (e.dateFin) { {{ e.dateFin }} } @else { <app-loader /> }</td>
             <td>{{e.equipe}}</td>
             <td>{{e.coutEstime | number}} FCFA</td>
             <td><span class="chip" [ngClass]="chipStatut(e.statut)">{{e.statut}}</span></td>

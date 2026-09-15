@@ -4,13 +4,14 @@ import { FormsModule } from '@angular/forms';
 import { ServicesTechniquesService } from '../../../../core/services/services-techniques.service';
 import { ToastService } from '../../../../core/services/toast.service';
 import { AuthService } from '../../../../core/services/auth.service';
+import { LoaderComponent } from '../../../../../shared/components/loader.component';
 
 type Tab = 'lampadaires' | 'pannes' | 'maintenance';
 
 @Component({
   selector: 'app-eclairage',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, LoaderComponent],
   template: `
 <div class="tabs">
   @for (t of tabs; track t.id) {
@@ -125,7 +126,7 @@ type Tab = 'lampadaires' | 'pannes' | 'maintenance';
             <td>{{p.localisation}}</td>
             <td>{{p.description}}</td>
             <td>{{p.dateSignalement}}</td>
-            <td>{{p.technicien || '—'}}</td>
+            <td>@if (p.technicien) { {{ p.technicien }} } @else { <app-loader /> }</td>
             <td><span class="chip" [ngClass]="chipPanne(p.statut)">{{p.statut}}</span></td>
             <td>
               @if (p.statut !== 'resolue') {

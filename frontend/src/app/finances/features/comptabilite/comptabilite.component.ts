@@ -3,13 +3,14 @@ import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { FinancesService } from '../../core/services/finances.service';
 import { FcfaPipe } from '../../shared/pipes/fcfa.pipe';
+import { LoaderComponent } from '../../../shared/components/loader.component';
 
 type ComptaTab = 'journal' | 'grandlivre' | 'balance' | 'bilan';
 
 @Component({
   selector: 'app-comptabilite',
   standalone: true,
-  imports: [FcfaPipe],
+  imports: [FcfaPipe, LoaderComponent],
   template: `
     <div class="nav">
       @for (tab of tabs; track tab.id) {
@@ -39,7 +40,7 @@ type ComptaTab = 'journal' | 'grandlivre' | 'balance' | 'bilan';
                   <td class="mono">{{ e.compte }}</td>
                   <td class="right" style="color:#009A44">{{ e.debit > 0 ? (e.debit | fcfa) : '' }}</td>
                   <td class="right" style="color:#E24B4A">{{ e.credit > 0 ? (e.credit | fcfa) : '' }}</td>
-                  <td class="mono">{{ e.piece || '-' }}</td>
+                  <td class="mono">@if (e.piece) { {{ e.piece }} } @else { <app-loader /> }</td>
                 </tr>
               }
             </tbody>

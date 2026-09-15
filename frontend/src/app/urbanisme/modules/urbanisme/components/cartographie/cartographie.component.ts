@@ -3,13 +3,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UrbanismeService } from '../../../../core/services/urbanisme.service';
 import { ToastService } from '../../../../core/services/toast.service';
+import { LoaderComponent } from '../../../../../shared/components/loader.component';
 
 type Tab = 'carte' | 'quartiers' | 'voiries' | 'reseaux';
 
 @Component({
   selector: 'app-cartographie',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, LoaderComponent],
   template: `
 <div class="tabs">
   @for (t of tabs; track t.id) {
@@ -130,9 +131,9 @@ type Tab = 'carte' | 'quartiers' | 'voiries' | 'reseaux';
             <td class="mono-td">{{q.code}}</td>
             <td style="font-weight:500">{{q.nom}}</td>
             <td>{{q.superficie | number}} ha</td>
-            <td>{{q.population ? (q.population | number) : '—'}} hab.</td>
-            <td>{{q.chef || '—'}}</td>
-            <td>{{q.nombreParcelles ?? '—'}}</td>
+            <td>@if (q.population) { {{ q.population | number }} } @else { <app-loader /> } hab.</td>
+            <td>@if (q.chef) { {{ q.chef }} } @else { <app-loader /> }</td>
+            <td>@if (q.nombreParcelles != null) { {{ q.nombreParcelles }} } @else { <app-loader /> }</td>
           </tr>
         }
         @empty { <tr><td colspan="6" class="empty-row">Aucun quartier enregistré</td></tr> }

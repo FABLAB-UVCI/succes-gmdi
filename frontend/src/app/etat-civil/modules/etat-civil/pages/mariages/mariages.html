@@ -47,7 +47,7 @@
                     <td><strong>{{ b.epoux }}</strong></td>
                     <td><strong>{{ b.epouse }}</strong></td>
                     <td>{{ b.datePublication }}</td>
-                    <td>{{ b.dateMariagePrevue || '—' }}</td>
+                    <td>@if (b.dateMariagePrevue) { {{ b.dateMariagePrevue }} } @else { <app-loader /> }</td>
                     <td><span class="chip cv">{{ b.statut }}</span></td>
                     <td><button class="btn-s" style="padding:3px 8px;font-size:11px" (click)="supprimerBans(b)"><i class="ti ti-trash"></i>Supprimer</button></td>
                   </tr>

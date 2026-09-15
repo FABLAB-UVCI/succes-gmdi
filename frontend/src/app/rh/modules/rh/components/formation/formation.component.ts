@@ -5,6 +5,7 @@ import { RhService } from '../../../../core/services/rh.service';
 import { ToastService } from '../../../../core/services/toast.service';
 import { ToastComponent } from '../../../../shared/components/toast.component';
 import { FcfaPipe } from '../../../../shared/pipes/fcfa.pipe';
+import { LoaderComponent } from '../../../../../shared/components/loader.component';
 
 type Tab = 'plan' | 'eval' | 'certif';
 
@@ -20,7 +21,7 @@ interface CritereEval {
 @Component({
   selector: 'app-formation',
   standalone: true,
-  imports: [CommonModule, FormsModule, ToastComponent, FcfaPipe],
+  imports: [CommonModule, FormsModule, ToastComponent, FcfaPipe, LoaderComponent],
   template: `
 <div class="nav">
   @for (t of tabs; track t.id) {
@@ -101,7 +102,7 @@ interface CritereEval {
             <tr>
               <td class="bold">{{ f.titre }}</td>
               <td>{{ f.organisme }}</td>
-              <td>{{ f.formateur || '—' }}</td>
+              <td>@if (f.formateur) { {{ f.formateur }} } @else { <app-loader /> }</td>
               <td>{{ f.dateDebut }}</td>
               <td>{{ f.dateFin }}</td>
               <td>{{ f.agents }}</td>

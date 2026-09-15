@@ -9,6 +9,7 @@ import { ApiService as EtatCivilApiService } from '../../etat-civil/services/api
 import { FinancesService } from '../../finances/core/services/finances.service';
 import { DemandeApiService } from '../../services-techniques/core/services/services-techniques-api.service';
 import { FileDownloadService } from '../services/file-download.service';
+import { LoaderComponent } from './loader.component';
 
 export interface Demarche {
   id: number;
@@ -27,7 +28,7 @@ export interface Demarche {
 @Component({
   selector: 'app-demandes-citoyens',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, LoaderComponent],
   template: `
     <div class="demandes-wrapper">
       <div class="d-header">
@@ -70,7 +71,7 @@ export interface Demarche {
               <tr>
                 <td class="ref-cell">{{ d.reference }}</td>
                 <td>{{ d.updated_at | date:'dd/MM/yyyy HH:mm' }}</td>
-                <td>{{ d.demandeur || '—' }}</td>
+                <td>@if (d.demandeur) { {{ d.demandeur }} } @else { <app-loader /> }</td>
                 <td>{{ d.type_demarche || 'Demande generale' }}</td>
                 <td>
                   <span class="badge" [ngClass]="d.statut">

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ServicesTechniquesService } from '../../../../core/services/services-techniques.service';
 import { ToastService } from '../../../../core/services/toast.service';
+import { LoaderComponent } from '../../../../../shared/components/loader.component';
 
 type Tab = 'liste' | 'travaux' | 'nouveau';
 const TYPES = [
@@ -16,7 +17,7 @@ const TYPES = [
 @Component({
   selector: 'app-batiments',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, LoaderComponent],
   template: `
 <div class="tabs">
   @for (t of tabs; track t.id) {
@@ -61,7 +62,7 @@ const TYPES = [
             <td>{{b.adresse}}</td>
             <td>{{b.superficie | number}} m²</td>
             <td><span class="chip" [ngClass]="chipEtat(b.etat)">{{b.etat}}</span></td>
-            <td>{{b.responsable || '—'}}</td>
+            <td>@if (b.responsable) { {{ b.responsable }} } @else { <app-loader /> }</td>
             <td>{{b.dateDerniereInspection || 'Non renseigné'}}</td>
           </tr>
         }
@@ -120,7 +121,7 @@ const TYPES = [
             <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{t.description}}</td>
             <td>{{t.dateDebut}}</td>
             <td>{{t.coutEstime | number}} FCFA</td>
-            <td>{{t.prestataire || '—'}}</td>
+            <td>@if (t.prestataire) { {{ t.prestataire }} } @else { <app-loader /> }</td>
             <td><span class="chip" [ngClass]="chipStatut(t.statut)">{{t.statut}}</span></td>
           </tr>
         }

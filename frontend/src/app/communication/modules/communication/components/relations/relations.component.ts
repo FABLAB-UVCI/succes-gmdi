@@ -168,7 +168,7 @@ export class RelationsComponent implements OnInit {
   ajouterPartenaire(): void {
     if (!this.fPart.nom) { this.toast.showError('part', "Nom de l'organisation obligatoire"); return; }
     this.saving.set(true);
-    this.com.ajouterPartenaire({ nom: this.fPart.nom, nom_contact: this.fPart.nomContact || '—', type: this.fPart.type, domaine: this.fPart.domaine || '—', contact: this.fPart.contact || '—', date_debut: this.fPart.dateDebut || new Date().toISOString().slice(0,10) }).subscribe({
+    this.com.ajouterPartenaire({ nom: this.fPart.nom, nom_contact: this.fPart.nomContact || '', type: this.fPart.type, domaine: this.fPart.domaine || '', contact: this.fPart.contact || '', date_debut: this.fPart.dateDebut || new Date().toISOString().slice(0,10) }).subscribe({
       next: p => { this.toast.show('part', 'Partenaire enregistré — '+p.nom); this.saving.set(false); this.fPart = { nom:'', type:'ONG / Association', nomContact:'', contact:'', domaine:'', dateDebut:'' }; },
       error: (err) => { this.saving.set(false); this.toast.showError('part', err?.error?.message || 'Une erreur est survenue.'); }
     });

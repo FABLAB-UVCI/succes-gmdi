@@ -5,13 +5,14 @@ import { RhService } from '../../../../core/services/rh.service';
 import { ToastService } from '../../../../core/services/toast.service';
 import { ToastComponent } from '../../../../shared/components/toast.component';
 import { FcfaPipe } from '../../../../shared/pipes/fcfa.pipe';
+import { LoaderComponent } from '../../../../../shared/components/loader.component';
 
 type Tab = 'recrutement' | 'affectation' | 'promotion' | 'mutation' | 'depart';
 
 @Component({
   selector: 'app-carriere',
   standalone: true,
-  imports: [CommonModule, FormsModule, ToastComponent, FcfaPipe],
+  imports: [CommonModule, FormsModule, ToastComponent, FcfaPipe, LoaderComponent],
   template: `
 <div class="nav">
   @for (t of tabs; track t.id) {
@@ -68,9 +69,9 @@ type Tab = 'recrutement' | 'affectation' | 'promotion' | 'mutation' | 'depart';
               <td>{{ r.direction }}</td>
               <td>{{ r.nbPostes }}</td>
               <td><span class="chip cgo">{{ r.type }}</span></td>
-              <td>{{ r.diplomeRequis || '—' }}</td>
-              <td class="right">{{ r.salairePropose ? (r.salairePropose | fcfa) : '—' }}</td>
-              <td>{{ r.cloture || '—' }}</td>
+              <td>@if (r.diplomeRequis) { {{ r.diplomeRequis }} } @else { <app-loader /> }</td>
+              <td class="right">@if (r.salairePropose) { {{ r.salairePropose | fcfa }} } @else { <app-loader /> }</td>
+              <td>@if (r.cloture) { {{ r.cloture }} } @else { <app-loader /> }</td>
               <td>{{ r.candidatures }}</td>
               <td><span class="chip" [ngClass]="chipRecr(r.statut)">{{ r.statut }}</span></td>
             </tr>

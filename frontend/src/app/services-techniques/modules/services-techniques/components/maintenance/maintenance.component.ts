@@ -3,13 +3,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ServicesTechniquesService } from '../../../../core/services/services-techniques.service';
 import { ToastService } from '../../../../core/services/toast.service';
+import { LoaderComponent } from '../../../../../shared/components/loader.component';
 
 type Tab = 'preventive' | 'corrective';
 
 @Component({
   selector: 'app-maintenance',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, LoaderComponent],
   template: `
 <div class="tabs">
   @for (t of tabs; track t.id) {
@@ -92,7 +93,7 @@ type Tab = 'preventive' | 'corrective';
             <td><span class="chip cn">{{p.periodicite}}</span></td>
             <td [class.date-retard]="estEnRetard(p.datePrevue)">{{p.datePrevue}}</td>
             <td>{{p.responsable}}</td>
-            <td>{{p.coutEstime ? (p.coutEstime | number) + ' F' : '—'}}</td>
+            <td>@if (p.coutEstime) { {{ p.coutEstime | number }} F } @else { <app-loader /> }</td>
             <td><span class="chip" [ngClass]="chipPrev(p.statut)">{{p.statut}}</span></td>
             <td>
               @if (p.statut!=='effectue') {
@@ -161,7 +162,7 @@ type Tab = 'preventive' | 'corrective';
             <td><span class="chip" [ngClass]="chipPrio(c.priorite)">{{c.priorite}}</span></td>
             <td>{{c.technicien || 'À assigner'}}</td>
             <td>{{c.dateSignalement}}</td>
-            <td>{{c.dateResolution || '—'}}</td>
+            <td>@if (c.dateResolution) { {{ c.dateResolution }} } @else { <app-loader /> }</td>
             <td><span class="chip" [ngClass]="chipCorr(c.statut)">{{c.statut}}</span></td>
             <td>
               @if (c.statut!=='resolu') {

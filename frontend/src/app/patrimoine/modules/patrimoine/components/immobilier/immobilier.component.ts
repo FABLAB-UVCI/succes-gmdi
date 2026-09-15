@@ -4,13 +4,14 @@ import { FormsModule } from '@angular/forms';
 import { PatrimoineService } from '../../../../core/services/patrimoine.service';
 import { ToastService } from '../../../../core/services/toast.service';
 import { FcfaPipe } from '../../../../core/pipes/fcfa.pipe';
+import { LoaderComponent } from '../../../../../shared/components/loader.component';
 
 type Tab = 'terrains' | 'batiments' | 'marches' | 'centres';
 
 @Component({
   selector: 'app-immobilier',
   standalone: true,
-  imports: [CommonModule, FormsModule, FcfaPipe],
+  imports: [CommonModule, FormsModule, FcfaPipe, LoaderComponent],
   template: `
 <div class="nav">
   @for (t of tabs; track t.id) {
@@ -62,7 +63,7 @@ type Tab = 'terrains' | 'batiments' | 'marches' | 'centres';
               <td class="right">{{ t.superficie | number:'1.0-0' }} m²</td>
               <td class="right">{{ t.valeur | fcfa }}</td>
               <td>{{ t.usage }}</td>
-              <td class="mono">{{ t.titreFoncier || '—' }}</td>
+              <td class="mono">@if (t.titreFoncier) { {{ t.titreFoncier }} } @else { <app-loader /> }</td>
               <td><span class="chip ci">{{ t.statut }}</span></td>
             </tr>
           }
@@ -118,9 +119,9 @@ type Tab = 'terrains' | 'batiments' | 'marches' | 'centres';
                 <td class="bold">{{ b.nom }}</td>
                 <td>{{ b.superficie | number:'1.0-0' }} m²</td>
                 <td class="right bold">{{ b.valeurActuelle | fcfa }}</td>
-                <td>{{ b.affectation || '—' }}</td>
+                <td>@if (b.affectation) { {{ b.affectation }} } @else { <app-loader /> }</td>
                 <td><span class="chip" [ngClass]="chipEtat(b.etat)">{{ etatLabel(b.etat) }}</span></td>
-                <td>{{ b.derniereInspection || '—' }}</td>
+                <td>@if (b.derniereInspection) { {{ b.derniereInspection }} } @else { <app-loader /> }</td>
               </tr>
             }
             @empty {
@@ -216,9 +217,9 @@ type Tab = 'terrains' | 'batiments' | 'marches' | 'centres';
         @for (c of pat.centres(); track c.id) {
           <tr>
             <td class="bold">{{ c.nom }}</td>
-            <td>{{ c.quartier || '—' }}</td>
+            <td>@if (c.quartier) { {{ c.quartier }} } @else { <app-loader /> }</td>
             <td>{{ c.capacite }}</td>
-            <td>{{ c.services || '—' }}</td>
+            <td>@if (c.services) { {{ c.services }} } @else { <app-loader /> }</td>
             <td><span class="chip" [ngClass]="c.statut === 'operationnel' ? 'cv' : 'ce'">{{ c.statut === 'operationnel' ? 'Opérationnel' : 'Travaux' }}</span></td>
           </tr>
         }

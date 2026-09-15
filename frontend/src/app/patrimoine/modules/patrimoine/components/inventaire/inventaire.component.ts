@@ -5,6 +5,7 @@ import { PatrimoineService } from '../../../../core/services/patrimoine.service'
 import { ToastService } from '../../../../core/services/toast.service';
 import { FcfaPipe } from '../../../../core/pipes/fcfa.pipe';
 import { FileDownloadService } from '../../../../../shared/services/file-download.service';
+import { LoaderComponent } from '../../../../../shared/components/loader.component';
 import { environment } from '@env/environment';
 
 type Tab = 'tous' | 'mobilier' | 'informatique' | 'vehicule' | 'equipement' | 'nouveau';
@@ -16,7 +17,7 @@ const STAT_CHIP:  Record<string, string> = { occupe:'ci', disponible:'cv', loue:
 @Component({
   selector: 'app-inventaire',
   standalone: true,
-  imports: [CommonModule, FormsModule, FcfaPipe],
+  imports: [CommonModule, FormsModule, FcfaPipe, LoaderComponent],
   template: `
 <div class="nav">
   @for (t of tabs; track t.id) {
@@ -133,7 +134,7 @@ const STAT_CHIP:  Record<string, string> = { occupe:'ci', disponible:'cv', loue:
             <td>{{ b.localisation }}</td>
             <td class="right bold">{{ b.valeurActuelle | fcfa }}</td>
             <td style="font-size:11px">{{ b.affectation }}</td>
-            <td>{{ etatLabel(b.etat) }}</td>
+            <td>@if (b.etat) { {{ etatLabel(b.etat) }} } @else { <app-loader /> }</td>
             <td><span class="chip" [ngClass]="chipStatut(b.statut)">{{ b.statut }}</span></td>
           </tr>
         }
@@ -475,5 +476,5 @@ export class InventaireComponent implements OnInit {
   catColor(c: string): string { return CAT_COLORS[c] ?? '#888'; }
   catIcon(c: string): string  { return CAT_ICONS[c] ?? 'ti-box'; }
   chipStatut(s: string): string { return STAT_CHIP[s] ?? 'ci'; }
-  etatLabel(e: string | null | undefined): string { return { neuf: 'Neuf', bon: 'Bon', use: 'Usagé', hs: 'Hors service' }[e ?? ''] ?? '—'; }
+  etatLabel(e: string | null | undefined): string { return { neuf: 'Neuf', bon: 'Bon', use: 'Usagé', hs: 'Hors service' }[e ?? ''] ?? ''; }
 }

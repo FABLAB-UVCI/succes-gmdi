@@ -1,11 +1,12 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CitoyenService, Demarche } from './citoyen.service';
+import { LoaderComponent } from '../shared/components/loader.component';
 
 @Component({
   selector: 'app-citoyen-demarches',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, LoaderComponent],
   template: `
 <div class="page">
 
@@ -74,7 +75,7 @@ import { CitoyenService, Demarche } from './citoyen.service';
             <tr class="dem-row">
               <td><code class="ref">{{ d.reference }}</code></td>
               <td><span class="module-badge">{{ labelModule(d.module) }}</span></td>
-              <td>{{ d.type_demarche ?? '—' }}</td>
+              <td>@if (d.type_demarche != null) { {{ d.type_demarche }} } @else { <app-loader /> }</td>
               <td>
                 <span class="statut-pill"
                   [style.background]="svc.colorForStatut(d.statut)+'22'"

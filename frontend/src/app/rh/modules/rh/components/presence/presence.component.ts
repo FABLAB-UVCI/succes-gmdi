@@ -5,6 +5,7 @@ import { RhService } from '../../../../core/services/rh.service';
 import { ToastService } from '../../../../core/services/toast.service';
 import { ToastComponent } from '../../../../shared/components/toast.component';
 import { Conge } from '../../../../core/models/rh.models';
+import { LoaderComponent } from '../../../../../shared/components/loader.component';
 
 type Tab = 'pointage' | 'conges' | 'absences' | 'permissions';
 
@@ -13,7 +14,7 @@ interface JourCal { label: string; classe: string; }
 @Component({
   selector: 'app-presence',
   standalone: true,
-  imports: [CommonModule, FormsModule, ToastComponent],
+  imports: [CommonModule, FormsModule, ToastComponent, LoaderComponent],
   template: `
 <div class="nav">
   @for (t of tabs; track t.id) {
@@ -134,7 +135,7 @@ interface JourCal { label: string; classe: string; }
                 @if (c.pieceJointe) {
                   <span class="chip cv" style="cursor: pointer;" title="Document joint">📎 {{ c.pieceJointe }}</span>
                 } @else {
-                  <span class="chip">—</span>
+                  <span class="chip"><app-loader /></span>
                 }
               </td>
               <td><span class="chip" [ngClass]="chipConge(c.statut)">{{ c.statut }}</span></td>

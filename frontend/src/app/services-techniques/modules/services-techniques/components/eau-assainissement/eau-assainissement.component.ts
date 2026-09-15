@@ -3,13 +3,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ServicesTechniquesService } from '../../../../core/services/services-techniques.service';
 import { ToastService } from '../../../../core/services/toast.service';
+import { LoaderComponent } from '../../../../../shared/components/loader.component';
 
 type Tab = 'caniveaux' | 'drainage' | 'dechets';
 
 @Component({
   selector: 'app-eau-assainissement',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, LoaderComponent],
   template: `
 <div class="tabs">
   @for (t of tabs; track t.id) {
@@ -61,7 +62,7 @@ type Tab = 'caniveaux' | 'drainage' | 'dechets';
             <td>{{c.quartier}}</td>
             <td>{{c.longueur | number}} m</td>
             <td><span class="chip" [ngClass]="chipEtat(c.etat)">{{c.etat}}</span></td>
-            <td>{{c.dateDernierNettoyage || '—'}}</td>
+            <td>@if (c.dateDernierNettoyage) { {{ c.dateDernierNettoyage }} } @else { <app-loader /> }</td>
             <td>
               @if (c.etat !== 'bon') {
                 <button class="btn-s" style="padding:3px 8px;font-size:11px" (click)="nettoyer(c.id)">
@@ -125,7 +126,7 @@ type Tab = 'caniveaux' | 'drainage' | 'dechets';
             <td>{{d.dateIntervention}}</td>
             <td>{{d.equipe}}</td>
             <td><span class="chip" [ngClass]="chipStatut(d.statut)">{{d.statut}}</span></td>
-            <td style="font-size:11px;color:var(--color-text-secondary)">{{d.observations || '—'}}</td>
+            <td style="font-size:11px;color:var(--color-text-secondary)">@if (d.observations) { {{ d.observations }} } @else { <app-loader /> }</td>
           </tr>
         }
         @empty { <tr><td colspan="6" class="empty-row">Aucune intervention drainage</td></tr> }
@@ -166,7 +167,7 @@ type Tab = 'caniveaux' | 'drainage' | 'dechets';
             <td style="font-weight:500">{{c.zone}}</td>
             <td>{{c.frequence}}</td>
             <td>{{c.prochaineCollecte}}</td>
-            <td>{{c.tonnage ? (c.tonnage | number) + ' t' : '—'}}</td>
+            <td>@if (c.tonnage) { {{ c.tonnage | number }} t } @else { <app-loader /> }</td>
             <td><span class="chip" [ngClass]="chipCollecte(c.statut)">{{c.statut}}</span></td>
             <td>
               @if (c.statut !== 'effectue') {

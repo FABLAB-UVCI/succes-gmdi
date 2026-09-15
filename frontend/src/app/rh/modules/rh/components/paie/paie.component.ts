@@ -5,6 +5,7 @@ import { RhService } from '../../../../core/services/rh.service';
 import { ToastService } from '../../../../core/services/toast.service';
 import { ToastComponent } from '../../../../shared/components/toast.component';
 import { FcfaPipe } from '../../../../shared/pipes/fcfa.pipe';
+import { LoaderComponent } from '../../../../../shared/components/loader.component';
 import { Agent } from '../../../../core/models/rh.models';
 
 type Tab = 'salaires' | 'primes' | 'bulletins';
@@ -12,7 +13,7 @@ type Tab = 'salaires' | 'primes' | 'bulletins';
 @Component({
   selector: 'app-paie',
   standalone: true,
-  imports: [CommonModule, FormsModule, ToastComponent, FcfaPipe],
+  imports: [CommonModule, FormsModule, ToastComponent, FcfaPipe, LoaderComponent],
   template: `
 <div class="nav">
   @for (t of tabs; track t.id) {
@@ -142,7 +143,7 @@ type Tab = 'salaires' | 'primes' | 'bulletins';
           <table class="tbl" style="margin-bottom:.5rem">
             <thead><tr><th>Élément</th><th>Base</th><th>Montant (FCFA)</th></tr></thead>
             <tbody>
-              <tr><td class="bold">Salaire de base</td><td>—</td><td class="right">{{ bulletinCalc()!.base | fcfa }}</td></tr>
+              <tr><td class="bold">Salaire de base</td><td><app-loader /></td><td class="right">{{ bulletinCalc()!.base | fcfa }}</td></tr>
               <tr><td class="bold">Prime d'ancienneté</td><td>10%</td><td class="right">{{ bulletinCalc()!.primeAnciennete | fcfa }}</td></tr>
               <tr><td class="bold">Indemnité transport</td><td>Forfait</td><td class="right">{{ bulletinCalc()!.indemniteTransport | fcfa }}</td></tr>
               <tr style="background:var(--color-background-secondary)"><td class="bold">TOTAL BRUT</td><td></td><td class="right bold">{{ bulletinCalc()!.totalBrut | fcfa }}</td></tr>

@@ -10,6 +10,7 @@ import { AbonnementsComponent } from '../../components/abonnements/abonnements.c
 import { CommunicationService } from '../../../../core/services/communication.service';
 import { LoadingService }       from '../../../../core/services/loading.service';
 import { AuthService }          from '../../../../core/services/auth.service';
+import { LoaderComponent }      from '../../../../../shared/components/loader.component';
 import { AnnoncesMaireComponent } from '../../../../../shared/components/annonces-maire/annonces-maire.component';
 import { DemandesCitoyensComponent } from '../../../../../shared/components/demandes-citoyens.component';
 import { DemandeRhComponent } from '../../../../../shared/components/demande-rh/demande-rh.component';
@@ -27,6 +28,7 @@ export type Section = 'actualites' | 'reseaux' | 'relations' | 'documents' | 'ci
     DemandesCitoyensComponent,
     AbonnementsComponent,
     DemandeRhComponent,
+    LoaderComponent,
   ],
   template: `
 <div class="root">
@@ -117,7 +119,7 @@ export type Section = 'actualites' | 'reseaux' | 'relations' | 'documents' | 'ci
         <div class="kpi" style="border-left-color:#C9A84C">
           <div class="kpi-icon-box" style="background:rgba(201,168,76,.15);font-size:26px">👥</div>
           <div>
-            <div class="kpi-v">{{com.kpi().abonnesTotaux > 0 ? (com.kpi().abonnesTotaux | number:'1.0-0':'fr-FR') : '—'}}</div>
+            <div class="kpi-v">@if (com.kpi().abonnesTotaux > 0) { {{ com.kpi().abonnesTotaux | number:'1.0-0':'fr-FR' }} } @else { <app-loader /> }</div>
             <div class="kpi-l">Abonnés réseaux</div>
           </div>
         </div>
@@ -138,7 +140,7 @@ export type Section = 'actualites' | 'reseaux' | 'relations' | 'documents' | 'ci
         <div class="kpi" style="border-left-color:#C9A84C">
           <div class="kpi-icon-box" style="background:rgba(201,168,76,.12);font-size:26px">🗂️</div>
           <div>
-            <div class="kpi-v">{{com.kpi().documentsArchives > 0 ? (com.kpi().documentsArchives | number:'1.0-0':'fr-FR') : '—'}}</div>
+            <div class="kpi-v">@if (com.kpi().documentsArchives > 0) { {{ com.kpi().documentsArchives | number:'1.0-0':'fr-FR' }} } @else { <app-loader /> }</div>
             <div class="kpi-l">Documents archivés</div>
           </div>
         </div>
